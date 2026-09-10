@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    url: ${DATABASE_URL}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-hours: 24
+
+ai:
+  gemini:
+    api-key: ${GEMINI_API_KEY}
+  fpt:
+    api-key: ${FPT_AI_API_KEY}
+
+aws:
+  access-key-id: ${AWS_ACCESS_KEY_ID}
+  secret-access-key: ${AWS_SECRET_ACCESS_KEY}

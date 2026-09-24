@@ -24,7 +24,11 @@ Kiến trúc: Web API monolithic, 3-layer (Controller – Service – Repository
 interview-practice-ai/
 ├── backend/    # Spring Boot API
 ├── frontend/   # React (Vite)
-├── docs/diagrams/
+├── docs/
+│   ├── architecture/  # Kiến trúc hệ thống
+│   ├── business/      # User Story, đặc tả use case, project proposal
+│   ├── diagrams/       # Use case/activity/sequence/class diagram (.drawio.xml)
+│   └── api/            # Đặc tả API (openapi.yaml)
 └── scripts/
 ```
 

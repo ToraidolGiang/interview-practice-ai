@@ -1,0 +1,865 @@
+openapi: 3.0.3
+info:
+  title: Interview Practice AI API
+  description: >
+    Đặc tả API cho hệ thống luyện phỏng vấn xin việc tích hợp AI (STT + LLM chấm điểm + TTS phản hồi).
+    Đây là bản draft viết dựa trên ClassDiagram.drawio.xml (Design Class Diagram) và SequenceDiagram.drawio.xml
+    trong docs/diagrams/, đối chiếu business rule trong docs/business/Đặc tả use case (2).docx.
+    Backend (Spring Boot) hiện chưa được implement — spec này là nguồn tham chiếu để build controller/service/entity.
+  version: 0.1.0-draft
+servers:
+  - url: /api
+    description: Base path tương đối (chưa xác định domain/host chính thức)
+
+tags:
+  - name: Auth
+    description: Đăng ký / đăng nhập (UC1, UC2)
+  - name: Questions
+    description: Xem và lọc câu hỏi phỏng vấn (UC3)
+  - name: Practice
+    description: Ghi âm, nộp câu trả lời và chấm điểm AI (UC4, UC5)
+  - name: Feedback
+    description: Nghe phản hồi AI bằng giọng nói (UC6)
+  - name: History
+    description: Lịch sử luyện tập (UC7)
+  - name: Admin - Questions
+    description: Quản lý ngân hàng câu hỏi (UC8, role ADMIN)
+  - name: Admin - Analytics
+    description: Theo dõi hoạt động người dùng (UC9, role ADMIN)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Đăng ký tài khoản (UC1)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Tạo tài khoản thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Dữ liệu không hợp lệ (B1 email không đúng RFC 5322, B2 mật khẩu < 8 ký tự, confirmPassword không khớp)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email đã tồn tại (B4)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Đăng nhập (UC2)
+      description: >
+        Trả JWT có hạn 24h (jwt.expiration-hours=24). Sau 5 lần sai liên tiếp, tài khoản bị khoá tạm thời
+        (B1: lock/CAPTCHA) — LoginAttemptService.isBlocked/increaseFailCount/resetFailCount.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Sai email hoặc mật khẩu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Tài khoản tạm khoá do đăng nhập sai quá 5 lần
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Yêu cầu đặt lại mật khẩu
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Đã gửi hướng dẫn đặt lại mật khẩu (nếu email tồn tại)
+        '400':
+          description: Email không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /questions:
+    get:
+      tags: [Questions]
+      summary: Danh sách câu hỏi theo bộ lọc (UC3)
+      description: Chỉ trả về câu hỏi có status=ACTIVE (B1).
+      parameters:
+        - name: industry
+          in: query
+          schema:
+            type: string
+        - name: position
+          in: query
+          schema:
+            type: string
+        - name: level
+          in: query
+          schema:
+            $ref: '#/components/schemas/QuestionLevel'
+        - name: random
+          in: query
+          description: true để lấy ngẫu nhiên 1 câu hỏi thay vì danh sách đầy đủ
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Danh sách câu hỏi phù hợp bộ lọc
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
+
+  /questions/{id}:
+    get:
+      tags: [Questions]
+      summary: Chi tiết một câu hỏi
+      parameters:
+        - $ref: '#/components/parameters/QuestionId'
+      responses:
+        '200':
+          description: Chi tiết câu hỏi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '404':
+          description: Không tìm thấy câu hỏi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /practice-sessions:
+    post:
+      tags: [Practice]
+      summary: Tạo phiên luyện tập với câu hỏi đã chọn (UC3 → UC4)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [questionId]
+              properties:
+                questionId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Phiên luyện tập được tạo, status=CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSession'
+        '404':
+          description: Câu hỏi không tồn tại hoặc không còn ACTIVE
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /practice-sessions/{id}:
+    get:
+      tags: [Practice]
+      summary: Xem chi tiết một phiên luyện tập
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Chi tiết phiên luyện tập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSession'
+        '403':
+          description: Không phải chủ sở hữu phiên luyện tập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Không tìm thấy phiên luyện tập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /practice-sessions/{id}/answer:
+    post:
+      tags: [Practice]
+      summary: Nộp file ghi âm câu trả lời (UC4)
+      description: >
+        Giới hạn thời lượng ghi âm 10 giây – 3 phút (B1), cảnh báo và tự dừng khi còn 30 giây (B2).
+        Sau khi upload thành công, status chuyển UPLOADED và có thể gọi tiếp /evaluate.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [audio]
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                durationSeconds:
+                  type: integer
+      responses:
+        '200':
+          description: Upload thành công, session chuyển sang UPLOADED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSession'
+        '400':
+          description: File audio không hợp lệ hoặc ngoài khoảng 10s–180s
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Không tìm thấy phiên luyện tập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /practice-sessions/{id}/evaluate:
+    post:
+      tags: [Practice]
+      summary: Chấm điểm câu trả lời bằng AI (UC5)
+      description: >
+        SttService.recognize có timeout 15s và tự động retry 1 lần khi timeout hoặc lỗi
+        (ghi nhận thực tế có lượt STT mất 83s). Sau đó LlmService.generateEvaluation được gọi
+        ĐÚNG 1 LẦN (B4, UC5) — dùng temperature thấp, yêu cầu chấm và giải thích riêng từng tiêu chí
+        STAR trước khi tổng hợp điểm để đảm bảo nhất quán, thay vì gọi 2 lần lấy trung bình
+        (tránh tăng gấp đôi chi phí/độ trễ). Nếu LLM timeout/lỗi, hệ thống tự động gọi lại đúng 1 lần;
+        nếu vẫn lỗi thì trả 502 và cho phép người dùng yêu cầu chấm lại.
+        NF1: tổng thời gian từ lúc nộp audio đến khi có kết quả ≤ 12 giây (đã đo với đúng pipeline 1 lần gọi LLM).
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Chấm điểm thành công, session chuyển sang SCORED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreResult'
+        '404':
+          description: Không tìm thấy phiên luyện tập hoặc chưa có audio (status != UPLOADED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '502':
+          description: STT hoặc LLM lỗi/hết thời gian chờ sau khi đã retry, session chuyển sang FAILED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /practice-sessions/{id}/feedback/audio:
+    get:
+      tags: [Feedback]
+      summary: Lấy audio TTS đọc phản hồi AI (UC6)
+      description: Giới hạn tối đa 1000 ký tự mỗi lần đọc (FeedbackService.normalizeText maxLength=1000), giọng vi-VN.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: URL audio phản hồi TTS
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ttsAudioUrl:
+                    type: string
+                    format: uri
+        '404':
+          description: Không tìm thấy phiên luyện tập hoặc chưa có feedback
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '502':
+          description: Lỗi kết nối dịch vụ TTS (giữ nguyên feedback dạng text)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /history:
+    get:
+      tags: [History]
+      summary: Danh sách lịch sử luyện tập của chính người dùng (UC7)
+      description: B1 — chỉ xem lịch sử của chính mình. B2 — dữ liệu lưu tối thiểu 6 tháng.
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Danh sách phiên luyện tập đã hoàn thành
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PracticeSession'
+
+  /history/{id}:
+    get:
+      tags: [History]
+      summary: Chi tiết một mục lịch sử, kèm link phát lại audio
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: >
+            Chi tiết phiên luyện tập + điểm số. Nếu file audio gốc đã hết hạn/không còn,
+            vẫn trả transcript/điểm số, playbackUrl sẽ null.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PracticeSession'
+                  - type: object
+                    properties:
+                      scoreResult:
+                        $ref: '#/components/schemas/ScoreResult'
+                      playbackUrl:
+                        type: string
+                        format: uri
+                        nullable: true
+        '403':
+          description: Không phải chủ sở hữu phiên luyện tập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Không tìm thấy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/questions:
+    get:
+      tags: [Admin - Questions]
+      summary: Danh sách toàn bộ câu hỏi (bao gồm HIDDEN) — chỉ ADMIN
+      security:
+        - bearerAuth: [ADMIN]
+      responses:
+        '200':
+          description: Danh sách câu hỏi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
+        '403':
+          description: Không có quyền ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [Admin - Questions]
+      summary: Thêm câu hỏi mới — chỉ ADMIN (UC8)
+      security:
+        - bearerAuth: [ADMIN]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionUpsertRequest'
+      responses:
+        '201':
+          description: Tạo thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '409':
+          description: Nội dung trùng 100% với câu hỏi khác cùng vị trí (B2)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Không có quyền ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/questions/{id}:
+    put:
+      tags: [Admin - Questions]
+      summary: Sửa câu hỏi — chỉ ADMIN
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - $ref: '#/components/parameters/QuestionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionUpsertRequest'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '404':
+          description: Không tìm thấy câu hỏi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Không có quyền ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [Admin - Questions]
+      summary: Xoá câu hỏi — chỉ ADMIN
+      description: >
+        Nếu câu hỏi đã từng được dùng trong ít nhất một PracticeSession → xoá mềm (status=HIDDEN).
+        Nếu chưa từng dùng → xoá cứng khỏi DB. Mọi thao tác đều ghi AuditLog (NF2).
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - $ref: '#/components/parameters/QuestionId'
+      responses:
+        '204':
+          description: Xoá (cứng hoặc mềm) thành công
+        '404':
+          description: Không tìm thấy câu hỏi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Không có quyền ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/analytics/overview:
+    get:
+      tags: [Admin - Analytics]
+      summary: Dashboard tổng quan hoạt động người dùng — chỉ ADMIN (UC9)
+      description: B2 — không truy cập được mật khẩu/thông tin nhạy cảm của user.
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Số liệu tổng quan (số user, số phiên luyện tập, số lượt gọi AI API...)
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '403':
+          description: Không có quyền ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/analytics/users/{userId}:
+    get:
+      tags: [Admin - Analytics]
+      summary: Chi tiết hoạt động của một người dùng — chỉ ADMIN
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chi tiết hoạt động luyện tập của người dùng
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Không tìm thấy user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Không có quyền ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/analytics/export:
+    get:
+      tags: [Admin - Analytics]
+      summary: Xuất báo cáo hoạt động dạng Excel/CSV — chỉ ADMIN
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [csv, xlsx]
+            default: csv
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: File báo cáo
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Không có quyền ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT trả về từ /auth/login, hạn dùng 24h.
+
+  parameters:
+    SessionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    QuestionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    Role:
+      type: string
+      enum: [CANDIDATE, ADMIN]
+    UserStatus:
+      type: string
+      enum: [ACTIVE, LOCKED]
+    QuestionLevel:
+      type: string
+      enum: [EASY, MEDIUM, HARD]
+    QuestionStatus:
+      type: string
+      enum: [ACTIVE, HIDDEN]
+    PracticeSessionStatus:
+      type: string
+      enum: [CREATED, UPLOADED, PROCESSING, SCORED, FAILED]
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    RegisterRequest:
+      type: object
+      required: [fullName, email, password, confirmPassword]
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        confirmPassword:
+          type: string
+          format: password
+
+    RegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        expiresInHours:
+          type: integer
+          example: 24
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+        status:
+          $ref: '#/components/schemas/UserStatus'
+        createdAt:
+          type: string
+          format: date-time
+
+    Question:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        industry:
+          type: string
+        position:
+          type: string
+        level:
+          $ref: '#/components/schemas/QuestionLevel'
+        starHint:
+          type: string
+        status:
+          $ref: '#/components/schemas/QuestionStatus'
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+
+    QuestionUpsertRequest:
+      type: object
+      required: [content, industry, position, level]
+      properties:
+        content:
+          type: string
+        industry:
+          type: string
+        position:
+          type: string
+        level:
+          $ref: '#/components/schemas/QuestionLevel'
+        starHint:
+          type: string
+
+    PracticeSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        questionId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/PracticeSessionStatus'
+        audioUrl:
+          type: string
+          format: uri
+          nullable: true
+        duration:
+          type: integer
+          description: Thời lượng ghi âm (giây)
+        totalScore:
+          type: number
+          format: float
+          nullable: true
+        feedback:
+          type: string
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    ScoreResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        transcript:
+          type: string
+        sScore:
+          type: number
+          format: float
+          description: Điểm Situation (thang điểm theo rubric STAR)
+        tScore:
+          type: number
+          format: float
+          description: Điểm Task
+        aScore:
+          type: number
+          format: float
+          description: Điểm Action
+        rScore:
+          type: number
+          format: float
+          description: Điểm Result
+        wpm:
+          type: integer
+          description: Tốc độ nói (từ/phút), chuẩn tham chiếu 120–160
+        fillerCount:
+          type: integer
+          description: Số lần dùng từ đệm
+        feedbackText:
+          type: string
+        sampleAnswer:
+          type: string
+          nullable: true
+        ttsAudioUrl:
+          type: string
+          format: uri
+          nullable: true

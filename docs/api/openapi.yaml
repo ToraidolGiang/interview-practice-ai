@@ -4,7 +4,7 @@ info:
   description: >
     Đặc tả API cho hệ thống luyện phỏng vấn xin việc tích hợp AI (STT + LLM chấm điểm + TTS phản hồi).
     Viết dựa trên Design Class Diagram và Sequence Diagram trong docs/diagrams/, đối chiếu business rule trong
-    docs/business/Đặc tả use case (2).docx và rubric chấm điểm trong docs/business/Rubric_Cham_Diem.md.
+    docs/business/Dac_Ta_Use_Case.docx và rubric chấm điểm trong docs/business/Rubric_Cham_Diem.md.
     Bản 0.2.0: chấm điểm bất đồng bộ (202 + polling), rubric đa chiều theo loại câu hỏi, đặt lại mật khẩu,
     phân trang, response lỗi chuẩn. Backend (Spring Boot) chưa được implement — spec này là nguồn tham chiếu để build controller/service/entity.
   version: 0.2.0

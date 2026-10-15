@@ -5,14 +5,14 @@ Sơ đồ dạng hình: `docs/diagrams/ERDDiagram.drawio.xml` (ảnh: `docs/diag
 
 ```mermaid
 erDiagram
-    users ||--o{ practice_sessions : "user_id"
-    questions ||--o{ practice_sessions : "question_id"
-    practice_sessions ||--o| score_results : "session_id"
-    score_results ||--o{ score_criteria : "result_id"
-    practice_sessions ||--o{ api_usages : "session_id"
-    users ||--o{ audit_logs : "admin_id"
-    users ||--o{ questions : "created_by"
-    users ||--o{ password_reset_tokens : "user_id"
+    users ||..o{ practice_sessions : "user_id"
+    questions ||..o{ practice_sessions : "question_id"
+    practice_sessions ||..o| score_results : "session_id"
+    score_results ||..o{ score_criteria : "result_id"
+    practice_sessions ||..o{ api_usages : "session_id"
+    users ||..o{ audit_logs : "admin_id"
+    users ||..o{ questions : "created_by"
+    users ||..o{ password_reset_tokens : "user_id"
     users {
         uuid id PK
         varchar full_name
@@ -110,6 +110,8 @@ erDiagram
         timestamptz created_at
     }
 ```
+
+Ký hiệu: đường nét đứt là quan hệ không xác định (mọi bảng có khóa chính riêng `id`, khóa ngoại chỉ là cột thường); đầu cha `||` là đúng một, đầu con `o{` là không hoặc nhiều, `o|` là không hoặc một.
 
 ## Quyết định thiết kế
 

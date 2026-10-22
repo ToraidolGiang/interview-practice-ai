@@ -34,7 +34,7 @@ DEFAULT_OUT = ROOT / "data" / "interim" / "questions_vi.jsonl"
 DEFAULT_ERRORS = ROOT / "data" / "interim" / "questions_vi.errors.jsonl"
 
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-PROMPT_VERSION = "normalize-v1"
+PROMPT_VERSION = "normalize-v2"
 
 QUESTION_TYPES = ["BEHAVIORAL", "SITUATIONAL", "TECHNICAL", "INTRO"]
 LEVELS = ["EASY", "MEDIUM", "HARD"]
@@ -43,12 +43,12 @@ DROP_REASONS = ["CODING_TASK", "COMMAND_SPECIFIC", "COMPANY_SPECIFIC", "NOT_INTE
 # Giá trị industry/position theo docs/business/Danh_Muc_Nganh_Vi_Tri.md (taxonomy-v1.0)
 INDUSTRY_VI = {"IT": "IT"}
 POSITION_VI = {
-    "Software Engineer": "Chung",
+    "Software Engineer": "Backend Developer",  # chỉ dùng khi câu hành vi không áp dụng được cho mọi vị trí
     "Frontend Developer": "Frontend Developer",
     "Data Scientist": "Data Scientist / AI",
     "System Administrator / DevOps": "DevOps / Quản trị hệ thống",
 }
-GENERAL_POSITION = "Chung"  # câu hỏi không phải TECHNICAL dùng chung cho mọi vị trí trong ngành
+GENERAL_POSITION = "Chung"  # câu hỏi Gemini đánh dấu all_positions, dùng chung cho mọi vị trí trong ngành
 
 SYSTEM_PROMPT = """Bạn là chuyên gia tuyển dụng ngành {industry} tại Việt Nam, đang xây ngân hàng câu hỏi cho ứng dụng luyện phỏng vấn bằng giọng nói tiếng Việt.
 Ứng viên trả lời bằng LỜI NÓI (1-3 phút), không viết code, không gõ lệnh.
@@ -57,7 +57,10 @@ Với MỖI câu hỏi tiếng Anh trong <items>, trả về một phần tử v
 
 1. keep / drop_reason: đặt keep=false nếu câu hỏi
    - CODING_TASK: bắt viết hoặc đọc đoạn code cụ thể
-   - COMMAND_SPECIFIC: chỉ hỏi cú pháp một lệnh/cờ cụ thể, trả lời bằng lời không có giá trị
+   - COMMAND_SPECIFIC: câu trả lời đúng chủ yếu là tên lệnh/cờ/cú pháp cụ thể, không có khái niệm hay lập luận để giải thích.
+     Ví dụ LOẠI: "How do you get a list of logged-in users?", "What do the fields in ls -al output mean?",
+     "How to recursively change permissions for directories only?". Ví dụ GIỮ: "What is load average?",
+     "Running commands as root: good or bad practice?" (có khái niệm, có lập luận)
    - COMPANY_SPECIFIC: chỉ có nghĩa với một công ty cụ thể và không thể khái quát hoá
    - NOT_INTERVIEW: không phải câu phỏng vấn (câu đố vui vô nghĩa, câu ứng viên hỏi ngược lại...)
    - OUTDATED: công nghệ/API đã lỗi thời, ít còn được hỏi
@@ -79,7 +82,11 @@ Với MỖI câu hỏi tiếng Anh trong <items>, trả về một phần tử v
 5. answer_hint: 1-3 câu tiếng Việt gợi ý CÁCH trả lời cho người luyện tập (không phải đáp án).
    BEHAVIORAL gợi ý theo STAR; SITUATIONAL theo phân tích → quyết định → lý do; TECHNICAL theo khái niệm → giải thích → ví dụ; INTRO theo hiện tại → quá khứ → định hướng.
 
-6. reference_answer: CHỈ cho TECHNICAL (loại khác để null). 3-6 ý chính bằng tiếng Việt, mỗi ý một dòng bắt đầu bằng "- ",
+6. all_positions: true nếu câu hỏi dùng được nguyên văn cho MỌI vị trí trong ngành (ví dụ "Kể về lần bạn bất đồng với quản lý"),
+   false nếu gắn với chuyên môn của vị trí "position" (ví dụ homelab, chứng chỉ sysadmin, thế giới quản trị hệ thống).
+   Câu TECHNICAL luôn false. Không tự sửa câu hỏi cho chung chung hơn chỉ để đặt true.
+
+7. reference_answer: CHỈ cho TECHNICAL (loại khác để null). 3-6 ý chính bằng tiếng Việt, mỗi ý một dòng bắt đầu bằng "- ",
    là các ý người chấm cần thấy trong câu trả lời. Nếu có "answer_en" thì dựa vào đó nhưng kiểm tra lại tính đúng đắn;
    reference_generated=true nếu không có answer_en và bạn tự soạn.
 
@@ -97,12 +104,13 @@ RESPONSE_SCHEMA = {
             "question_type": {"type": "STRING", "enum": QUESTION_TYPES, "nullable": True},
             "level": {"type": "STRING", "enum": LEVELS, "nullable": True},
             "answer_hint": {"type": "STRING", "nullable": True},
+            "all_positions": {"type": "BOOLEAN", "nullable": True},
             "reference_answer": {"type": "STRING", "nullable": True},
             "reference_generated": {"type": "BOOLEAN", "nullable": True},
         },
         "required": ["id", "keep"],
         "propertyOrdering": ["id", "keep", "drop_reason", "content_vi", "question_type", "level",
-                             "answer_hint", "reference_answer", "reference_generated"],
+                             "answer_hint", "all_positions", "reference_answer", "reference_generated"],
     },
 }
 
@@ -160,11 +168,13 @@ def call_gemini(api_key, model, system_prompt, user_text, max_retries=5):
             # 429 (hết quota/phút) và 5xx thì chờ rồi thử lại; lỗi khác (sai key, sai model) dừng luôn
             if e.code not in (429, 500, 502, 503, 504) or attempt == max_retries - 1:
                 raise RuntimeError(f"Gemini HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:500]}") from e
-        except (urllib.error.URLError, TimeoutError):
+            reason = f"HTTP {e.code}"
+        except (urllib.error.URLError, TimeoutError) as e:
             if attempt == max_retries - 1:
                 raise
+            reason = type(e).__name__
         wait = 2 ** attempt * 5 + random.random() * 2
-        print(f"    thử lại sau {wait:.0f}s...", file=sys.stderr)
+        print(f"    {reason}, thử lại sau {wait:.0f}s...", file=sys.stderr)
         time.sleep(wait)
 
 
@@ -201,8 +211,8 @@ def to_output_record(result, source, model):
         "drop_reason": None if keep else result.get("drop_reason"),
         "content": text("content_vi", keep),
         "industry": INDUSTRY_VI.get(source["industry"], source["industry"]),
-        "position": (POSITION_VI.get(source["position"], source["position"])
-                     if technical or not keep else GENERAL_POSITION),
+        "position": (GENERAL_POSITION if keep and not technical and result.get("all_positions")
+                     else POSITION_VI.get(source["position"], source["position"])),
         "level": result.get("level") if keep else None,
         "question_type": result.get("question_type") if keep else None,
         "answer_hint": text("answer_hint", keep),

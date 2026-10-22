@@ -43,13 +43,13 @@ WHERE status = 'ACTIVE' AND industry = :industry AND position IN (:position, 'Ch
 
 | Nguồn (`source.key`) | `position` gốc | `industry` | `position` |
 |---|---|---|---|
-| `tech-interview-handbook` | Software Engineer | `IT` | `Chung` |
+| `tech-interview-handbook` | Software Engineer | `IT` | `Backend Developer` |
 | `h5bp-frontend` | Frontend Developer | `IT` | `Frontend Developer` |
 | `react-interview-questions` | Frontend Developer | `IT` | `Frontend Developer` |
 | `data-science-interviews` | Data Scientist | `IT` | `Data Scientist / AI` |
 | `sysadmin-skills` | System Administrator / DevOps | `IT` | `DevOps / Quản trị hệ thống` |
 
-Riêng câu hỏi không phải `TECHNICAL` (hành vi, tình huống, giới thiệu) từ mọi nguồn IT đều chuyển sang `Chung`.
+Câu hỏi không phải `TECHNICAL` mà dùng được nguyên văn cho mọi vị trí trong ngành (Gemini đánh dấu `all_positions`, người duyệt kiểm tra lại) chuyển sang `Chung`. Câu hành vi gắn với chuyên môn (ví dụ "Mô tả homelab của bạn") giữ vị trí theo bảng trên.
 
 ## 4. Thay đổi danh mục
 

@@ -35,6 +35,13 @@ export async function request(path, { method = 'GET', body, auth = true } = {}) 
   const data = text ? safeParse(text) : null
 
   if (!response.ok) {
+    // 502-504: Vite proxy không gọi được backend/mock (chưa chạy `npm run mock` hoặc backend tắt)
+    if (response.status >= 502 && response.status <= 504 && !data) {
+      throw new ApiError(response.status, {
+        code: 'NETWORK_ERROR',
+        message: 'Không kết nối được máy chủ API. Kiểm tra backend hoặc mock (npm run mock) đã chạy chưa.',
+      })
+    }
     // JWT hết hạn hoặc bị thu hồi: AuthProvider nghe sự kiện này để đăng xuất
     if (response.status === 401 && token) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
     throw new ApiError(response.status, data)

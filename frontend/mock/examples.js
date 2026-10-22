@@ -62,6 +62,32 @@ const questions = [
   createdAt: '2026-10-01T08:00:00Z',
 }))
 
+function scoreResult(i) {
+  return {
+    id: `9a1b2c3d-0000-4000-8000-00000000000${i}`,
+    sessionId: '7e0f1a30-4a4e-4c0b-b6d2-1a2b3c4d5e00',
+    transcript:
+      'Ừm, trong đợt Black Friday năm ngoái, hệ thống thanh toán bị sập vào giờ cao điểm. Tôi tôi là Tech Lead trực on-call nên đã khoanh vùng lỗi ở connection pool, rollback bản cập nhật và phối hợp với nhóm vận hành. Kiểu như sau 20 phút hệ thống hoạt động lại và chúng tôi bổ sung cảnh báo.',
+    questionType: 'BEHAVIORAL',
+    totalScore: 78.5,
+    contentScore: 76.4,
+    criteria: [
+      { code: 'RELEVANCE', score: 5, weight: 20, reasoning: 'Trả lời đúng câu hỏi về sự cố và cách xử lý.', quote: 'hệ thống thanh toán bị sập vào giờ cao điểm', quoteInvalid: false },
+      { code: 'STRUCTURE', score: 4, weight: 30, reasoning: 'Có tình huống, vai trò, hành động; kết quả còn ngắn.', quote: 'Tech Lead trực on-call', quoteInvalid: false },
+      { code: 'DEPTH', score: 3, weight: 40, reasoning: 'Thiếu nguyên nhân gốc và số liệu sau khắc phục.', quote: 'khoanh vùng lỗi ở connection pool', quoteInvalid: false },
+    ],
+    delivery: { wpm: 138, fillerCount: 3, fillerRate: 5.36, deliveryScore: 4, fillerListVersion: 'filler-vi-v1' },
+    offTopic: false,
+    injectionSuspected: false,
+    rubricVersion: 'rubric-v1.0',
+    promptVersion: 'prompt-v1',
+    modelVersion: 'mock',
+    feedbackText: 'Bạn mô tả sự cố rõ ràng và nêu được vai trò của mình. Hãy bổ sung nguyên nhân gốc và số liệu sau khắc phục.',
+    sampleAnswer: null,
+    ttsAudioUrl: null,
+  }
+}
+
 export const SCHEMA_EXAMPLES = {
   Question: questions[0],
   QuestionPage: { content: questions, page: 0, size: 6, totalElements: 128, totalPages: 22 },
@@ -79,6 +105,22 @@ export const SCHEMA_EXAMPLES = {
     submittedAt: null,
     completedAt: null,
     errorCode: null,
+  },
+  ScoreResult: scoreResult(0),
+  HistoryDetail: {
+    id: '7e0f1a30-4a4e-4c0b-b6d2-1a2b3c4d5e00',
+    userId: '3f6c1f0e-2a54-4a54-9b1e-0d5e2f7a9c11',
+    questionId: questions[0].id,
+    status: 'SCORED',
+    audioUrl: null,
+    duration: 95,
+    totalScore: 78.5,
+    feedback: null,
+    startedAt: '2026-10-21T14:30:00Z',
+    submittedAt: '2026-10-21T14:32:00Z',
+    completedAt: '2026-10-21T14:32:00Z',
+    errorCode: null,
+    scoreResult: scoreResult(0),
   },
   HistoryPage: {
     content: [

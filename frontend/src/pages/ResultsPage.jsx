@@ -55,7 +55,7 @@ function ResultsView({ sessionId }) {
   return (
     <div className={styles.page}>
       <Breadcrumb
-        items={[{ label: 'Phòng luyện tập', to: '/practice' }]}
+        items={[{ label: 'Lịch sử & Tiến độ', to: '/history' }]}
         current="Kết quả chấm điểm"
         tag={questionType ? questionTypeLabel(questionType).split(' (')[0] : null}
       >

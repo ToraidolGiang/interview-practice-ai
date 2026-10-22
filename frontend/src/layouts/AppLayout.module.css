@@ -119,19 +119,6 @@
   text-decoration: none;
 }
 
-.bell {
-  display: flex;
-  padding: 8px;
-  border: 0;
-  border-radius: 9999px;
-  background: none;
-  cursor: pointer;
-}
-
-.bell:hover {
-  background: var(--color-surface-tint);
-}
-
 .profile {
   display: flex;
   align-items: center;
@@ -232,6 +219,16 @@
   font-weight: 700;
   line-height: 20px;
   color: var(--color-text-heading);
+}
+
+.footerCol a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.footerCol a:hover {
+  text-decoration: underline;
+  color: var(--color-brand-dark);
 }
 
 .footerCol ul {

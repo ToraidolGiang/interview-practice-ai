@@ -15,7 +15,9 @@ Chưa có backend thì chạy với mock sinh từ contract `docs/api/openapi.ya
 npm run dev:mock   # chạy cùng lúc mock Prism (cổng 4010) và Vite, cấu hình trong .env.mock
 ```
 
-Mock trả dữ liệu `example` trong contract; muốn thử nhánh lỗi thì thêm header `Prefer: code=401` (Prism).
+Contract thiếu `example` ở nhiều schema nên `npm run mock` chèn dữ liệu mẫu từ `mock/examples.js` vào một bản sao
+(`mock/.generated/openapi.yaml`, không commit); `docs/api/openapi.yaml` không bị sửa. Mock trả dữ liệu cố định, ví dụ
+mọi ngành đều đếm 128 câu. Muốn thử nhánh lỗi thì thêm header `Prefer: code=401` (Prism).
 Đổi địa chỉ backend bằng biến `API_PROXY_TARGET` trong `.env.local`.
 
 ## Cấu trúc

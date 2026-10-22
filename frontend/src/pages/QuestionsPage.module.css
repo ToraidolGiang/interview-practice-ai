@@ -1,0 +1,525 @@
+/* Màn Ngân hàng câu hỏi (Figma 15:464) */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--color-text-muted);
+}
+
+.breadcrumbCurrent {
+  font-weight: 600;
+  color: var(--color-brand-dark);
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 38px;
+  letter-spacing: -0.75px;
+  color: var(--color-text-heading);
+}
+
+.randomButton,
+.searchButton,
+.practiceButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-brand-dark);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  color: #fff;
+  cursor: pointer;
+}
+
+.randomButton {
+  padding: 8px 16px;
+}
+
+.randomButton:disabled,
+.practiceButton:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.randomButton:hover:not(:disabled),
+.searchButton:hover,
+.practiceButton:hover:not(:disabled) {
+  background: #2a1db0;
+}
+
+/* ---- Khối tìm kiếm và bộ lọc ---- */
+.filterCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 48px 24px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 19px;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 16px 190px 17px 49px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  outline: none;
+  background: var(--color-surface-tint);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  color: var(--color-text-heading);
+}
+
+.searchInput::placeholder {
+  color: #777587;
+}
+
+.searchInput:focus {
+  border-color: var(--color-brand-dark);
+}
+
+.enterHint {
+  position: absolute;
+  right: 120px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: #e5eeff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--color-text-muted);
+}
+
+.searchButton {
+  position: absolute;
+  right: 8px;
+  padding: 8px 16px;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.suggestion {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-surface-tint);
+  font-size: 12px;
+  color: var(--color-text-heading);
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: var(--color-brand-soft);
+  color: var(--color-brand-dark);
+}
+
+.separator {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.industryRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.groupLabel {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding-top: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.industryChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.industryChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-surface-tint);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--color-text-heading);
+  cursor: pointer;
+}
+
+.industryChip:hover {
+  background: var(--color-brand-soft);
+}
+
+.industryChipActive,
+.industryChipActive:hover {
+  background: var(--color-brand-dark);
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Icon trong Figma màu tối, chip đang chọn thì đổi sang trắng */
+.industryChipActive img {
+  filter: brightness(0) invert(1);
+}
+
+.chipCount {
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.select {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-tint);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-heading);
+}
+
+.select:disabled {
+  color: var(--color-placeholder);
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-tint);
+}
+
+.segment {
+  padding: 5px 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  cursor: pointer;
+}
+
+.segmentActive {
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.toneEASY {
+  color: #059669;
+}
+
+.toneMEDIUM {
+  color: #d97706;
+}
+
+.toneHARD {
+  color: #dc2626;
+}
+
+.activeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.activeChips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.activeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brand-dark);
+}
+
+.activeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border: 1px solid #c7d2fe;
+  border-radius: 9999px;
+  background: var(--color-brand-soft);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brand-dark);
+}
+
+.activeChip button {
+  display: flex;
+  padding: 2px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.clearButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: none;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.clearButton:hover {
+  color: var(--color-brand-dark);
+}
+
+/* ---- Danh sách ---- */
+.listHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 32px 0 12px;
+}
+
+.listTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.countBadge {
+  padding: 2px 10px;
+  border-radius: 9999px;
+  background: var(--color-brand-soft);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.alert {
+  padding: 10px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: var(--color-danger-bg);
+  font-size: 13px;
+  color: var(--color-danger);
+}
+
+.empty {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--color-text-subtle);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+  transition: opacity 0.15s;
+}
+
+.gridLoading {
+  opacity: 0.5;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.card:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 12px rgba(53, 37, 205, 0.06);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+}
+
+.cardIndustry {
+  color: var(--color-brand-dark);
+}
+
+.cardTitle {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--color-text-heading);
+}
+
+.cardHint {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+}
+
+.cardHint strong {
+  color: var(--color-text-heading);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.cardMeta span:first-child {
+  font-weight: 500;
+  color: var(--color-text-heading);
+}
+
+.practiceButton {
+  flex: none;
+  padding: 6px 16px;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .industryRow {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .enterHint {
+    display: none;
+  }
+
+  .searchInput {
+    padding-right: 110px;
+  }
+
+  .filterCard {
+    padding: 16px;
+  }
+}

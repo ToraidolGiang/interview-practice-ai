@@ -21,6 +21,7 @@ import argparse
 import json
 import os
 import random
+import re
 import sys
 import time
 import urllib.error
@@ -145,7 +146,11 @@ def build_prompt_items(batch):
     return "<items>\n" + json.dumps(items, ensure_ascii=False, indent=1) + "\n</items>"
 
 
-def call_gemini(api_key, model, system_prompt, user_text, max_retries=5):
+class QuotaExhausted(Exception):
+    """Gemini báo hết quota theo ngày."""
+
+
+def call_gemini(api_key, model, system_prompt, user_text, max_retries=8):
     body = json.dumps({
         "systemInstruction": {"parts": [{"text": system_prompt}]},
         "contents": [{"role": "user", "parts": [{"text": user_text}]}],
@@ -165,15 +170,19 @@ def call_gemini(api_key, model, system_prompt, user_text, max_retries=5):
                 payload = json.loads(resp.read())
             return payload["candidates"][0]["content"]["parts"][0]["text"]
         except urllib.error.HTTPError as e:
-            # 429 (hết quota/phút) và 5xx thì chờ rồi thử lại; lỗi khác (sai key, sai model) dừng luôn
+            body = e.read().decode("utf-8", "replace")
+            # Hết quota theo ngày (gói miễn phí): thử lại vô ích, dừng hẳn
+            if e.code == 429 and re.search(r"PerDay|retry in \d+h", body):
+                raise QuotaExhausted(body[:500]) from e
+            # 429 (quota/phút) và 5xx thì chờ rồi thử lại; lỗi khác (sai key, sai model) dừng luôn
             if e.code not in (429, 500, 502, 503, 504) or attempt == max_retries - 1:
-                raise RuntimeError(f"Gemini HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:500]}") from e
+                raise RuntimeError(f"Gemini HTTP {e.code}: {body[:500]}") from e
             reason = f"HTTP {e.code}"
-        except (urllib.error.URLError, TimeoutError) as e:
+        except OSError as e:  # URLError, timeout, RemoteDisconnected, ConnectionReset...
             if attempt == max_retries - 1:
                 raise
             reason = type(e).__name__
-        wait = 2 ** attempt * 5 + random.random() * 2
+        wait = min(2 ** attempt * 5, 60) + random.random() * 2
         print(f"    {reason}, thử lại sau {wait:.0f}s...", file=sys.stderr)
         time.sleep(wait)
 
@@ -307,7 +316,18 @@ def main():
             args.errors.open("a", encoding="utf-8", newline="\n") as err:
         for i, batch in enumerate(batches, 1):
             print(f"[{i}/{len(batches)}] {batch[0]['position']} ({len(batch)} câu)", file=sys.stderr)
-            ok, failed = process_batch(batch, api_key, args.model)
+            try:
+                ok, failed = process_batch(batch, api_key, args.model)
+            except QuotaExhausted as e:
+                print(f"\nDừng: hết quota Gemini theo ngày. Chạy lại script sau khi quota được cấp lại.\n{e}",
+                      file=sys.stderr)
+                break
+            except (RuntimeError, OSError) as e:
+                # Lỗi API kéo dài (503 quá tải...): ghi lại và làm lô sau; lần chạy sau sẽ thử lại lô này
+                if "HTTP 4" in str(e) and "HTTP 429" not in str(e):
+                    raise  # sai key/model/request: dừng luôn, chạy tiếp cũng vô ích
+                print(f"    bỏ qua lô: {str(e)[:120]}", file=sys.stderr)
+                ok, failed = [], [{"id": r["id"], "errors": ["api"], "raw": str(e)[:500]} for r in batch]
             for record in ok:
                 out.write(json.dumps(record, ensure_ascii=False) + "\n")
                 stats["giữ" if record["keep"] else f"loại:{record['drop_reason']}"] += 1

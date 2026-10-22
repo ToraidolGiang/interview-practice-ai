@@ -19,3 +19,11 @@ export function uploadAnswer(id, audioBlob, durationSeconds) {
 export function evaluateSession(id) {
   return request(`/practice-sessions/${encodeURIComponent(id)}/evaluate`, { method: 'POST' })
 }
+
+export function getScoreResult(id) {
+  return request(`/practice-sessions/${encodeURIComponent(id)}/result`)
+}
+
+export function getFeedbackAudio(id) {
+  return request(`/practice-sessions/${encodeURIComponent(id)}/feedback/audio`)
+}

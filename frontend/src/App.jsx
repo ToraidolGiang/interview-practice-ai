@@ -7,6 +7,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import PracticePage from './pages/PracticePage'
 import QuestionsPage from './pages/QuestionsPage'
 import RegisterPage from './pages/RegisterPage'
+import ResultsPage from './pages/ResultsPage'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/practice" element={<PracticePage />} />
           <Route path="/practice/:sessionId" element={<PracticePage />} />
+          <Route path="/results/:sessionId" element={<ResultsPage />} />
           <Route path="/history" element={<HistoryPage />} />
         </Route>
       </Route>

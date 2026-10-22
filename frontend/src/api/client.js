@@ -15,7 +15,9 @@ export class ApiError extends Error {
 
 export async function request(path, { method = 'GET', body, auth = true } = {}) {
   const headers = { Accept: 'application/json' }
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  // FormData (upload file) để trình duyệt tự đặt Content-Type kèm boundary
+  const isForm = body instanceof FormData
+  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json'
 
   const token = auth ? getAccessToken() : null
   if (token) headers.Authorization = `Bearer ${token}`
@@ -25,7 +27,7 @@ export async function request(path, { method = 'GET', body, auth = true } = {}) 
     response = await fetch(BASE_URL + path, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined || isForm ? body : JSON.stringify(body),
     })
   } catch {
     throw new ApiError(0, { code: 'NETWORK_ERROR', message: 'Không kết nối được máy chủ' })

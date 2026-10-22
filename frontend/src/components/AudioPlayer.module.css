@@ -1,0 +1,80 @@
+.player {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-tint);
+}
+
+.playButton {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding-left: 2px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-brand-dark);
+  cursor: pointer;
+}
+
+.pauseGlyph {
+  width: 10px;
+  height: 12px;
+  margin-left: -2px;
+  border-left: 3px solid #fff;
+  border-right: 3px solid #fff;
+}
+
+.time {
+  flex: none;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.track {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 9999px;
+  background: #dbe3f5;
+  cursor: pointer;
+}
+
+.fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-brand-dark);
+}
+
+.speeds {
+  display: flex;
+  gap: 4px;
+}
+
+.speed {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.speedActive {
+  background: var(--color-brand-soft);
+  font-weight: 700;
+  color: var(--color-brand-dark);
+}
+
+@media (max-width: 640px) {
+  .speeds {
+    display: none;
+  }
+}

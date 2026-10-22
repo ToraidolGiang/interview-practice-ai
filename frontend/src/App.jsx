@@ -20,6 +20,7 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/practice" element={<PracticePage />} />
+          <Route path="/practice/:sessionId" element={<PracticePage />} />
           <Route path="/history" element={<HistoryPage />} />
         </Route>
       </Route>

@@ -12,7 +12,6 @@ npm run dev        # proxy /api -> backend Spring (mặc định http://localhos
 Chưa có backend thì chạy với mock sinh từ contract `docs/api/openapi.yaml`:
 
 ```bash
-
 npm run dev:mock   # chạy cùng lúc mock Prism (cổng 4010) và Vite, cấu hình trong .env.mock
 ```
 

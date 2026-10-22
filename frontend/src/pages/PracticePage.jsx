@@ -3,7 +3,6 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router'
 import iconCheckBadgeSm from '../assets/figma/icon-check-badge-sm.svg'
 import iconChevronUp from '../assets/figma/icon-chevron-up.svg'
 import iconClock from '../assets/figma/icon-clock.svg'
-import iconFolder from '../assets/figma/icon-folder.svg'
 import iconLightbulb from '../assets/figma/icon-lightbulb.svg'
 import iconMicLevel from '../assets/figma/icon-mic-level.svg'
 import iconMicWhite from '../assets/figma/icon-mic-white.svg'
@@ -17,6 +16,7 @@ import iconStop from '../assets/figma/icon-stop.svg'
 import { evaluateSession, getPracticeSession, uploadAnswer } from '../api/practice'
 import { getQuestion } from '../api/questions'
 import AudioPlayer from '../components/AudioPlayer'
+import Breadcrumb from '../components/Breadcrumb'
 import {
   formatClock,
   MAX_RECORDING_SECONDS,
@@ -88,18 +88,7 @@ function PracticeRoom({ sessionId }) {
 
   return (
     <div className={styles.page}>
-      <div className={styles.topBar}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <img src={iconFolder} alt="" width="21.5" height="16" />
-          <Link to="/questions">Ngân hàng câu hỏi</Link>
-          <span aria-hidden>/</span>
-          <span className={styles.breadcrumbCurrent}>
-            <span className={styles.dot} aria-hidden />
-            Phiên luyện tập
-          </span>
-        </nav>
-      </div>
-
+      <Breadcrumb items={[{ label: 'Phòng luyện tập', to: '/practice' }]} current="Phiên luyện tập" />
       <div className={styles.column}>
         <QuestionCard question={question} />
         <RecorderCard

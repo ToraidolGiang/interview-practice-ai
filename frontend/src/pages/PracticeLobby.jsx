@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import iconFolder from '../assets/figma/icon-folder.svg'
 import iconMicWhite from '../assets/figma/icon-mic-white.svg'
 import iconSearch from '../assets/figma/icon-search.svg'
 import { listHistory } from '../api/history'
 import { createPracticeSession } from '../api/practice'
 import { getQuestion, listQuestions, randomQuestion } from '../api/questions'
+import Breadcrumb from '../components/Breadcrumb'
 import { MAX_RECORDING_SECONDS, MIN_RECORDING_SECONDS } from '../constants/practice'
 import { RUBRIC_VERSION, scoreBand } from '../constants/scoring'
 import { industryLabel, levelOf, questionTypeLabel } from '../constants/taxonomy'
@@ -61,18 +61,7 @@ export default function PracticeLobby() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.topBar}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <img src={iconFolder} alt="" width="21.5" height="16" />
-          <Link to="/questions">Ngân hàng câu hỏi</Link>
-          <span aria-hidden>/</span>
-          <span className={styles.breadcrumbCurrent}>
-            <span className={styles.dot} aria-hidden />
-            Phòng luyện tập
-          </span>
-        </nav>
-      </div>
-
+      <Breadcrumb current="Phòng luyện tập" />
       <div className={styles.column}>
         <section className={styles.card}>
           <p className={styles.eyebrow}>

@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import iconBars from '../assets/figma/icon-bars.svg'
 import iconBolt from '../assets/figma/icon-bolt.svg'
-import iconBreadcrumbChevron from '../assets/figma/icon-breadcrumb-chevron.svg'
 import iconBuilding from '../assets/figma/icon-building.svg'
 import iconCloseSmall from '../assets/figma/icon-close-small.svg'
 import iconFilterLines from '../assets/figma/icon-filter-lines.svg'
 import iconFormat from '../assets/figma/icon-format.svg'
 import iconGrid from '../assets/figma/icon-grid.svg'
-import iconHome from '../assets/figma/icon-home.svg'
 import iconCskh from '../assets/figma/icon-industry-cskh.svg'
 import iconFinance from '../assets/figma/icon-industry-finance.svg'
 import iconHr from '../assets/figma/icon-industry-hr.svg'
@@ -23,6 +21,7 @@ import iconSliders from '../assets/figma/icon-sliders.svg'
 import iconTrendDark from '../assets/figma/icon-trend-dark.svg'
 import { createPracticeSession } from '../api/practice'
 import { listQuestions, randomQuestion } from '../api/questions'
+import Breadcrumb from '../components/Breadcrumb'
 import Pagination from '../components/Pagination'
 import {
   INDUSTRIES,
@@ -197,12 +196,7 @@ export default function QuestionsPage() {
       <span className={styles.glowLeft} aria-hidden />
 
       <div className={styles.inner}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <img src={iconHome} alt="" width="10.6667" height="12" />
-          <span>Ứng viên</span>
-          <img src={iconBreadcrumbChevron} alt="" width="4.31667" height="7" />
-          <span className={styles.breadcrumbCurrent}>Ngân hàng câu hỏi</span>
-        </nav>
+        <Breadcrumb current="Ngân hàng câu hỏi" />
 
         <div className={styles.titleRow}>
           <h1 className={styles.title}>Ngân hàng câu hỏi phỏng vấn thực tế</h1>

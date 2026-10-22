@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
-import iconBreadcrumbChevron from '../assets/figma/icon-breadcrumb-chevron.svg'
 import iconBulbSm from '../assets/figma/icon-bulb-sm.svg'
 import iconChat from '../assets/figma/icon-chat.svg'
 import iconFeedbackDoc from '../assets/figma/icon-feedback-doc.svg'
-import iconFlag from '../assets/figma/icon-flag.svg'
 import iconPdf from '../assets/figma/icon-pdf.svg'
 import iconPlayWhite from '../assets/figma/icon-play-white.svg'
 import iconQuote from '../assets/figma/icon-quote.svg'
@@ -12,6 +10,7 @@ import iconTranscript from '../assets/figma/icon-transcript.svg'
 import iconTrendUp from '../assets/figma/icon-trend-up.svg'
 import { evaluateSession, getFeedbackAudio } from '../api/practice'
 import { getQuestion } from '../api/questions'
+import Breadcrumb from '../components/Breadcrumb'
 import DeliveryPanel from '../components/DeliveryPanel'
 import RubricRadar from '../components/RubricRadar'
 import { formatClock } from '../constants/practice'
@@ -55,14 +54,11 @@ function ResultsView({ sessionId }) {
 
   return (
     <div className={styles.page}>
-      <div className={styles.topBar}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <img src={iconFlag} alt="" width="9.33333" height="10.6667" />
-          <Link to="/questions">Luyện tập</Link>
-          <img src={iconBreadcrumbChevron} alt="" width="4.31667" height="7" />
-          <span className={styles.breadcrumbCurrent}>Kết quả phân tích câu trả lời</span>
-          {questionType && <span className={styles.breadcrumbTag}>{questionTypeLabel(questionType).split(' (')[0]}</span>}
-        </nav>
+      <Breadcrumb
+        items={[{ label: 'Phòng luyện tập', to: '/practice' }]}
+        current="Kết quả chấm điểm"
+        tag={questionType ? questionTypeLabel(questionType).split(' (')[0] : null}
+      >
         {phase === 'scored' && (
           <div className={styles.topActions}>
             <span className={styles.engineChip}>
@@ -75,7 +71,7 @@ function ResultsView({ sessionId }) {
             </button>
           </div>
         )}
-      </div>
+      </Breadcrumb>
 
       {phase === 'loading' && <p className={styles.muted}>Đang tải kết quả...</p>}
       {phase === 'error' && (

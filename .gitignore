@@ -15,6 +15,9 @@ dist-ssr/
 .vite/
 *.local
 
+# Dataset: file gốc tải về (tái tạo được bằng scripts/dataset)
+data/raw/
+
 # IDE
 .idea/
 *.iml

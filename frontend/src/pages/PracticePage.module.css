@@ -608,40 +608,17 @@
   flex: none;
 }
 
-/* Trọng số rubric của loại câu hỏi (rubric-v1.0 mục 4) */
-.weights {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
-.weightsLabel {
-  font-weight: 600;
-  color: var(--color-text-heading);
-}
-
-.weightChip {
-  padding: 4px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 9999px;
-  background: #fff;
+.stepAnchor {
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-border);
+  font-size: 11px;
+  line-height: 17px;
   color: var(--color-text-muted);
 }
 
-.weightChip b {
+.stepAnchor strong {
   color: var(--color-text-heading);
-}
-
-.weightChipActive {
-  border-color: #c7d2fe;
-  background: var(--color-brand-soft);
-  color: var(--color-brand-dark);
-}
-
-.weightChipActive b {
-  color: var(--color-brand-dark);
 }
 
 /* ---- Ghi chú ---- */
@@ -689,6 +666,12 @@
 
 .notes:focus {
   border-color: var(--color-brand-dark);
+}
+
+@media (max-width: 1000px) {
+  .steps {
+    grid-template-columns: repeat(min(var(--step-count), 3), minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 800px) {

@@ -18,33 +18,22 @@ import { evaluateSession, getPracticeSession, uploadAnswer } from '../api/practi
 import { getQuestion } from '../api/questions'
 import AudioPlayer from '../components/AudioPlayer'
 import {
-  ANSWER_FRAMEWORKS,
   formatClock,
   MAX_RECORDING_SECONDS,
   MIN_RECORDING_SECONDS,
+  RUBRIC_TIPS,
   WARNING_REMAINING_SECONDS,
 } from '../constants/practice'
-import { CRITERIA, WEIGHTS } from '../constants/scoring'
+import { anchor5, CRITERIA, criterionDesc, RUBRIC_VERSION, WEIGHTS } from '../constants/scoring'
 import { industryLabel, levelOf, questionTypeLabel } from '../constants/taxonomy'
 import { isRecordingSupported, useAudioRecorder } from '../hooks/useAudioRecorder'
-import Placeholder from './Placeholder'
+import PracticeLobby from './PracticeLobby'
 import styles from './PracticePage.module.css'
 
 export default function PracticePage() {
   const { sessionId } = useParams()
-  if (!sessionId) {
-    return (
-      <div>
-        <Placeholder
-          title="Phòng luyện tập"
-          note="Chọn một câu hỏi trong Ngân hàng câu hỏi để bắt đầu phiên luyện tập."
-        />
-        <p style={{ textAlign: 'center' }}>
-          <Link to="/questions">Đến Ngân hàng câu hỏi</Link>
-        </p>
-      </div>
-    )
-  }
+  // Mở từ menu (chưa có phiên): màn chọn cách bắt đầu
+  if (!sessionId) return <PracticeLobby />
   // key: đổi phiên thì dựng lại toàn bộ trạng thái ghi âm
   return <PracticeRoom key={sessionId} sessionId={sessionId} />
 }
@@ -119,7 +108,7 @@ function PracticeRoom({ sessionId }) {
           submitState={submitState}
           onSubmit={submit}
         />
-        <FrameworkCard questionType={question.questionType} />
+        <RubricGuideCard questionType={question.questionType} />
         <NotesCard sessionId={sessionId} />
       </div>
     </div>
@@ -357,13 +346,13 @@ function RecorderCard({ canReuseUpload, failedCode, submitState, onSubmit }) {
   )
 }
 
-function FrameworkCard({ questionType }) {
+// Cách chấm câu này theo rubric-v1.0: tiêu chí, trọng số và mức 5 điểm (thay cho khung STAR cố định)
+function RubricGuideCard({ questionType }) {
   const [open, setOpen] = useState(true)
-  const framework = ANSWER_FRAMEWORKS[questionType]
-  if (!framework) return null
-  // Thời lượng gợi ý tính trên 150 giây (khoảng giữa giới hạn ghi âm)
-  const target = 150
-  const weights = WEIGHTS[questionType] ?? {}
+  const weights = WEIGHTS[questionType]
+  if (!weights) return null
+  const entries = Object.entries(weights)
+  const topWeight = Math.max(...entries.filter(([code]) => code !== 'DELIVERY').map(([, w]) => w))
 
   return (
     <section className={`${styles.card} ${styles.frameworkCard}`}>
@@ -378,11 +367,12 @@ function FrameworkCard({ questionType }) {
         </span>
         <span className={styles.frameworkTitles}>
           <span className={styles.frameworkTitle}>
-            {framework.title}
-            <span className={styles.frameworkBadge}>Gợi ý {target}s</span>
+            Cách AI chấm câu trả lời này
+            <span className={styles.frameworkBadge}>{RUBRIC_VERSION}</span>
           </span>
           <span className={styles.frameworkSub}>
-            Khung của tiêu chí Cấu trúc ({weights.STRUCTURE}% điểm) • phân bổ thời lượng gợi ý cho từng phần
+            {entries.length} tiêu chí cho câu hỏi {questionTypeLabel(questionType).split(' (')[0].toLowerCase()}, mỗi
+            tiêu chí chấm 1-5 rồi quy đổi theo trọng số về thang 100
           </span>
         </span>
         <span className={styles.collapse}>
@@ -399,32 +389,28 @@ function FrameworkCard({ questionType }) {
 
       {open && (
         <div className={styles.frameworkBody}>
-          <div className={styles.steps} style={{ '--step-count': framework.steps.length }}>
-            {framework.steps.map((step) => (
-              <div key={step.key} className={`${styles.step} ${step.core ? styles.stepCore : ''}`}>
-                <div className={styles.stepTop}>
-                  <span className={styles.stepKey}>{step.key}</span>
-                  <code>
-                    ~{Math.round(step.share * target)}s ({Math.round(step.share * 100)}%)
-                  </code>
+          <div className={styles.steps} style={{ '--step-count': entries.length }}>
+            {entries.map(([code, weight]) => {
+              const meta = CRITERIA[code]
+              return (
+                <div key={code} className={`${styles.step} ${weight === topWeight ? styles.stepCore : ''}`}>
+                  <div className={styles.stepTop}>
+                    <span className={styles.stepKey}>{meta.key}</span>
+                    <code>{weight}% điểm</code>
+                  </div>
+                  <p className={styles.stepName}>{meta.label}</p>
+                  <p className={styles.stepDesc}>{criterionDesc(code, questionType)}</p>
+                  <p className={styles.stepAnchor}>
+                    <strong>Đạt 5 điểm:</strong> {anchor5(code, questionType)}
+                  </p>
                 </div>
-                <p className={styles.stepName}>{step.name}</p>
-                <p className={styles.stepDesc}>{step.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className={styles.weights}>
-            <span className={styles.weightsLabel}>Câu này được chấm theo:</span>
-            {Object.entries(weights).map(([code, weight]) => (
-              <span key={code} className={`${styles.weightChip} ${code === 'STRUCTURE' ? styles.weightChipActive : ''}`}>
-                {CRITERIA[code]?.label ?? code} <b>{weight}%</b>
-              </span>
-            ))}
+              )
+            })}
           </div>
           <p className={styles.tip}>
             <img src={iconCheckBadgeSm} alt="" width="22" height="21" />
             <span>
-              <strong>Mẹo:</strong> {framework.tip}
+              <strong>Mẹo:</strong> {RUBRIC_TIPS[questionType]}
             </span>
           </p>
         </div>

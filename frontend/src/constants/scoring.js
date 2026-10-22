@@ -1,6 +1,6 @@
 // Rubric chấm điểm cho giao diện, theo docs/business/Rubric_Cham_Diem.md (rubric-v1.0).
-// Không còn chấm 4 trụ S/T/A/R cố định: mỗi loại câu hỏi có bộ tiêu chí và trọng số riêng,
-// STAR chỉ là khung của tiêu chí Cấu trúc cho câu hỏi hành vi.
+// Không còn chấm 4 trụ S/T/A/R cố định: mỗi loại câu hỏi có bộ tiêu chí và trọng số riêng.
+// Trình tự tình huống → nhiệm vụ → hành động → kết quả chỉ là mô tả tiêu chí Cấu trúc của câu hỏi hành vi.
 export const RUBRIC_VERSION = 'rubric-v1.0'
 
 export const CRITERIA = {
@@ -39,22 +39,22 @@ export const CRITERIA = {
 // Khung của tiêu chí Cấu trúc theo loại câu hỏi (rubric mục 3.1)
 export const STRUCTURE_FRAMEWORK = {
   BEHAVIORAL: {
-    name: 'Khung STAR',
+    name: 'Trình tự kể',
     steps: 'Tình huống → Nhiệm vụ → Hành động → Kết quả',
-    anchor5: 'Đủ Situation, Task, Action, Result, rõ vai trò cá nhân, trình tự hợp lý.',
+    anchor5: 'Đủ tình huống, nhiệm vụ, hành động và kết quả, rõ vai trò cá nhân, trình tự hợp lý.',
   },
   SITUATIONAL: {
-    name: 'Khung phân tích',
+    name: 'Trình tự',
     steps: 'Phân tích → Quyết định → Lý do',
     anchor5: 'Nêu cách tiếp cận có thứ tự, giải thích lý do, cân nhắc rủi ro hoặc phương án khác.',
   },
   TECHNICAL: {
-    name: 'Khung giải thích',
+    name: 'Trình tự',
     steps: 'Khái niệm → Giải thích → Ví dụ',
     anchor5: 'Mạch rõ: khái niệm, cơ chế, ví dụ hoặc trường hợp áp dụng.',
   },
   INTRO: {
-    name: 'Khung giới thiệu',
+    name: 'Trình tự',
     steps: 'Hiện tại → Quá khứ → Định hướng',
     anchor5: 'Mạch lạc, nối kinh nghiệm với vị trí ứng tuyển và định hướng.',
   },

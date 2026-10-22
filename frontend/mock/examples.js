@@ -80,4 +80,28 @@ export const SCHEMA_EXAMPLES = {
     completedAt: null,
     errorCode: null,
   },
+  HistoryPage: {
+    content: [
+      { score: 78.5, q: 0, at: '2026-10-21T14:32:00Z' },
+      { score: 64, q: 3, at: '2026-10-20T09:10:00Z' },
+      { score: 88, q: 5, at: '2026-10-18T19:45:00Z' },
+    ].map(({ score, q, at }, i) => ({
+      id: `7e0f1a30-4a4e-4c0b-b6d2-1a2b3c4d5e${String(i).padStart(2, '0')}`,
+      userId: '3f6c1f0e-2a54-4a54-9b1e-0d5e2f7a9c11',
+      questionId: questions[q].id,
+      status: 'SCORED',
+      audioUrl: null,
+      duration: 95,
+      totalScore: score,
+      feedback: null,
+      startedAt: at,
+      submittedAt: at,
+      completedAt: at,
+      errorCode: null,
+    })),
+    page: 0,
+    size: 20,
+    totalElements: 3,
+    totalPages: 1,
+  },
 }

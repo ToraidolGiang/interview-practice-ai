@@ -1,11 +1,12 @@
 // Danh mục ngành/vị trí theo docs/business/Danh_Muc_Nganh_Vi_Tri.md (taxonomy-v1.0).
-// Giá trị gửi lên API phải đúng nguyên văn.
+// Giá trị gửi lên API phải đúng nguyên văn; label (thẻ câu hỏi) và chipLabel (bộ lọc) chỉ để hiển thị theo Figma.
 export const TAXONOMY_VERSION = 'taxonomy-v1.0'
 
 export const INDUSTRIES = [
   {
     value: 'IT',
     label: 'Công nghệ thông tin (IT)',
+    chipLabel: 'Công nghệ thông tin (IT)',
     positions: [
       'Chung',
       'Backend Developer',
@@ -21,27 +22,32 @@ export const INDUSTRIES = [
   },
   {
     value: 'Marketing',
-    label: 'Marketing',
+    label: 'Marketing / PR',
+    chipLabel: 'Marketing & PR',
     positions: ['Chung', 'Digital Marketing', 'Content Marketing', 'Chuyên viên SEO'],
   },
   {
     value: 'Kinh doanh / Bán hàng',
     label: 'Kinh doanh / Bán hàng',
+    chipLabel: 'Kinh doanh & Bán hàng',
     positions: ['Chung', 'Nhân viên kinh doanh', 'Nhân viên bán hàng'],
   },
   {
     value: 'Kế toán / Tài chính',
-    label: 'Kế toán / Tài chính',
+    label: 'Tài chính / Kế toán',
+    chipLabel: 'Tài chính & Kế toán',
     positions: ['Chung', 'Kế toán viên', 'Chuyên viên phân tích tài chính'],
   },
   {
     value: 'Nhân sự',
     label: 'Nhân sự (HR)',
+    chipLabel: 'Quản trị nhân sự (HR)',
     positions: ['Chung', 'Chuyên viên tuyển dụng', 'Chuyên viên C&B'],
   },
   {
     value: 'Chăm sóc khách hàng',
-    label: 'Chăm sóc khách hàng',
+    label: 'CSKH / Dịch vụ',
+    chipLabel: 'Chăm sóc khách hàng',
     positions: ['Chung', 'Nhân viên CSKH'],
   },
 ]

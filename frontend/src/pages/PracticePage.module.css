@@ -21,36 +21,6 @@
   color: var(--color-danger);
 }
 
-.topBar {
-  margin: -32px -24px 0;
-  padding: 14px 24px;
-  background: var(--color-surface-tint);
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--color-text-muted);
-}
-
-.breadcrumb a {
-  text-decoration: none;
-}
-
-.breadcrumb a:hover {
-  color: var(--color-brand-dark);
-}
-
-.breadcrumbCurrent {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  color: var(--color-text-heading);
-}
-
 .dot,
 .dotGreen {
   display: inline-block;
@@ -608,6 +578,19 @@
   flex: none;
 }
 
+.stepAnchor {
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-border);
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--color-text-muted);
+}
+
+.stepAnchor strong {
+  color: var(--color-text-heading);
+}
+
 /* ---- Ghi chú ---- */
 .notesCard {
   gap: 12px;
@@ -653,6 +636,12 @@
 
 .notes:focus {
   border-color: var(--color-brand-dark);
+}
+
+@media (max-width: 1000px) {
+  .steps {
+    grid-template-columns: repeat(min(var(--step-count), 3), minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 800px) {

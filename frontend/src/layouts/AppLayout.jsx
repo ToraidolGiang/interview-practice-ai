@@ -1,15 +1,16 @@
-import { NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import iconAdminSwitch from '../assets/figma/icon-admin-switch.svg'
-import iconBell from '../assets/figma/icon-bell.svg'
 import iconGlobe from '../assets/figma/icon-globe.svg'
 import logo from '../assets/figma/logo.jpg'
 import { useAuth } from '../auth/AuthContext'
+import ResultsMenu from '../components/ResultsMenu'
 import styles from './AppLayout.module.css'
 
 const NAV_ITEMS = [
   { to: '/questions', label: 'Ngân hàng câu hỏi' },
   { to: '/practice', label: 'Phòng luyện tập' },
-  { to: '/history', label: 'Lịch sử & Tiến độ' },
+  // Trang kết quả thuộc mục Lịch sử để người dùng biết tìm lại ở đâu
+  { to: '/history', label: 'Lịch sử & Tiến độ', also: ['/results'] },
 ]
 
 function initials(fullName = '') {
@@ -21,6 +22,7 @@ function initials(fullName = '') {
 // Header + footer chung cho các màn hình sau đăng nhập (Figma 15:889, 19:2921)
 export default function AppLayout() {
   const { user, logout } = useAuth()
+  const { pathname } = useLocation()
 
   return (
     <div className={styles.shell}>
@@ -37,7 +39,9 @@ export default function AppLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
-                className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navActive : ''}`}
+                className={({ isActive }) =>
+                  `${styles.navLink} ${isActive || item.also?.some((p) => pathname.startsWith(p)) ? styles.navActive : ''}`
+                }
               >
                 {item.label}
               </NavLink>
@@ -55,9 +59,7 @@ export default function AppLayout() {
                 Chuyển sang Admin
               </NavLink>
             )}
-            <button type="button" className={styles.bell} aria-label="Thông báo">
-              <img src={iconBell} alt="" width="13.333" height="16.667" />
-            </button>
+            <ResultsMenu />
             <div className={styles.profile}>
               <span className={styles.avatar} aria-hidden>
                 {initials(user?.fullName)}
@@ -87,22 +89,28 @@ export default function AppLayout() {
                 <span className={styles.brandName}>TalentSTAR AI</span>
               </div>
               <p>
-                Nền tảng luyện phỏng vấn AI thông minh chuẩn khung năng lực STAR dành cho ứng
-                viên tài năng và doanh nghiệp tuyển dụng hàng đầu.
+                Nền tảng luyện phỏng vấn AI, chấm điểm theo rubric riêng cho từng loại câu hỏi dành cho
+                ứng viên tài năng và doanh nghiệp tuyển dụng hàng đầu.
               </p>
             </div>
             <div className={styles.footerCol}>
               <h4>Tài nguyên</h4>
               <ul>
-                <li>Ngân hàng câu hỏi tuyển dụng</li>
-                <li>Phòng mô phỏng AI STAR</li>
-                <li>Báo cáo phân tích năng lực</li>
+                <li>
+                  <Link to="/questions">Ngân hàng câu hỏi tuyển dụng</Link>
+                </li>
+                <li>
+                  <Link to="/practice">Phòng luyện tập AI</Link>
+                </li>
+                <li>
+                  <Link to="/history">Báo cáo phân tích năng lực</Link>
+                </li>
               </ul>
             </div>
             <div className={styles.footerCol}>
               <h4>Hỗ trợ &amp; Pháp lý</h4>
               <ul>
-                <li>Hướng dẫn phương pháp STAR</li>
+                <li>Hướng dẫn rubric chấm điểm</li>
                 <li>Chính sách bảo mật dữ liệu</li>
                 <li>Điều khoản dịch vụ TalentSTAR</li>
               </ul>

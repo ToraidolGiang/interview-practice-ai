@@ -1,0 +1,147 @@
+.root {
+  position: relative;
+}
+
+.bell {
+  position: relative;
+  display: flex;
+  padding: 8px;
+  border: 0;
+  border-radius: 9999px;
+  background: none;
+  cursor: pointer;
+}
+
+.bell:hover,
+.bellOpen {
+  background: var(--color-surface-tint);
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border: 2px solid #fff;
+  border-radius: 9999px;
+  background: #e11d48;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 12px;
+  color: #fff;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
+}
+
+.panelHead {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.empty {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.item:hover {
+  background: var(--color-surface-tint);
+}
+
+.score {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.band_excellent,
+.band_good {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.band_fair {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.band_weak {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.itemTitle {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-heading);
+}
+
+.itemMeta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.all {
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  color: var(--color-brand-dark);
+}
+
+.all:hover {
+  background: var(--color-surface-tint);
+}

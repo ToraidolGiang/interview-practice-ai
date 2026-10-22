@@ -59,7 +59,7 @@ export const LEVELS = [
 ]
 
 export const QUESTION_TYPES = [
-  { value: 'BEHAVIORAL', label: 'Hành vi STAR (Behavioral)' },
+  { value: 'BEHAVIORAL', label: 'Hành vi (Behavioral)' },
   { value: 'SITUATIONAL', label: 'Tình huống (Situational)' },
   { value: 'TECHNICAL', label: 'Chuyên môn (Technical)' },
   { value: 'INTRO', label: 'Giới thiệu bản thân (Intro)' },

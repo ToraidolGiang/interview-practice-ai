@@ -1,0 +1,67 @@
+.figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.svg {
+  width: 100%;
+  max-width: 280px;
+  overflow: visible;
+}
+
+.grid,
+.gridOuter {
+  fill: none;
+  stroke: #c7d2fe;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.gridOuter {
+  stroke: #a5b4fc;
+  stroke-dasharray: none;
+}
+
+.axis {
+  stroke: #e0e7ff;
+  stroke-width: 1;
+}
+
+.area {
+  fill: rgba(53, 37, 205, 0.18);
+  stroke: var(--color-brand-dark);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.dot {
+  fill: var(--color-brand-dark);
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--color-text-heading);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: var(--color-brand-dark);
+}

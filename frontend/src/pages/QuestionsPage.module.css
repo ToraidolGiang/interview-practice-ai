@@ -1,7 +1,6 @@
 /* Màn Ngân hàng câu hỏi (Figma 15:464), số đo lấy từ design context */
 .page {
   position: relative;
-  margin-top: -8px;
 }
 
 .glowRight,
@@ -34,21 +33,6 @@
   flex-direction: column;
   gap: 8px;
   padding-bottom: 88px;
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
-  color: var(--color-text-muted);
-}
-
-.breadcrumbCurrent {
-  font-weight: 600;
-  color: var(--color-brand-dark);
 }
 
 .titleRow {

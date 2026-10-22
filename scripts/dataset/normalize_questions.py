@@ -40,14 +40,15 @@ QUESTION_TYPES = ["BEHAVIORAL", "SITUATIONAL", "TECHNICAL", "INTRO"]
 LEVELS = ["EASY", "MEDIUM", "HARD"]
 DROP_REASONS = ["CODING_TASK", "COMMAND_SPECIFIC", "COMPANY_SPECIFIC", "NOT_INTERVIEW", "OUTDATED", "LOW_QUALITY"]
 
-# Giá trị industry/position tiếng Việt dùng thống nhất trong bảng questions (cột lọc idx_questions_filter)
-INDUSTRY_VI = {"IT": "Công nghệ thông tin"}
+# Giá trị industry/position theo docs/business/Danh_Muc_Nganh_Vi_Tri.md (taxonomy-v1.0)
+INDUSTRY_VI = {"IT": "IT"}
 POSITION_VI = {
-    "Software Engineer": "Kỹ sư phần mềm",
-    "Frontend Developer": "Lập trình viên Frontend",
-    "Data Scientist": "Nhà khoa học dữ liệu",
-    "System Administrator / DevOps": "Quản trị hệ thống / DevOps",
+    "Software Engineer": "Chung",
+    "Frontend Developer": "Frontend Developer",
+    "Data Scientist": "Data Scientist / AI",
+    "System Administrator / DevOps": "DevOps / Quản trị hệ thống",
 }
+GENERAL_POSITION = "Chung"  # câu hỏi không phải TECHNICAL dùng chung cho mọi vị trí trong ngành
 
 SYSTEM_PROMPT = """Bạn là chuyên gia tuyển dụng ngành {industry} tại Việt Nam, đang xây ngân hàng câu hỏi cho ứng dụng luyện phỏng vấn bằng giọng nói tiếng Việt.
 Ứng viên trả lời bằng LỜI NÓI (1-3 phút), không viết code, không gõ lệnh.
@@ -200,7 +201,8 @@ def to_output_record(result, source, model):
         "drop_reason": None if keep else result.get("drop_reason"),
         "content": text("content_vi", keep),
         "industry": INDUSTRY_VI.get(source["industry"], source["industry"]),
-        "position": POSITION_VI.get(source["position"], source["position"]),
+        "position": (POSITION_VI.get(source["position"], source["position"])
+                     if technical or not keep else GENERAL_POSITION),
         "level": result.get("level") if keep else None,
         "question_type": result.get("question_type") if keep else None,
         "answer_hint": text("answer_hint", keep),

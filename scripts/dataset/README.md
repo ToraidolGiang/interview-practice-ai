@@ -57,4 +57,4 @@ python scripts/dataset/normalize_questions.py                       # chạy h�
 - Cần `GEMINI_API_KEY` (biến môi trường hoặc `.env`). Model mặc định `gemini-3.7-flash`, đổi bằng `--model` hoặc `GEMINI_MODEL`.
 - Ghi nối tiếp vào `data/interim/questions_vi.jsonl` và bỏ qua id đã xử lý, nên chạy lại được khi bị ngắt hoặc hết quota.
 - Kết quả từng câu được kiểm tra (enum, trường bắt buộc, TECHNICAL phải có `reference_answer`); câu lỗi được gọi lại riêng 1 lần, vẫn lỗi thì ghi vào `questions_vi.errors.jsonl`.
-- Mọi câu có `review_status: "PENDING"`, **phải có người duyệt** trước khi seed vào bảng `questions`. `industry`/`position` được đổi sang tiếng Việt theo `INDUSTRY_VI`/`POSITION_VI` trong script, nhóm thống nhất lại nếu cần.
+- Mọi câu có `review_status: "PENDING"`, **phải có người duyệt** trước khi seed vào bảng `questions`. `industry`/`position` theo `docs/business/Danh_Muc_Nganh_Vi_Tri.md`; câu không phải `TECHNICAL` gán vị trí `Chung`.

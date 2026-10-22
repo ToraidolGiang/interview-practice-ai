@@ -20,7 +20,7 @@
 .pages {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .page,
@@ -32,21 +32,23 @@
   height: 40px;
   padding: 0 8px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--color-surface-tint);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--color-text-heading);
   cursor: pointer;
 }
 
 .arrow {
-  min-width: 28px;
-  background: none;
+  min-width: 0;
+  width: 24px;
+  height: 31px;
+  padding: 0;
 }
 
 .arrow:disabled {
-  opacity: 0.35;
+  opacity: 0.4;
   cursor: default;
 }
 
@@ -57,11 +59,14 @@
 .pageActive,
 .pageActive:hover {
   background: var(--color-brand-dark);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  font-weight: 700;
   color: #fff;
 }
 
 .gap {
-  padding: 0 4px;
+  padding: 0 8px;
+  font-size: 12px;
 }
 
 .jump {

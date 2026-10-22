@@ -1,19 +1,17 @@
 import { useState } from 'react'
 import iconPageNext from '../assets/figma/icon-page-next.svg'
 import iconPagePrev from '../assets/figma/icon-page-prev.svg'
+import { formatCount } from '../utils/format'
 import styles from './Pagination.module.css'
 
 // Trang trong API bắt đầu từ 0, hiển thị cho người dùng bắt đầu từ 1
 function pageItems(current, totalPages) {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i)
-  const items = [0]
-  const start = Math.max(1, current - 1)
-  const end = Math.min(totalPages - 2, current + 1)
-  if (start > 1) items.push('gap-start')
-  for (let i = start; i <= end; i++) items.push(i)
-  if (end < totalPages - 2) items.push('gap-end')
-  items.push(totalPages - 1)
-  return items
+  const last = totalPages - 1
+  // Như Figma: 1 2 3 ... 3402 ở đầu, cửa sổ 3 trang quanh trang hiện tại ở giữa
+  if (current < 3) return [0, 1, 2, 'gap-end', last]
+  if (current > last - 3) return [0, 'gap-start', last - 2, last - 1, last]
+  return [0, 'gap-start', current - 1, current, current + 1, 'gap-end', last]
 }
 
 export default function Pagination({ page, size, totalElements, totalPages, itemLabel, onChange }) {
@@ -33,8 +31,8 @@ export default function Pagination({ page, size, totalElements, totalPages, item
   return (
     <nav className={styles.bar} aria-label="Phân trang">
       <p className={styles.summary}>
-        Hiển thị <strong>{from.toLocaleString('vi-VN')} - {to.toLocaleString('vi-VN')}</strong> trên
-        tổng số <strong>{totalElements.toLocaleString('vi-VN')}</strong> {itemLabel}
+        Hiển thị <strong>{formatCount(from)} - {formatCount(to)}</strong> trên
+        tổng số <strong>{formatCount(totalElements)}</strong> {itemLabel}
       </p>
 
       <div className={styles.pages}>

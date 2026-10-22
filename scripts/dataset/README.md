@@ -38,3 +38,23 @@ Yêu cầu Python 3.9+, không cần cài thêm thư viện. Đặt `GITHUB_TOKE
 | `level_guess` | `EASY`/`MEDIUM`/`HARD` nếu nguồn có, ngược lại `null` |
 | `industry`, `position`, `topic` | Ngành, vị trí, chủ đề/mục trong file gốc |
 | `source` | `repo`, `path`, `commit`, `url`, `license`; cần giữ để ghi nguồn theo license |
+
+## `normalize_questions.py`
+
+Dùng Gemini (REST `generateContent`, structured output) để chuyển `github_questions.jsonl` thành bản nháp câu hỏi tiếng Việt:
+
+- loại câu không hợp trả lời bằng lời nói (`drop_reason`: `CODING_TASK`, `COMMAND_SPECIFIC`, `COMPANY_SPECIFIC`, `NOT_INTERVIEW`, `OUTDATED`, `LOW_QUALITY`)
+- viết lại câu hỏi tiếng Việt tự nhiên, khái quát hoá tên công ty
+- gán `question_type`, `level` theo `docs/business/Rubric_Cham_Diem.md`
+- soạn `answer_hint` (mọi loại) và `reference_answer` (chỉ `TECHNICAL`, 3-6 ý chính)
+
+```bash
+python scripts/dataset/normalize_questions.py --dry-run --limit 5   # xem prompt, không gọi API
+python scripts/dataset/normalize_questions.py --limit 20            # chạy thử
+python scripts/dataset/normalize_questions.py                       # chạy hết (~80 lô)
+```
+
+- Cần `GEMINI_API_KEY` (biến môi trường hoặc `.env`). Model mặc định `gemini-3.7-flash`, đổi bằng `--model` hoặc `GEMINI_MODEL`.
+- Ghi nối tiếp vào `data/interim/questions_vi.jsonl` và bỏ qua id đã xử lý, nên chạy lại được khi bị ngắt hoặc hết quota.
+- Kết quả từng câu được kiểm tra (enum, trường bắt buộc, TECHNICAL phải có `reference_answer`); câu lỗi được gọi lại riêng 1 lần, vẫn lỗi thì ghi vào `questions_vi.errors.jsonl`.
+- Mọi câu có `review_status: "PENDING"`, **phải có người duyệt** trước khi seed vào bảng `questions`. `industry`/`position` được đổi sang tiếng Việt theo `INDUSTRY_VI`/`POSITION_VI` trong script, nhóm thống nhất lại nếu cần.

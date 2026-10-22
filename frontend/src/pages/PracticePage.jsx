@@ -24,6 +24,7 @@ import {
   MIN_RECORDING_SECONDS,
   WARNING_REMAINING_SECONDS,
 } from '../constants/practice'
+import { CRITERIA, WEIGHTS } from '../constants/scoring'
 import { industryLabel, levelOf, questionTypeLabel } from '../constants/taxonomy'
 import { isRecordingSupported, useAudioRecorder } from '../hooks/useAudioRecorder'
 import Placeholder from './Placeholder'
@@ -362,6 +363,7 @@ function FrameworkCard({ questionType }) {
   if (!framework) return null
   // Thời lượng gợi ý tính trên 150 giây (khoảng giữa giới hạn ghi âm)
   const target = 150
+  const weights = WEIGHTS[questionType] ?? {}
 
   return (
     <section className={`${styles.card} ${styles.frameworkCard}`}>
@@ -379,7 +381,9 @@ function FrameworkCard({ questionType }) {
             {framework.title}
             <span className={styles.frameworkBadge}>Gợi ý {target}s</span>
           </span>
-          <span className={styles.frameworkSub}>Phân bổ thời lượng gợi ý cho từng phần câu trả lời</span>
+          <span className={styles.frameworkSub}>
+            Khung của tiêu chí Cấu trúc ({weights.STRUCTURE}% điểm) • phân bổ thời lượng gợi ý cho từng phần
+          </span>
         </span>
         <span className={styles.collapse}>
           {open ? 'Thu gọn' : 'Mở rộng'}
@@ -407,6 +411,14 @@ function FrameworkCard({ questionType }) {
                 <p className={styles.stepName}>{step.name}</p>
                 <p className={styles.stepDesc}>{step.desc}</p>
               </div>
+            ))}
+          </div>
+          <div className={styles.weights}>
+            <span className={styles.weightsLabel}>Câu này được chấm theo:</span>
+            {Object.entries(weights).map(([code, weight]) => (
+              <span key={code} className={`${styles.weightChip} ${code === 'STRUCTURE' ? styles.weightChipActive : ''}`}>
+                {CRITERIA[code]?.label ?? code} <b>{weight}%</b>
+              </span>
             ))}
           </div>
           <p className={styles.tip}>

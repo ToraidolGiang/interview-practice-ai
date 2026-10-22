@@ -64,7 +64,9 @@ a {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -75,4 +77,12 @@ input {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* Xuất PDF báo cáo kết quả: bỏ header, footer của ứng dụng */
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
 }

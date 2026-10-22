@@ -1,21 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
+import iconBreadcrumbChevron from '../assets/figma/icon-breadcrumb-chevron.svg'
 import iconBulbSm from '../assets/figma/icon-bulb-sm.svg'
 import iconChat from '../assets/figma/icon-chat.svg'
+import iconFeedbackDoc from '../assets/figma/icon-feedback-doc.svg'
 import iconFlag from '../assets/figma/icon-flag.svg'
+import iconPdf from '../assets/figma/icon-pdf.svg'
+import iconPlayWhite from '../assets/figma/icon-play-white.svg'
 import iconQuote from '../assets/figma/icon-quote.svg'
-import iconSpeaker from '../assets/figma/icon-speaker.svg'
 import iconTranscript from '../assets/figma/icon-transcript.svg'
 import iconTrendUp from '../assets/figma/icon-trend-up.svg'
 import { evaluateSession, getFeedbackAudio } from '../api/practice'
 import { getQuestion } from '../api/questions'
-import AudioPlayer from '../components/AudioPlayer'
 import DeliveryPanel from '../components/DeliveryPanel'
+import RubricRadar from '../components/RubricRadar'
 import { formatClock } from '../constants/practice'
-import { CRITERIA, FAILED_MESSAGES, scoreBand } from '../constants/scoring'
+import {
+  anchor5,
+  contribution,
+  CRITERIA,
+  criterionDesc,
+  FAILED_MESSAGES,
+  formatPoints,
+  scoreBand,
+  WEIGHTS,
+} from '../constants/scoring'
 import { industryLabel, levelOf, questionTypeLabel } from '../constants/taxonomy'
 import { useSessionResult } from '../hooks/useSessionResult'
-import { splitFillers } from '../utils/fillers'
+import { highlightTranscript } from '../utils/fillers'
 import styles from './ResultsPage.module.css'
 
 export default function ResultsPage() {
@@ -39,14 +51,31 @@ function ResultsView({ sessionId }) {
     }
   }, [questionId])
 
+  const questionType = result?.questionType ?? question?.questionType
+
   return (
     <div className={styles.page}>
-      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <img src={iconFlag} alt="" width="9.33333" height="10.6667" />
-        <Link to="/questions">Luyện tập</Link>
-        <span aria-hidden>›</span>
-        <span className={styles.breadcrumbCurrent}>Kết quả phân tích</span>
-      </nav>
+      <div className={styles.topBar}>
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+          <img src={iconFlag} alt="" width="9.33333" height="10.6667" />
+          <Link to="/questions">Luyện tập</Link>
+          <img src={iconBreadcrumbChevron} alt="" width="4.31667" height="7" />
+          <span className={styles.breadcrumbCurrent}>Kết quả phân tích câu trả lời</span>
+          {questionType && <span className={styles.breadcrumbTag}>{questionTypeLabel(questionType).split(' (')[0]}</span>}
+        </nav>
+        {phase === 'scored' && (
+          <div className={styles.topActions}>
+            <span className={styles.engineChip}>
+              <span className={styles.engineDot} aria-hidden />
+              Chấm theo {result.rubricVersion ?? 'rubric-v1.0'}
+            </span>
+            <button type="button" className={styles.pdfButton} onClick={() => window.print()}>
+              <img src={iconPdf} alt="" width="13.3333" height="13.3333" />
+              Xuất PDF Báo cáo
+            </button>
+          </div>
+        )}
+      </div>
 
       {phase === 'loading' && <p className={styles.muted}>Đang tải kết quả...</p>}
       {phase === 'error' && (
@@ -70,7 +99,9 @@ function ResultsView({ sessionId }) {
           </Link>
         </section>
       )}
-      {phase === 'scored' && <ScoredView session={session} result={result} question={question} />}
+      {phase === 'scored' && (
+        <ScoredView session={session} result={result} question={question} questionType={questionType} />
+      )}
     </div>
   )
 }
@@ -144,11 +175,34 @@ function FailedCard({ session, onRetried }) {
   )
 }
 
-function ScoredView({ session, result, question }) {
+/** Gộp tiêu chí do LLM chấm và Delivery (code tính) thành một danh sách hàng rubric. */
+function rubricRows(result, questionType) {
+  const weights = WEIGHTS[questionType] ?? {}
+  const rows = (result.criteria ?? []).map((c) => ({
+    code: c.code,
+    score: c.score,
+    weight: c.weight ?? weights[c.code] ?? 0,
+    reasoning: c.reasoning,
+    quote: c.quote,
+    quoteInvalid: c.quoteInvalid,
+  }))
+  if (result.delivery) {
+    rows.push({
+      code: 'DELIVERY',
+      score: Number(result.delivery.deliveryScore),
+      // Server không trả trọng số Delivery; lấy theo rubric (10) hoặc phần còn lại để tổng = 100
+      weight: weights.DELIVERY ?? Math.max(0, 100 - rows.reduce((sum, r) => sum + r.weight, 0)),
+      reasoning: `Tốc độ ${result.delivery.wpm} từ/phút, ${result.delivery.fillerCount} từ đệm (${Number(result.delivery.fillerRate).toLocaleString('en-US', { maximumFractionDigits: 2 })} trên 100 từ).`,
+    })
+  }
+  return rows
+}
+
+function ScoredView({ session, result, question, questionType }) {
   const total = Math.round(result.totalScore ?? 0)
   const band = scoreBand(total)
   const delivery = result.delivery
-  const level = question ? levelOf(question.level) : null
+  const rows = rubricRows(result, questionType)
 
   return (
     <>
@@ -156,8 +210,10 @@ function ScoredView({ session, result, question }) {
         <ScoreRing value={total} />
         <div className={styles.heroText}>
           <p className={styles.heroBadges}>
-            <span className={`${styles.bandBadge} ${styles[`band_${band.tone}`]}`}>{band.label}</span>
-            <span>{questionTypeLabel(result.questionType ?? question?.questionType)}</span>
+            <span className={styles.bandBadge}>{band.label}</span>
+            <span>
+              Chấm theo rubric {questionTypeLabel(questionType).split(' (')[0].toLowerCase()} • {rows.length} tiêu chí
+            </span>
           </p>
           <h1 className={styles.heroTitle}>{question?.content ?? 'Câu hỏi luyện tập'}</h1>
           {question && (
@@ -167,7 +223,7 @@ function ScoredView({ session, result, question }) {
           )}
         </div>
         <div className={styles.heroStats}>
-          <Stat label="Nội dung" value={result.contentScore != null ? Math.round(result.contentScore) : '--'} unit="/100" />
+          <Stat label="Nội dung" value={result.contentScore != null ? formatPoints(result.contentScore) : '--'} />
           <Stat label="Tốc độ" value={delivery?.wpm ?? '--'} unit="wpm" />
           <Stat label="Từ đệm" value={delivery?.fillerCount ?? '--'} unit="lần" />
         </div>
@@ -178,46 +234,23 @@ function ScoredView({ session, result, question }) {
       <div className={styles.layout}>
         <div className={styles.mainCol}>
           <FeedbackCard sessionId={session.id} result={result} />
-          <CriteriaCard criteria={result.criteria ?? []} />
-          <TranscriptCard transcript={result.transcript} />
-          {result.sampleAnswer && <SampleAnswerCard text={result.sampleAnswer} />}
+          <RubricCard rows={rows} questionType={questionType} total={total} band={band} hasDelivery={!!delivery} />
+          <TranscriptCard transcript={result.transcript} criteria={result.criteria ?? []} />
+          <SuggestionsCard rows={rows} questionType={questionType} result={result} sessionId={session.id} />
         </div>
 
         <aside className={styles.sideCol}>
-          <DeliveryPanel delivery={delivery} />
+          <DeliveryPanel delivery={delivery} transcript={result.transcript} />
           <section className={styles.card}>
-            <h3 className={styles.sideTitle}>Thông số phiên luyện tập</h3>
-            <dl className={styles.facts}>
-              {level && (
-                <>
-                  <dt>Độ khó</dt>
-                  <dd>
-                    <span className={`${styles.levelBadge} ${styles[`level_${level.value}`]}`}>{level.label === 'TB' ? 'Trung bình' : level.label}</span>
-                  </dd>
-                </>
-              )}
-              <dt>Thời lượng trả lời</dt>
-              <dd>{session.duration ? formatClock(session.duration) : '--'}</dd>
-              <dt>Thời điểm chấm</dt>
-              <dd>{formatDateTime(session.completedAt ?? session.submittedAt)}</dd>
-              <dt>Phiên bản rubric</dt>
-              <dd>{result.rubricVersion ?? '--'}</dd>
-              {delivery?.fillerListVersion && (
-                <>
-                  <dt>Danh sách từ đệm</dt>
-                  <dd>{delivery.fillerListVersion}</dd>
-                </>
-              )}
-            </dl>
-            <div className={styles.sideActions}>
-              <Link className={styles.primaryLink} to="/questions">
-                Luyện câu khác
-              </Link>
-              <Link className={styles.secondaryLink} to="/history">
-                Xem lịch sử
-              </Link>
+            <div>
+              <h3 className={styles.sideHeading}>Hồ sơ năng lực theo rubric</h3>
+              <p className={styles.muted}>Điểm từng tiêu chí của câu trả lời này trên thang 1-5.</p>
             </div>
+            <RubricRadar
+              items={rows.map((r) => ({ label: CRITERIA[r.code]?.label ?? r.code, score: r.score }))}
+            />
           </section>
+          <SessionInfo session={session} result={result} question={question} />
         </aside>
       </div>
     </>
@@ -229,7 +262,7 @@ function ScoreRing({ value }) {
   const c = 2 * Math.PI * r
   return (
     <div className={styles.ring} role="img" aria-label={`Điểm tổng ${value} trên 100`}>
-      <svg viewBox="0 0 100 100" width="104" height="104" aria-hidden>
+      <svg viewBox="0 0 100 100" width="96" height="96" aria-hidden>
         <circle cx="50" cy="50" r={r} className={styles.ringTrack} />
         <circle
           cx="50"
@@ -254,7 +287,7 @@ function Stat({ label, value, unit }) {
       <span className={styles.statLabel}>{label}</span>
       <span className={styles.statValue}>
         {value}
-        <small> {unit}</small>
+        {unit && <small> {unit}</small>}
       </span>
     </div>
   )
@@ -265,9 +298,9 @@ function Warnings({ result }) {
   if (result.offTopic)
     items.push('Câu trả lời được đánh giá là lạc đề so với câu hỏi, điểm tổng bị giới hạn tối đa 30.')
   if (result.injectionSuspected)
-    items.push('Phát hiện nội dung có dấu hiệu yêu cầu thao túng điểm trong câu trả lời. Kết quả đã được chấm bình thường theo nội dung.')
+    items.push('Phát hiện nội dung có dấu hiệu yêu cầu thao túng điểm trong câu trả lời. Kết quả vẫn được chấm theo nội dung thật.')
   if (!result.delivery)
-    items.push('Không đủ dữ liệu để chấm Delivery (dưới 30 từ). Trọng số Delivery đã chia lại cho các tiêu chí nội dung.')
+    items.push('Không đủ dữ liệu để chấm Giọng nói (dưới 30 từ). Trọng số 10% đã chia lại cho các tiêu chí nội dung.')
   if (!items.length) return null
   return (
     <div className={styles.warnings} role="status">
@@ -278,124 +311,227 @@ function Warnings({ result }) {
   )
 }
 
-function FeedbackCard({ sessionId, result }) {
-  const [audio, setAudio] = useState({ status: 'idle', url: result.ttsAudioUrl ?? null, error: null })
+const SPEEDS = [1, 1.25, 1.5]
+const WAVE = [12, 20, 28, 16, 24, 32, 18, 10, 22, 30, 14, 26, 20, 12, 28, 18, 24, 10, 30, 16, 22, 14, 26, 20, 12, 18, 28, 16, 22, 10, 24, 14]
 
-  async function loadAudio() {
-    setAudio({ status: 'loading', url: null, error: null })
+// Khối phản hồi giọng nói (UC6, Figma "Spoken Voice Feedback"): audio TTS chỉ tải khi bấm nghe
+function FeedbackCard({ sessionId, result }) {
+  const audioRef = useRef(null)
+  const [src, setSrc] = useState(result.ttsAudioUrl ?? null)
+  const [status, setStatus] = useState('idle')
+  const [error, setError] = useState(null)
+  const [playing, setPlaying] = useState(false)
+  const [time, setTime] = useState({ current: 0, duration: 0 })
+  const [speed, setSpeed] = useState(1)
+  const [showText, setShowText] = useState(true)
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.playbackRate = speed
+  }, [speed, src])
+
+  async function togglePlay() {
+    const audio = audioRef.current
+    if (src && audio) {
+      if (audio.paused) audio.play()
+      else audio.pause()
+      return
+    }
+    setStatus('loading')
+    setError(null)
     try {
       const res = await getFeedbackAudio(sessionId)
-      setAudio({ status: 'ready', url: res.ttsAudioUrl, error: null })
+      setSrc(res.ttsAudioUrl)
+      setStatus('ready')
     } catch (err) {
-      setAudio({
-        status: 'error',
-        url: null,
-        error: err.status === 502 ? 'Dịch vụ đọc phản hồi tạm thời gián đoạn, bạn vẫn đọc được phản hồi bên dưới.' : err.message,
-      })
+      setStatus('error')
+      setError(err.status === 502 ? 'Dịch vụ đọc phản hồi tạm thời gián đoạn, bạn vẫn đọc được phản hồi bên dưới.' : err.message)
     }
   }
+
+  const progress = time.duration ? time.current / time.duration : 0
 
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>
         <div>
-          <h2 className={styles.cardTitle}>Phản hồi của AI</h2>
-          <p className={styles.muted}>Nhận xét tổng hợp về câu trả lời của bạn</p>
+          <h2 className={styles.cardTitle}>Phản hồi âm thanh AI (Spoken Voice Feedback)</h2>
+          <p className={styles.muted}>
+            Tổng hợp từ kết quả chấm theo rubric • Giọng đọc: <span className={styles.accent}>Tiếng Việt (TTS)</span>
+          </p>
         </div>
-        {!audio.url && (
-          <button type="button" className={styles.listenButton} onClick={loadAudio} disabled={audio.status === 'loading'}>
-            <img src={iconSpeaker} alt="" width="18" height="17.5" />
-            {audio.status === 'loading' ? 'Đang tạo giọng đọc...' : 'Nghe phản hồi'}
-          </button>
+        <span className={styles.pillChip}>Phản hồi giọng nói</span>
+      </div>
+
+      <div className={styles.deck}>
+        <div className={styles.deckRow}>
+          <div className={styles.deckControls}>
+            <button
+              type="button"
+              className={styles.roundButton}
+              onClick={() => setShowText((v) => !v)}
+              aria-label={showText ? 'Ẩn lời phản hồi' : 'Hiện lời phản hồi'}
+              aria-pressed={showText}
+            >
+              <img src={iconFeedbackDoc} alt="" width="15" height="15" />
+            </button>
+            <button
+              type="button"
+              className={styles.playButton}
+              onClick={togglePlay}
+              disabled={status === 'loading'}
+              aria-label={playing ? 'Tạm dừng phản hồi' : 'Nghe phản hồi'}
+            >
+              {playing ? <span className={styles.pauseGlyph} aria-hidden /> : <img src={iconPlayWhite} alt="" width="11" height="14" />}
+            </button>
+          </div>
+          <div className={styles.wave} aria-hidden>
+            {WAVE.map((h, i) => (
+              <span
+                key={i}
+                style={{ height: h }}
+                className={i / WAVE.length < progress ? styles.wavePlayed : undefined}
+              />
+            ))}
+          </div>
+          <span className={styles.deckTime}>
+            {status === 'loading' ? 'Đang tạo...' : `${formatClock(time.current)} / ${formatClock(time.duration)}`}
+          </span>
+          <div className={styles.speeds}>
+            {SPEEDS.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className={`${styles.speed} ${s === speed ? styles.speedActive : ''}`}
+                onClick={() => setSpeed(s)}
+              >
+                {s === 1 ? '1.0' : s}x
+              </button>
+            ))}
+          </div>
+        </div>
+        {src && (
+          <audio
+            ref={audioRef}
+            src={src}
+            autoPlay={status === 'ready'}
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
+            onEnded={() => setPlaying(false)}
+            onTimeUpdate={(e) => setTime({ current: e.currentTarget.currentTime, duration: e.currentTarget.duration || 0 })}
+            onLoadedMetadata={(e) => setTime((t) => ({ ...t, duration: e.currentTarget.duration || 0 }))}
+          />
+        )}
+        {showText && result.feedbackText && (
+          <blockquote className={styles.quoteBox}>
+            <img src={iconQuote} alt="" width="14.1667" height="12" />
+            <p>“{result.feedbackText}”</p>
+          </blockquote>
         )}
       </div>
-      {audio.url && <AudioPlayer src={audio.url} />}
-      {audio.error && <p className={styles.notice}>{audio.error}</p>}
-      {result.feedbackText && (
-        <blockquote className={styles.quoteBox}>
-          <img src={iconQuote} alt="" width="14.1667" height="12" />
-          <p>{result.feedbackText}</p>
-        </blockquote>
-      )}
+      {error && <p className={styles.notice}>{error}</p>}
     </section>
   )
 }
 
-function CriteriaCard({ criteria }) {
-  const best = criteria.reduce((max, c) => (max && max.score >= c.score ? max : c), null)
+function RubricCard({ rows, questionType, total, band, hasDelivery }) {
+  const best = rows.reduce((max, r) => (max && max.score >= r.score ? max : r), null)
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>
         <div>
-          <h2 className={styles.cardTitle}>Đánh giá theo rubric</h2>
-          <p className={styles.muted}>Mỗi tiêu chí chấm thang 1-5 kèm trích dẫn từ câu trả lời của bạn</p>
+          <h2 className={styles.cardTitle}>Đánh giá theo rubric chấm điểm</h2>
+          <p className={styles.muted}>
+            {questionTypeLabel(questionType)}: chấm từng tiêu chí thang 1-5, quy đổi theo trọng số về thang 100.
+          </p>
         </div>
+        <span className={`${styles.bandChip} ${styles[`band_${band.tone}`]}`}>
+          {band.label} {total}/100
+        </span>
       </div>
-      <div className={styles.criteria}>
-        {criteria.map((c) => {
-          const meta = CRITERIA[c.code] ?? { key: c.code.charAt(0), label: c.code, desc: '' }
-          const percent = ((c.score - 1) / 4) * 100
+
+      <div className={styles.rubricRows}>
+        {rows.map((r) => {
+          const meta = CRITERIA[r.code] ?? { key: r.code.charAt(0), label: r.code }
+          const points = contribution(r.score, r.weight)
           return (
-            <article key={c.code} className={styles.criterion}>
-              <div className={styles.criterionTop}>
-                <span className={styles.criterionKey}>{meta.key}</span>
-                <div className={styles.criterionName}>
+            <article key={r.code} className={styles.rubricRow}>
+              <div className={styles.rowTop}>
+                <span className={`${styles.rowKey} ${r.code === 'DELIVERY' ? styles.rowKeyAlt : ''}`}>{meta.key}</span>
+                <div className={styles.rowName}>
                   <p>
                     {meta.label}
-                    {best?.code === c.code && criteria.length > 1 && <span className={styles.bestTag}>Cao nhất</span>}
+                    {best?.code === r.code && rows.length > 1 && <span className={styles.bestTag}>Cao nhất</span>}
+                  </p>
+                  <small>{criterionDesc(r.code, questionType)}</small>
+                </div>
+                <div className={styles.rowScore}>
+                  <p>
+                    {formatPoints(r.score)}
+                    <small>/5</small>
                   </p>
                   <small>
-                    {meta.desc} • trọng số {c.weight}%
+                    +{formatPoints(points)}/{r.weight} điểm
                   </small>
                 </div>
-                <span className={styles.criterionScore}>
-                  {c.score}
-                  <small>/5</small>
-                </span>
               </div>
               <div className={styles.bar}>
-                <div
-                  className={`${styles.barFill} ${c.score >= 4 ? styles.barGood : c.score <= 2 ? styles.barWeak : ''}`}
-                  style={{ width: `${Math.max(4, percent)}%` }}
-                />
+                <div className={styles.barFill} style={{ width: `${Math.max(3, ((r.score - 1) / 4) * 100)}%` }} />
               </div>
-              {c.reasoning && (
+              {r.reasoning && (
                 <p className={styles.reasoning}>
-                  <strong>Nhận xét AI:</strong> {c.reasoning}
+                  <strong>{r.code === 'DELIVERY' ? 'Đo tự động:' : 'Nhận xét AI:'}</strong> {r.reasoning}
                 </p>
               )}
-              {c.quote && (
-                <p className={`${styles.evidence} ${c.quoteInvalid ? styles.evidenceInvalid : ''}`}>
-                  “{c.quote}”
-                  {c.quoteInvalid && (
-                    <span> Trích dẫn không khớp với transcript nên điểm tiêu chí này đã bị hạ.</span>
-                  )}
+              {r.quote && (
+                <p className={`${styles.evidence} ${r.quoteInvalid ? styles.evidenceInvalid : ''}`}>
+                  Trích dẫn: “{r.quote}”
+                  {r.quoteInvalid && <span> Không khớp với transcript nên điểm tiêu chí này đã bị hạ.</span>}
                 </p>
               )}
             </article>
           )
         })}
       </div>
+
+      <p className={styles.formula}>
+        Điểm tổng = Σ trọng số × (điểm − 1) / 4. Điểm 1 ứng với 0%, điểm 5 ứng với 100% trọng số.
+        {!hasDelivery && ' Thiếu dữ liệu giọng nói nên trọng số Delivery đã chia lại cho các tiêu chí nội dung.'}
+      </p>
     </section>
   )
 }
 
-function TranscriptCard({ transcript }) {
-  const segments = splitFillers(transcript)
+function TranscriptCard({ transcript, criteria }) {
+  const quotes = criteria.filter((c) => c.quote && !c.quoteInvalid).map((c) => c.quote)
+  const segments = highlightTranscript(transcript, quotes)
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={`${styles.cardTitle} ${styles.withIcon}`}>
           <img src={iconTranscript} alt="" width="18.3333" height="14.6667" />
-          Văn bản nhận diện giọng nói
+          Văn bản nhận diện giọng nói (AI Transcript)
         </h2>
         <span className={styles.legend}>
-          <mark>ừm</mark> Từ đệm
+          <span className={styles.legendQuote}>
+            <b>A</b> Trích dẫn chấm điểm
+          </span>
+          <span className={styles.legendFiller}>
+            <b>!</b> Từ đệm (Filler Word)
+          </span>
         </span>
       </div>
       {transcript ? (
         <p className={styles.transcript}>
-          {segments.map((s, i) => (s.filler ? <mark key={i}>{s.text}</mark> : <span key={i}>{s.text}</span>))}
+          {segments.map((s, i) => {
+            const className = [s.quote && styles.hlQuote, s.filler && styles.hlFiller].filter(Boolean).join(' ')
+            return className ? (
+              <mark key={i} className={className}>
+                {s.text}
+              </mark>
+            ) : (
+              <span key={i}>{s.text}</span>
+            )
+          })}
         </p>
       ) : (
         <p className={styles.muted}>Không có transcript.</p>
@@ -404,30 +540,82 @@ function TranscriptCard({ transcript }) {
   )
 }
 
-function SampleAnswerCard({ text }) {
+// Gợi ý nâng cấp: các tiêu chí còn dưới 5 điểm (thấp nhất trước) kèm mô tả mức 5 điểm của rubric
+function SuggestionsCard({ rows, questionType, result, sessionId }) {
+  const weak = rows
+    .filter((r) => r.score < 5)
+    .sort((a, b) => a.score - b.score || b.weight - a.weight)
+    .slice(0, 3)
+
   return (
     <section className={styles.card}>
-      <h2 className={`${styles.cardTitle} ${styles.withIcon}`}>
-        <img src={iconTrendUp} alt="" width="20" height="12" />
-        Gợi ý nâng cấp câu trả lời
-      </h2>
-      <div className={styles.suggestion}>
-        <h3>
-          <img src={iconBulbSm} alt="" width="11.25" height="15" />
-          Câu trả lời mẫu tham khảo
-        </h3>
-        <p>{text}</p>
+      <div>
+        <h2 className={`${styles.cardTitle} ${styles.withIcon}`}>
+          <img src={iconTrendUp} alt="" width="20" height="12" />
+          Gợi ý nâng cấp câu trả lời
+        </h2>
+        <p className={styles.muted}>Ưu tiên các tiêu chí còn điểm thấp và có trọng số lớn để tăng điểm tổng nhanh nhất.</p>
       </div>
-      <div className={styles.suggestion}>
-        <h3>
-          <img src={iconChat} alt="" width="15" height="15" />
-          Luyện lại để cải thiện
-        </h3>
-        <p>
-          Ghi âm lại câu hỏi này hoặc chọn câu cùng chủ đề trong ngân hàng câu hỏi.{' '}
-          <Link to="/questions">Chọn câu hỏi</Link>
-        </p>
+      {weak.map((r) => (
+        <div key={r.code} className={styles.suggestion}>
+          <h3>
+            <img src={r.code === 'DELIVERY' ? iconChat : iconBulbSm} alt="" width="15" height="15" />
+            Nâng {CRITERIA[r.code]?.label ?? r.code} từ {formatPoints(r.score)} lên 5 điểm (+
+            {formatPoints(r.weight - contribution(r.score, r.weight))} điểm tổng)
+          </h3>
+          <p>Mức 5 điểm theo rubric: {anchor5(r.code, questionType)}</p>
+        </div>
+      ))}
+      {result.sampleAnswer && (
+        <div className={styles.suggestion}>
+          <h3>
+            <img src={iconBulbSm} alt="" width="11.25" height="15" />
+            Câu trả lời mẫu tham khảo
+          </h3>
+          <p className={styles.preWrap}>{result.sampleAnswer}</p>
+        </div>
+      )}
+      <div className={styles.actions}>
+        <Link className={styles.primaryLink} to={`/practice/${sessionId}`}>
+          Luyện lại câu này
+        </Link>
+        <Link className={styles.secondaryLink} to="/questions">
+          Chọn câu hỏi khác
+        </Link>
       </div>
+    </section>
+  )
+}
+
+function SessionInfo({ session, result, question }) {
+  const level = question ? levelOf(question.level) : null
+  return (
+    <section className={styles.card}>
+      <h3 className={styles.infoTitle}>Thông số phiên luyện tập</h3>
+      <dl className={styles.facts}>
+        {level && (
+          <>
+            <dt>Độ khó</dt>
+            <dd>
+              <span className={`${styles.levelBadge} ${styles[`level_${level.value}`]}`}>
+                {level.value === 'MEDIUM' ? 'Trung bình' : level.label}
+              </span>
+            </dd>
+          </>
+        )}
+        <dt>Thời lượng trả lời</dt>
+        <dd>{session.duration ? formatClock(session.duration) : '--'}</dd>
+        <dt>Thời điểm chấm</dt>
+        <dd>{formatDateTime(session.completedAt ?? session.submittedAt)}</dd>
+        <dt>Phiên bản rubric</dt>
+        <dd>{result.rubricVersion ?? '--'}</dd>
+        {result.delivery?.fillerListVersion && (
+          <>
+            <dt>Danh sách từ đệm</dt>
+            <dd>{result.delivery.fillerListVersion}</dd>
+          </>
+        )}
+      </dl>
     </section>
   )
 }

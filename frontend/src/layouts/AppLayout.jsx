@@ -87,22 +87,22 @@ export default function AppLayout() {
                 <span className={styles.brandName}>TalentSTAR AI</span>
               </div>
               <p>
-                Nền tảng luyện phỏng vấn AI thông minh chuẩn khung năng lực STAR dành cho ứng
-                viên tài năng và doanh nghiệp tuyển dụng hàng đầu.
+                Nền tảng luyện phỏng vấn AI, chấm điểm theo rubric riêng cho từng loại câu hỏi dành cho
+                ứng viên tài năng và doanh nghiệp tuyển dụng hàng đầu.
               </p>
             </div>
             <div className={styles.footerCol}>
               <h4>Tài nguyên</h4>
               <ul>
                 <li>Ngân hàng câu hỏi tuyển dụng</li>
-                <li>Phòng mô phỏng AI STAR</li>
+                <li>Phòng luyện tập AI</li>
                 <li>Báo cáo phân tích năng lực</li>
               </ul>
             </div>
             <div className={styles.footerCol}>
               <h4>Hỗ trợ &amp; Pháp lý</h4>
               <ul>
-                <li>Hướng dẫn phương pháp STAR</li>
+                <li>Hướng dẫn rubric chấm điểm</li>
                 <li>Chính sách bảo mật dữ liệu</li>
                 <li>Điều khoản dịch vụ TalentSTAR</li>
               </ul>

@@ -608,6 +608,42 @@
   flex: none;
 }
 
+/* Trọng số rubric của loại câu hỏi (rubric-v1.0 mục 4) */
+.weights {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.weightsLabel {
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.weightChip {
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background: #fff;
+  color: var(--color-text-muted);
+}
+
+.weightChip b {
+  color: var(--color-text-heading);
+}
+
+.weightChipActive {
+  border-color: #c7d2fe;
+  background: var(--color-brand-soft);
+  color: var(--color-brand-dark);
+}
+
+.weightChipActive b {
+  color: var(--color-brand-dark);
+}
+
 /* ---- Ghi chú ---- */
 .notesCard {
   gap: 12px;

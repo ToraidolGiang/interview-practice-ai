@@ -1,23 +1,26 @@
+/* Figma: "Acoustic & Phonetic Analytics Panel" */
 .panel {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px 20px;
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
+  padding: 24px;
+  border-radius: 12px;
   background: #fff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 8px;
 }
 
 .header h3 {
   font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 600;
+  line-height: 26px;
   color: var(--color-text-heading);
 }
 
@@ -30,7 +33,7 @@
 .block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   padding: 16px;
   border-radius: 12px;
   background: var(--color-surface-tint);
@@ -45,39 +48,58 @@
 .label {
   font-size: 12px;
   font-weight: 500;
+  line-height: 16px;
   color: var(--color-text-muted);
 }
 
 .verdict {
+  padding: 2px 4px;
+  border-radius: 4px;
   font-size: 11px;
   font-weight: 700;
+  line-height: 14px;
   text-transform: uppercase;
 }
 
 .good {
-  color: #059669;
+  background: #ecfdf5;
+  color: #047857;
 }
 
 .warn {
-  color: #d97706;
+  background: #fffbeb;
+  color: #b45309;
 }
 
 .bad {
-  color: #dc2626;
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
-.big {
+.big,
+.mid {
   font-family: var(--font-heading);
-  font-size: 32px;
   font-weight: 800;
-  line-height: 1;
   color: var(--color-text-heading);
 }
 
-.big small {
+.big {
+  font-size: 36px;
+  line-height: 40px;
+}
+
+.mid {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.big small,
+.mid small {
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 400;
+  line-height: 18px;
   color: var(--color-text-muted);
 }
 
@@ -93,40 +115,74 @@
 
 .scale {
   position: relative;
-  height: 6px;
-  margin-top: 6px;
+  height: 8px;
+  margin-top: 4px;
   border-radius: 9999px;
-  background: #dbe3f5;
+  background: #d3e4fe;
 }
 
 .ideal {
   position: absolute;
   top: 0;
-  height: 100%;
+  bottom: 0;
   border-radius: 9999px;
-  background: #6ee7b7;
+  background: #6ffbbe;
 }
 
-.marker {
+.pin {
   position: absolute;
-  top: 50%;
+  top: -4px;
   width: 14px;
-  height: 14px;
-  border: 2px solid #fff;
+  height: 16px;
   border-radius: 9999px;
   background: var(--color-brand-dark);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateX(-50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
 .scaleLabels {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  padding-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
   color: var(--color-text-muted);
 }
 
 .idealLabel {
   font-weight: 700;
   color: #047857;
+}
+
+.fillerList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+}
+
+.fillerList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.fillerWord {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: #b45309;
+}
+
+.fillerTimes {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  color: var(--color-text-muted);
 }

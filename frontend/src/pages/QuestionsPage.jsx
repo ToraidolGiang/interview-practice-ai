@@ -227,7 +227,7 @@ export default function QuestionsPage() {
                 type="search"
                 value={keywordInput}
                 onChange={(e) => setKeywordInput(e.target.value)}
-                placeholder="Tìm kiếm theo từ khóa, kỹ năng (ví dụ: Xử lý mâu thuẫn, System Design, ROI marketing, STAR...)"
+                placeholder="Tìm kiếm theo từ khóa, kỹ năng (ví dụ: Xử lý mâu thuẫn, System Design, ROI marketing...)"
                 aria-label="Từ khóa"
               />
               <div className={styles.searchActions}>
@@ -512,7 +512,6 @@ function SegmentButton({ active, tone, variant = 'soft', disabled, title, onClic
 
 function QuestionCard({ question, starting, disabled, onPractice }) {
   const level = levelOf(question.level)
-  const hintLabel = question.questionType === 'BEHAVIORAL' ? 'STAR:' : 'Gợi ý:'
   return (
     <article className={styles.card}>
       <div className={styles.cardBody}>
@@ -523,7 +522,7 @@ function QuestionCard({ question, starting, disabled, onPractice }) {
         <h3 className={styles.cardTitle}>{question.content}</h3>
         {question.answerHint && (
           <p className={styles.cardHint}>
-            <strong>{hintLabel}</strong> {question.answerHint}
+            <strong>Gợi ý:</strong> {question.answerHint}
           </p>
         )}
       </div>

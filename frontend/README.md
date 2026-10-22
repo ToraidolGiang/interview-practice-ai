@@ -1,16 +1,29 @@
-# React + Vite
+# Frontend - TalentSTAR AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite, router `react-router` v7, CSS Modules. Giao diện theo Figma "AI-Interview".
 
-Currently, two official plugins are available:
+## Chạy
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev        # proxy /api -> backend Spring (mặc định http://localhost:8080)
+```
 
-## React Compiler
+Chưa có backend thì chạy với mock sinh từ contract `docs/api/openapi.yaml`:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm run mock       # Prism mock ở cổng 4010 (terminal 1)
+npm run dev:mock   # Vite proxy /api -> mock (terminal 2), cấu hình trong .env.mock
+```
 
-## Expanding the Oxlint configuration
+Mock trả dữ liệu `example` trong contract; muốn thử nhánh lỗi thì thêm header `Prefer: code=401` (Prism).
+Đổi địa chỉ backend bằng biến `API_PROXY_TARGET` trong `.env.local`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Cấu trúc
+
+- `src/api/` - `client.js` (fetch + gắn JWT, chuẩn hoá `ErrorResponse`), mỗi nhóm API một file
+- `src/auth/` - phiên đăng nhập (JWT 24h, "Ghi nhớ đăng nhập" lưu localStorage), route guard, validate form
+- `src/layouts/` - `AuthLayout` (màn chia đôi đăng nhập/đăng ký), `AppLayout` (header + footer sau đăng nhập)
+- `src/components/` - component dùng chung
+- `src/pages/` - mỗi màn hình một file
+- `src/assets/figma/` - icon, logo tải từ Figma

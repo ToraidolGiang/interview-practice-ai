@@ -29,3 +29,6 @@ Thumbs.db
 .claude/
 CLAUDE.md
 scripts/commit-msg-hook.sh
+
+# Mock spec sinh tu docs/api/openapi.yaml
+frontend/mock/.generated/

@@ -1,8 +1,10 @@
 """Sinh migration Flyway seed câu hỏi từ data/interim/questions_vi.jsonl.
 
-    python scripts/dataset/build_seed_sql.py
+    python scripts/dataset/build_seed_sql.py                  # chỉ câu đã duyệt (APPROVED)
+    python scripts/dataset/build_seed_sql.py --allow-pending  # gồm cả câu chưa duyệt, để chạy thử local
 
-- Lấy câu keep=true và review_status khác REJECTED (người duyệt đánh dấu REJECTED để loại).
+- Lấy câu keep=true có review_status APPROVED (duyệt qua scripts/dataset/review_questions.py);
+  câu REJECTED luôn bị loại, câu PENDING chỉ được lấy khi có --allow-pending.
 - UUID sinh cố định từ id nguồn (uuid5) nên chạy lại cho cùng kết quả.
 - Bỏ câu trùng (position, content) để không vi phạm uq_questions_position_content.
 - Tạo tài khoản hệ thống ADMIN làm created_by; password_hash không phải BCrypt nên không đăng nhập được.
@@ -36,7 +38,7 @@ def sql_str(value):
     return "'" + value.replace("'", "''") + "'"
 
 
-def load_questions(path):
+def load_questions(path, allow_pending=False):
     rows, skipped = [], Counter()
     seen = set()
     with path.open(encoding="utf-8") as f:
@@ -47,6 +49,9 @@ def load_questions(path):
                 continue
             if r.get("review_status") == "REJECTED":
                 skipped["người duyệt loại"] += 1
+                continue
+            if r.get("review_status") != "APPROVED" and not allow_pending:
+                skipped["chưa duyệt (PENDING)"] += 1
                 continue
             if r["question_type"] not in QUESTION_TYPES or r["level"] not in LEVELS or not r["content"]:
                 skipped["dữ liệu không hợp lệ"] += 1
@@ -92,10 +97,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--in", dest="input", type=Path, default=DEFAULT_IN)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--allow-pending", action="store_true", help="lấy cả câu chưa duyệt (chỉ dùng để chạy thử)")
     args = parser.parse_args()
     sys.stderr.reconfigure(encoding="utf-8")
 
-    rows, skipped = load_questions(args.input)
+    rows, skipped = load_questions(args.input, args.allow_pending)
     args.out.write_text(build_sql(rows), encoding="utf-8", newline="\n")
 
     print(f"Đã ghi {len(rows)} câu hỏi vào {args.out}", file=sys.stderr)

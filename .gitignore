@@ -32,3 +32,6 @@ Thumbs.db
 .claude/
 CLAUDE.md
 scripts/commit-msg-hook.sh
+
+# Dataset: file CSV tạm khi duyệt câu hỏi (nguồn chính là questions_vi.jsonl)
+data/interim/review.csv

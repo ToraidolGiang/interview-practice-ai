@@ -56,14 +56,29 @@ python scripts/dataset/normalize_questions.py                       # chạy h�
 
 - Cần `GEMINI_API_KEY` (biến môi trường hoặc `.env`). Model mặc định `gemini-3.7-flash`, đổi bằng `--model` hoặc `GEMINI_MODEL`.
 - Ghi nối tiếp vào `data/interim/questions_vi.jsonl` và bỏ qua id đã xử lý, nên chạy lại được khi bị ngắt hoặc hết quota.
-- Kết quả từng câu được kiểm tra (enum, trường bắt buộc, TECHNICAL phải có `reference_answer`); câu lỗi được gọi lại riêng 1 lần, vẫn lỗi thì ghi vào `questions_vi.errors.jsonl`.
+- Kết quả từng câu được kiểm tra (enum, trường bắt buộc, câu hỏi không chứa ký hiệu markdown/code vì được đọc bằng TTS, `reference_answer` của TECHNICAL gồm 3-6 dòng bắt đầu bằng `- `); câu lỗi được gọi lại riêng 1 lần, vẫn lỗi thì ghi vào `questions_vi.errors.jsonl`.
 - Mọi câu có `review_status: "PENDING"`, **phải có người duyệt** trước khi seed vào bảng `questions`. `industry`/`position` theo `docs/business/Danh_Muc_Nganh_Vi_Tri.md`; câu không phải `TECHNICAL` gán vị trí `Chung`.
-- Khi Gemini hết quota, phần còn lại có thể chuẩn hoá thủ công theo đúng quy tắc trong `SYSTEM_PROMPT`; bản ghi vẫn qua `validate()`/`to_output_record()` và ghi rõ người làm trong `generated_by.model`. Hiện tại 316 câu do `gemini-3.7-flash` làm, 835 câu chuẩn hoá thủ công (`claude-opus-5-5 (thủ công)`).
+- Khi Gemini hết quota, có thể chuẩn hoá thủ công theo đúng quy tắc trong `SYSTEM_PROMPT`; bản ghi vẫn qua `validate()`/`to_output_record()` và ghi rõ người làm trong `generated_by.model`. Hiện tại cả 1151 câu được chuẩn hoá thủ công (`claude-opus-5-5 (thủ công)`), câu trùng ý giữa các nguồn đã loại với `drop_reason: LOW_QUALITY`.
+
+## `review_questions.py`
+
+Duyệt câu hỏi bằng bảng tính thay vì sửa JSONL:
+
+```bash
+python scripts/dataset/review_questions.py export   # ghi data/interim/review.csv (gitignore)
+# mở bằng Excel/Google Sheets, điền review_status = APPROVED / REJECTED, có thể sửa nội dung
+python scripts/dataset/review_questions.py import   # kiểm tra rồi ghi ngược vào questions_vi.jsonl
+```
+
+Import kiểm tra lại toàn bộ luật (enum, vị trí theo `Danh_Muc_Nganh_Vi_Tri.md`, định dạng câu hỏi và đáp án); có dòng sai thì báo và không ghi gì. Câu bị sửa nội dung được đánh dấu `generated_by.edited_by_reviewer`.
 
 ## `build_seed_sql.py`
 
-Sinh `backend/src/main/resources/db/migration/V2__seed_questions.sql` từ `questions_vi.jsonl` (lấy câu `keep=true`, bỏ câu `REJECTED`, bỏ trùng `(position, content)`):
+Sinh `backend/src/main/resources/db/migration/V2__seed_questions.sql` từ `questions_vi.jsonl` (lấy câu `keep=true` đã `APPROVED`, bỏ trùng `(position, content)`):
 
 ```bash
-python scripts/dataset/build_seed_sql.py
+python scripts/dataset/build_seed_sql.py                  # bản chính thức: chỉ câu đã duyệt
+python scripts/dataset/build_seed_sql.py --allow-pending  # gồm cả câu chưa duyệt, để chạy thử local
 ```
+
+V2 hiện tại được sinh bằng `--allow-pending` (chưa ai duyệt); trước khi deploy phải duyệt xong rồi sinh lại không có cờ này.

@@ -58,3 +58,12 @@ python scripts/dataset/normalize_questions.py                       # chạy h�
 - Ghi nối tiếp vào `data/interim/questions_vi.jsonl` và bỏ qua id đã xử lý, nên chạy lại được khi bị ngắt hoặc hết quota.
 - Kết quả từng câu được kiểm tra (enum, trường bắt buộc, TECHNICAL phải có `reference_answer`); câu lỗi được gọi lại riêng 1 lần, vẫn lỗi thì ghi vào `questions_vi.errors.jsonl`.
 - Mọi câu có `review_status: "PENDING"`, **phải có người duyệt** trước khi seed vào bảng `questions`. `industry`/`position` theo `docs/business/Danh_Muc_Nganh_Vi_Tri.md`; câu không phải `TECHNICAL` gán vị trí `Chung`.
+- Khi Gemini hết quota, phần còn lại có thể chuẩn hoá thủ công theo đúng quy tắc trong `SYSTEM_PROMPT`; bản ghi vẫn qua `validate()`/`to_output_record()` và ghi rõ người làm trong `generated_by.model`. Hiện tại 316 câu do `gemini-3.7-flash` làm, 835 câu chuẩn hoá thủ công (`claude-opus-5-5 (thủ công)`).
+
+## `build_seed_sql.py`
+
+Sinh `backend/src/main/resources/db/migration/V2__seed_questions.sql` từ `questions_vi.jsonl` (lấy câu `keep=true`, bỏ câu `REJECTED`, bỏ trùng `(position, content)`):
+
+```bash
+python scripts/dataset/build_seed_sql.py
+```

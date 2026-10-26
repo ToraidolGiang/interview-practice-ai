@@ -43,7 +43,7 @@ def load_questions(path):
         for line in f:
             r = json.loads(line)
             if not r["keep"]:
-                skipped[f"loại bởi Gemini ({r['drop_reason']})"] += 1
+                skipped[f"loại khi chuẩn hoá ({r['drop_reason']})"] += 1
                 continue
             if r.get("review_status") == "REJECTED":
                 skipped["người duyệt loại"] += 1

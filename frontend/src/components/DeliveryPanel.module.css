@@ -1,0 +1,188 @@
+/* Figma: "Acoustic & Phonetic Analytics Panel" */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 12px;
+  background: #fff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.header h3 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+  color: var(--color-text-heading);
+}
+
+.empty {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--color-text-muted);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--color-surface-tint);
+}
+
+.blockTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--color-text-muted);
+}
+
+.verdict {
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.good {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.warn {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.bad {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.big,
+.mid {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text-heading);
+}
+
+.big {
+  font-size: 36px;
+  line-height: 40px;
+}
+
+.mid {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.big small,
+.mid small {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--color-text-muted);
+}
+
+.fillerCount {
+  color: #b45309;
+}
+
+.note {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+}
+
+.scale {
+  position: relative;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: 9999px;
+  background: #d3e4fe;
+}
+
+.ideal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 9999px;
+  background: #6ffbbe;
+}
+
+.pin {
+  position: absolute;
+  top: -4px;
+  width: 14px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--color-brand-dark);
+  transform: translateX(-50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.scaleLabels {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  color: var(--color-text-muted);
+}
+
+.idealLabel {
+  font-weight: 700;
+  color: #047857;
+}
+
+.fillerList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+}
+
+.fillerList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.fillerWord {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: #b45309;
+}
+
+.fillerTimes {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  color: var(--color-text-muted);
+}

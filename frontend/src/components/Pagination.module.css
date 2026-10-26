@@ -1,0 +1,98 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.summary strong {
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page,
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-surface-tint);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-heading);
+  cursor: pointer;
+}
+
+.arrow {
+  min-width: 0;
+  width: 24px;
+  height: 31px;
+  padding: 0;
+}
+
+.arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.page:hover {
+  background: var(--color-brand-soft);
+}
+
+.pageActive,
+.pageActive:hover {
+  background: var(--color-brand-dark);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  font-weight: 700;
+  color: #fff;
+}
+
+.gap {
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.jump {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.jump input {
+  width: 64px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-surface-tint);
+  text-align: center;
+  font-size: 13px;
+}
+
+.jump button {
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-brand-soft);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brand-dark);
+  cursor: pointer;
+}

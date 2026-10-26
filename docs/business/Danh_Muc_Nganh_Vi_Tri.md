@@ -48,6 +48,8 @@ WHERE status = 'ACTIVE' AND industry = :industry AND position IN (:position, 'Ch
 | `react-interview-questions` | Frontend Developer | `IT` | `Frontend Developer` |
 | `data-science-interviews` | Data Scientist | `IT` | `Data Scientist / AI` |
 | `sysadmin-skills` | System Administrator / DevOps | `IT` | `DevOps / Quản trị hệ thống` |
+| `java-backend-qa` | Backend Developer | `IT` | `Backend Developer` |
+| `backend-node-go` | Backend Developer | `IT` | `Backend Developer` |
 
 Câu hỏi không phải `TECHNICAL` mà dùng được nguyên văn cho mọi vị trí trong ngành (Gemini đánh dấu `all_positions`, người duyệt kiểm tra lại) chuyển sang `Chung`. Câu hành vi gắn với chuyên môn (ví dụ "Mô tả homelab của bạn") giữ vị trí theo bảng trên.
 

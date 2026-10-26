@@ -48,6 +48,7 @@ POSITION_VI = {
     "Frontend Developer": "Frontend Developer",
     "Data Scientist": "Data Scientist / AI",
     "System Administrator / DevOps": "DevOps / Quản trị hệ thống",
+    "Backend Developer": "Backend Developer",
 }
 GENERAL_POSITION = "Chung"  # câu hỏi Gemini đánh dấu all_positions, dùng chung cho mọi vị trí trong ngành
 

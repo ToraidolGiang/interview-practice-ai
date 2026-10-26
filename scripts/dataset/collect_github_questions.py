@@ -20,6 +20,7 @@ import os
 import re
 import sys
 import textwrap
+import urllib.parse
 import urllib.request
 from collections import Counter
 from pathlib import Path
@@ -198,6 +199,25 @@ def parse_details_summary(md):
     return items
 
 
+def parse_numbered_headings_toc(md):
+    """Backend-NodeJS-Golang-Interview_QA: như parse_numbered_headings, chủ đề lấy từ "### Table of Contents - X"."""
+    items = []
+    parts = re.split(r"^\s*###\s+Table of Contents\s*-\s*(.+)$", md, flags=re.M)  # heading Golang thụt 1 dấu cách
+    # parts = [phần đầu, chủ đề 1, nội dung 1, chủ đề 2, nội dung 2, ...]
+    for i in range(1, len(parts) - 1, 2):
+        topic = strip_markup(parts[i])
+        items += [(topic, q, a) for _, q, a in parse_numbered_headings(parts[i + 1])]
+    return items
+
+
+def parse_single_qa(md):
+    """java-interview-questions-and-answers: mỗi file một câu, tiêu đề "# Câu hỏi", phần còn lại là đáp án."""
+    m = re.match(r"\s*#\s+(.+?)\n(.*)", md, flags=re.S)
+    if not m:
+        return []
+    return [(None, clean_question(m.group(1)), clean_answer(m.group(2)))]
+
+
 # ---------------------------------------------------------------------------
 # Khai báo nguồn
 # ---------------------------------------------------------------------------
@@ -280,6 +300,25 @@ SOURCES = [
         "parser": parse_details_summary,
         "post": post_sysadmin,
     },
+    {
+        "key": "java-backend-qa",
+        "repo": "ViacheslavChernyshov/java-interview-questions-and-answers",
+        "position": "Backend Developer",
+        # Mỗi câu một file trong eng/<số>. <Chủ đề>/; bỏ file mục lục "00. Section Navigator"
+        "files_under": "eng/",
+        "files_exclude": r"(^|/)(00\. Section Navigator|README)\.md$",
+        "parser": parse_single_qa,
+        "post": post_technical,
+        "topic_from_dir": True,
+    },
+    {
+        "key": "backend-node-go",
+        "repo": "Gauthamjm007/Backend-NodeJS-Golang-Interview_QA",
+        "position": "Backend Developer",
+        "files": ["README.md"],
+        "parser": parse_numbered_headings_toc,
+        "post": post_technical,
+    },
 ]
 
 # Câu hỏi h5bp general/fun phần lớn là câu hỏi mềm
@@ -312,12 +351,19 @@ def fetch_repo_meta(repo):
     }
 
 
+def list_files(repo, commit, prefix, exclude):
+    """Các file .md dưới thư mục prefix tại commit cố định (1 request GitHub API)."""
+    tree = json.loads(http_get(f"https://api.github.com/repos/{repo}/git/trees/{commit}?recursive=1"))["tree"]
+    return sorted(t["path"] for t in tree if t["type"] == "blob" and t["path"].startswith(prefix)
+                  and t["path"].endswith(".md") and not re.search(exclude, t["path"]))
+
+
 def load_file(cache_dir, repo, commit, path, refresh):
     """Tải file theo commit SHA cố định để kết quả tái lập được; lưu cache cục bộ."""
     local = cache_dir / repo.replace("/", "__") / commit[:12] / path
     if local.exists() and not refresh:
         return local.read_text(encoding="utf-8")
-    text = http_get(f"https://raw.githubusercontent.com/{repo}/{commit}/{path}").decode("utf-8")
+    text = http_get(f"https://raw.githubusercontent.com/{repo}/{commit}/{urllib.parse.quote(path)}").decode("utf-8")
     local.parent.mkdir(parents=True, exist_ok=True)
     local.write_text(text, encoding="utf-8")
     return text
@@ -334,7 +380,8 @@ def collect_source(src, cache_dir, refresh):
         return []
 
     records = []
-    for path in src["files"]:
+    files = src.get("files") or list_files(src["repo"], meta["commit"], src["files_under"], src["files_exclude"])
+    for path in files:
         md = load_file(cache_dir, src["repo"], meta["commit"], path, refresh)
         file_name = Path(path).stem.replace("-questions", "")
         for topic, question, answer in src["parser"](md):
@@ -343,7 +390,9 @@ def collect_source(src, cache_dir, refresh):
             record = {
                 "content_en": question,
                 "answer_en": answer,
-                "topic": src.get("topic") or (file_name.upper() if src.get("topic_from_file") else topic),
+                "topic": src.get("topic") or (file_name.upper() if src.get("topic_from_file")
+                                              else re.sub(r"^\d+\.\s*", "", Path(path).parent.name) if src.get("topic_from_dir")
+                                              else topic),
                 "industry": "IT",
                 "position": src["position"],
             }
@@ -355,7 +404,7 @@ def collect_source(src, cache_dir, refresh):
                 "repo": src["repo"],
                 "path": path,
                 "commit": meta["commit"],
-                "url": f"https://github.com/{src['repo']}/blob/{meta['commit']}/{path}",
+                "url": f"https://github.com/{src['repo']}/blob/{meta['commit']}/{urllib.parse.quote(path)}",
                 "license": meta["license"],
             }
             record["id"] = hashlib.sha1(f"{src['key']}|{normalize_for_dedup(record['content_en'])}"

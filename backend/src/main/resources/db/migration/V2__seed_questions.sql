@@ -1,5 +1,7 @@
 -- Flyway migration V2: seed ngân hàng câu hỏi (sinh bởi scripts/dataset/build_seed_sql.py, không sửa tay).
 -- Câu hỏi được chuyển thể sang tiếng Việt bằng Gemini từ các nguồn mở sau (giữ ghi nguồn theo license):
+--   https://github.com/Gauthamjm007/Backend-NodeJS-Golang-Interview_QA (MIT, commit 2cbec619bd7d)
+--   https://github.com/ViacheslavChernyshov/java-interview-questions-and-answers (MIT, commit 597e08112ab6)
 --   https://github.com/alexeygrigorev/data-science-interviews (CC-BY-4.0, commit 919f44547ef5)
 --   https://github.com/h5bp/Front-end-Developer-Interview-Questions (MIT, commit 33f5498b653e)
 --   https://github.com/sudheerj/reactjs-interview-questions (MIT, commit 55b7d491cd74)
@@ -2582,4 +2584,1144 @@ INSERT INTO questions (id, content, industry, position, level, question_type, an
 - Thử Ctrl+Z để tạm dừng rồi kill tiến trình theo job
 - Từ terminal khác tìm PID và gửi SIGTERM
 - Nếu vẫn không dừng mới dùng SIGKILL
-- Kiểm tra và dừng cả các tiến trình con còn sót', 'ACTIVE', '00000000-0000-0000-0000-000000000001');
+- Kiểm tra và dừng cả các tiến trình con còn sót', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d27de116-f921-523f-b82e-a96a9b28d18e', 'Index trong cơ sở dữ liệu là gì và vì sao cần nó?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Index là cấu trúc dữ liệu phụ giúp tìm bản ghi nhanh mà không phải quét toàn bộ bảng
+- Phổ biến nhất là B-tree, cho phép tìm theo giá trị và theo khoảng trong thời gian logarit
+- Tăng tốc truy vấn có điều kiện lọc, sắp xếp và join trên cột được đánh index
+- Đổi lại tốn thêm dung lượng và làm chậm thao tác ghi vì phải cập nhật index
+- Khoá chính và ràng buộc unique thường tự tạo index', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e7cafce9-7837-5b71-aef6-7a00d51f5b9f', 'Correlated subquery là gì? Nó ảnh hưởng hiệu năng thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là truy vấn con tham chiếu tới cột của truy vấn bên ngoài
+- Về mặt logic được thực thi lại cho từng dòng của truy vấn ngoài
+- Có thể rất chậm với bảng lớn nếu bộ tối ưu không viết lại được
+- Thường thay bằng JOIN, EXISTS hoặc window function để hiệu quả hơn
+- Ví dụ: tìm nhân viên có lương cao hơn lương trung bình của phòng ban mình', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f7562029-df58-51c5-9bcf-934d0e3aa1bc', 'WHERE và HAVING khác nhau như thế nào? GROUP BY dùng để làm gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- GROUP BY gom các dòng có cùng giá trị ở các cột chỉ định thành một nhóm để tính hàm tổng hợp
+- WHERE lọc từng dòng trước khi gom nhóm, không dùng được hàm tổng hợp
+- HAVING lọc các nhóm sau khi gom, dùng được hàm tổng hợp như COUNT, SUM
+- Nên lọc bằng WHERE khi có thể để giảm dữ liệu phải gom nhóm
+- Ví dụ: lọc đơn hàng năm nay bằng WHERE, rồi chỉ giữ khách có trên 5 đơn bằng HAVING', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('acc0341b-5f6b-5624-b031-52fbe92b14f0', 'Window function trong SQL là gì? ROW_NUMBER, RANK và DENSE_RANK khác nhau ra sao?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Window function tính toán trên một tập dòng liên quan (cửa sổ) nhưng không gộp dòng như GROUP BY
+- Khai báo bằng mệnh đề OVER với PARTITION BY và ORDER BY
+- ROW_NUMBER đánh số liên tục, không trùng
+- RANK cho cùng hạng khi bằng nhau và bỏ qua số tiếp theo; DENSE_RANK cho cùng hạng nhưng không bỏ số
+- Dùng cho xếp hạng, top N mỗi nhóm, tổng luỹ kế, so sánh với dòng trước sau (LAG, LEAD)', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('299d6dda-a1ba-58a9-9ff4-56b959e2f287', 'MVCC trong PostgreSQL hoạt động như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- MVCC (Multi-Version Concurrency Control) giữ nhiều phiên bản của một dòng thay vì khoá khi đọc
+- Mỗi phiên bản dòng có thông tin transaction tạo và transaction xoá (xmin, xmax)
+- Mỗi transaction đọc theo snapshot, chỉ thấy các phiên bản hợp lệ với snapshot đó
+- Đọc không chặn ghi và ghi không chặn đọc
+- UPDATE tạo phiên bản mới, phiên bản cũ thành dòng chết cần VACUUM dọn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('08662e0f-d05d-56ee-b85b-088670c73d66', 'VACUUM trong PostgreSQL là gì và vì sao cần nó?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Do MVCC, UPDATE và DELETE để lại các phiên bản dòng chết
+- VACUUM thu hồi không gian của dòng chết để tái sử dụng
+- Ngăn bảng và index phình to (bloat)
+- Ngăn lỗi transaction ID wraparound bằng cách đóng băng các dòng cũ
+- Autovacuum chạy tự động; ANALYZE đi kèm cập nhật thống kê cho bộ tối ưu truy vấn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('12f5392a-a7f3-56d6-b737-da015a2b5e94', 'Index B-tree hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- B-tree là cây cân bằng, các khoá được sắp xếp, mỗi nút chứa nhiều khoá
+- Tìm kiếm đi từ gốc xuống lá, số bước tỉ lệ logarit với số bản ghi
+- Các nút lá liên kết với nhau nên quét theo khoảng và sắp xếp hiệu quả
+- Hỗ trợ so sánh bằng, lớn hơn, nhỏ hơn, BETWEEN, LIKE có tiền tố
+- Không hiệu quả với LIKE bắt đầu bằng ký tự đại diện hoặc khi bọc cột trong hàm', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('3956dd6f-655a-5178-87ea-71c8e275dce5', 'EXPLAIN dùng để làm gì? Bạn đọc kế hoạch thực thi truy vấn như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- EXPLAIN hiển thị kế hoạch mà bộ tối ưu chọn để thực thi truy vấn
+- EXPLAIN ANALYZE chạy thật và cho biết thời gian, số dòng thực tế
+- Xem kiểu truy cập: sequential scan, index scan, index only scan
+- Xem kiểu join (nested loop, hash join, merge join) và chi phí ước tính
+- So sánh số dòng ước tính với thực tế để phát hiện thống kê sai, tìm bước tốn kém nhất', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0fc29bd6-0b79-581c-ae59-351ca7fed93e', 'Bạn tối ưu một truy vấn SQL chậm như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Xác định truy vấn chậm qua log truy vấn chậm hoặc công cụ như pg_stat_statements
+- Phân tích bằng EXPLAIN ANALYZE để tìm bước tốn kém
+- Thêm hoặc sửa index phù hợp, tránh bọc cột trong hàm làm mất index
+- Chỉ lấy cột cần thiết, phân trang hợp lý, viết lại subquery thành join khi phù hợp
+- Cập nhật thống kê, cân nhắc cache, denormalize hoặc chia nhỏ bảng khi cần', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ce8515c4-0d1e-5d65-a8ea-ca5c57194ab4', 'Composite index là gì? Thứ tự cột trong composite index có quan trọng không?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Composite index là index trên nhiều cột
+- Thứ tự cột rất quan trọng: index được dùng theo tiền tố từ trái sang phải
+- Index trên (a, b) dùng được cho điều kiện trên a hoặc a và b, nhưng không hiệu quả khi chỉ lọc b
+- Thường đặt cột lọc bằng trước, cột lọc theo khoảng hoặc sắp xếp sau
+- Có thể tạo covering index để truy vấn chỉ cần đọc index', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('dcb1fff7-ab5f-54bb-a60b-0a84e436d8bc', 'Khi nào nên tạo index và index có những nhược điểm gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Nên tạo cho cột thường dùng trong WHERE, JOIN, ORDER BY trên bảng lớn
+- Cột có độ chọn lọc cao (nhiều giá trị khác nhau) hưởng lợi nhiều hơn
+- Nhược điểm: tốn dung lượng lưu trữ
+- Làm chậm INSERT, UPDATE, DELETE vì phải cập nhật index
+- Index không dùng tới vẫn tốn chi phí, cần rà soát định kỳ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5b95b268-e0f4-5d5d-ba5e-d92a8d2ce857', 'Có những loại JOIN nào trong SQL? INNER JOIN và LEFT JOIN khác nhau thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- INNER JOIN chỉ trả về các dòng khớp ở cả hai bảng
+- LEFT JOIN trả về mọi dòng bảng trái, cột bảng phải là NULL nếu không khớp
+- RIGHT JOIN ngược lại với LEFT JOIN
+- FULL OUTER JOIN trả về mọi dòng của cả hai bảng
+- CROSS JOIN tạo tích Descartes; SELF JOIN là join một bảng với chính nó', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('4c599838-23b5-5499-85f4-87fb5a83d208', 'Nên dùng JOIN hay subquery? Vì sao?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Nhiều trường hợp hai cách cho cùng kết quả và bộ tối ưu có thể biến đổi qua lại
+- JOIN thường hiệu quả và dễ tối ưu hơn khi cần lấy cột từ nhiều bảng
+- Subquery với EXISTS hoặc IN rõ nghĩa khi chỉ cần kiểm tra tồn tại
+- Correlated subquery có thể chậm với dữ liệu lớn
+- Nên kiểm tra bằng EXPLAIN thay vì theo quy tắc cứng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d9799b16-80d4-536f-8e5d-d02684ee36a9', 'HashMap trong Java hoạt động bên trong như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- HashMap lưu dữ liệu trong mảng các bucket
+- Vị trí bucket được tính từ hashCode của key sau khi trộn bit, chia lấy dư theo kích thước mảng
+- Khi put, nếu bucket đã có phần tử thì so sánh bằng equals để ghi đè hoặc thêm vào
+- Khi get, tính bucket rồi tìm phần tử có key bằng equals
+- Khi số phần tử vượt ngưỡng load factor, mảng được mở rộng gấp đôi và phân bổ lại', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ee717606-def4-5924-b665-fa0e791d1398', 'Collision trong HashMap là gì và được xử lý như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Collision xảy ra khi nhiều key khác nhau rơi vào cùng một bucket
+- HashMap xử lý bằng cách lưu các phần tử trong cùng bucket thành danh sách liên kết
+- Từ Java 8, khi một bucket có quá nhiều phần tử (từ 8) và mảng đủ lớn, danh sách được chuyển thành cây đỏ đen
+- Nhờ đó trường hợp xấu giảm từ O(n) xuống O(log n)
+- hashCode phân bố tốt giúp giảm collision', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e8922f8d-5d49-564b-a394-6941a0558500', 'Hợp đồng giữa equals và hashCode trong Java là gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Hai object bằng nhau theo equals thì bắt buộc có cùng hashCode
+- Hai object cùng hashCode không nhất thiết bằng nhau theo equals
+- hashCode phải ổn định nếu các trường dùng trong equals không đổi
+- equals phải có tính phản xạ, đối xứng, bắc cầu, nhất quán và trả về false khi so với null
+- Vi phạm hợp đồng làm HashMap, HashSet hoạt động sai', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('44f84126-d24d-53cd-b362-59956d5a0a9c', 'Điều gì xảy ra nếu override equals mà không override hashCode?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Hai object bằng nhau theo equals có thể có hashCode khác nhau
+- Khi dùng làm key trong HashMap hoặc phần tử HashSet, chúng rơi vào bucket khác nhau
+- Không tìm thấy phần tử đã thêm khi dùng object tương đương để tra cứu
+- HashSet có thể chứa phần tử trùng lặp
+- Luôn override cả hai cùng nhau, dựa trên cùng tập trường', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('568017ce-d43c-50c4-ad98-60ad6ae3d6f0', 'Có nên dùng object có thể thay đổi (mutable) làm key trong HashMap không? Điều gì xảy ra nếu sửa key sau khi thêm vào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Không nên, key nên bất biến
+- Nếu sửa trường dùng trong hashCode sau khi thêm, hashCode thay đổi
+- HashMap tìm ở bucket mới nên không lấy lại được giá trị, dù phần tử vẫn còn trong map
+- Gây rò rỉ bộ nhớ và lỗi khó phát hiện
+- Vì vậy String, Integer hoặc record là lựa chọn tốt cho key', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('dd042ef6-e9af-5338-87a6-40a9682c6e43', 'Load factor và capacity của HashMap là gì? Rehashing xảy ra khi nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Capacity là số bucket của mảng bên trong, mặc định 16 và luôn là luỹ thừa của 2
+- Load factor là ngưỡng tỉ lệ đầy, mặc định 0.75
+- Khi số phần tử vượt capacity nhân load factor, HashMap mở rộng gấp đôi
+- Rehashing phân bổ lại mọi phần tử sang mảng mới, tốn chi phí O(n)
+- Biết trước số phần tử thì nên đặt capacity ban đầu để tránh rehash nhiều lần', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('dba240ad-8c93-5556-9ef6-cd0aa6a9563b', 'Độ phức tạp của get và put trong HashMap là bao nhiêu? Khi nào nó trở thành O(n)?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Trung bình là O(1) khi hashCode phân bố tốt
+- Trường hợp xấu là khi rất nhiều key rơi vào cùng bucket
+- Trước Java 8, bucket là danh sách liên kết nên trường hợp xấu là O(n)
+- Từ Java 8, bucket lớn được chuyển thành cây nên trường hợp xấu là O(log n)
+- hashCode kém (ví dụ luôn trả cùng giá trị) làm mất ưu điểm của HashMap', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('767d2b54-6dac-5c30-b86f-c8118ba4f81b', 'ConcurrentHashMap là gì và khác HashMap như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- HashMap không an toàn luồng: ghi đồng thời có thể mất dữ liệu hoặc hỏng cấu trúc
+- ConcurrentHashMap an toàn luồng mà vẫn cho hiệu năng cao
+- Đọc hầu như không khoá; ghi khoá ở mức từng bucket và dùng CAS thay vì khoá toàn bộ map
+- Không cho phép key hoặc value null
+- Có các thao tác nguyên tử như putIfAbsent, computeIfAbsent, merge', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0d053429-b7de-54a0-ba4b-c8750a8ffeca', 'Bạn chọn cài đặt Map nào (HashMap, LinkedHashMap, TreeMap, ConcurrentHashMap) trong từng trường hợp?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- HashMap: mặc định khi không cần thứ tự, nhanh nhất
+- LinkedHashMap: giữ thứ tự thêm vào hoặc thứ tự truy cập, dùng làm cache LRU
+- TreeMap: key được sắp xếp, hỗ trợ tìm theo khoảng, thao tác O(log n)
+- ConcurrentHashMap: dùng chung giữa nhiều luồng
+- EnumMap cho key là enum, hiệu quả về bộ nhớ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('84dff17d-406e-5aa3-9b82-dc8e90f4174c', 'ACID là gì? Bạn hãy giải thích từng chữ cái.', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Atomicity: transaction thực hiện trọn vẹn hoặc không thực hiện gì
+- Consistency: dữ liệu chuyển từ trạng thái hợp lệ này sang trạng thái hợp lệ khác, giữ mọi ràng buộc
+- Isolation: các transaction chạy đồng thời không ảnh hưởng sai lệch lẫn nhau
+- Durability: transaction đã commit thì không mất kể cả khi hệ thống sập
+- Ví dụ chuyển tiền: trừ tài khoản này và cộng tài khoản kia phải cùng thành công', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('96261626-8bea-5df6-98c7-f52c954e3ffc', 'Có những mức cô lập (isolation level) nào trong transaction?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Read Uncommitted: có thể đọc dữ liệu chưa commit (dirty read)
+- Read Committed: chỉ đọc dữ liệu đã commit, nhưng đọc lại có thể ra kết quả khác
+- Repeatable Read: đọc lại cùng dòng cho cùng kết quả, có thể gặp phantom read tuỳ hệ quản trị
+- Serializable: kết quả như các transaction chạy tuần tự, an toàn nhất nhưng chậm nhất
+- Mức càng cao càng ít hiện tượng bất thường nhưng giảm khả năng đồng thời; PostgreSQL mặc định Read Committed, MySQL InnoDB mặc định Repeatable Read', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b67d6c55-a865-5e0c-a5e3-442b2c94a323', 'Dirty read, non-repeatable read và phantom read là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dirty read: đọc dữ liệu mà transaction khác chưa commit, có thể bị rollback sau đó
+- Non-repeatable read: đọc lại cùng một dòng nhưng giá trị đã bị transaction khác sửa và commit
+- Phantom read: chạy lại cùng truy vấn nhưng xuất hiện hoặc mất dòng do transaction khác thêm hoặc xoá
+- Mỗi mức cô lập ngăn được một phần các hiện tượng này
+- Serializable ngăn được tất cả', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('03d5be3d-8c14-50c0-9281-f81fb59a8160', 'Lost update là gì và làm sao phòng tránh?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Lost update xảy ra khi hai transaction cùng đọc rồi ghi đè một dòng, thay đổi của một bên bị mất
+- Ví dụ hai người cùng trừ tồn kho dựa trên giá trị đọc được trước đó
+- Cập nhật nguyên tử ngay trong câu lệnh, ví dụ cộng trừ trực tiếp trên cột
+- Khoá bi quan bằng SELECT FOR UPDATE
+- Khoá lạc quan bằng cột version, hoặc dùng mức cô lập cao hơn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d69a4ec1-ad83-55f9-b7b4-9e5d843ac293', 'Transaction propagation trong Spring là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Propagation quy định method có annotation Transactional tham gia transaction hiện có hay tạo mới
+- REQUIRED (mặc định): dùng transaction hiện có, nếu chưa có thì tạo mới
+- REQUIRES_NEW: luôn tạo transaction mới, tạm dừng transaction hiện tại
+- NESTED: tạo savepoint trong transaction hiện tại
+- Các mức khác: SUPPORTS, NOT_SUPPORTED, MANDATORY, NEVER', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d85d336d-aae4-59fb-8b21-32e6cce496a5', 'Propagation REQUIRED và REQUIRES_NEW khác nhau như thế nào? Khi nào dùng REQUIRES_NEW?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- REQUIRED tham gia transaction đang có, mọi thao tác commit hoặc rollback cùng nhau
+- REQUIRES_NEW tạm dừng transaction ngoài và chạy transaction độc lập, commit hoặc rollback riêng
+- Lỗi trong transaction trong REQUIRED làm cả transaction ngoài bị đánh dấu rollback
+- Dùng REQUIRES_NEW khi cần lưu kết quả bất kể transaction ngoài thất bại, ví dụ ghi log kiểm toán
+- Lưu ý REQUIRES_NEW chiếm thêm kết nối cơ sở dữ liệu và có thể gây deadlock', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ceefb9ef-68c5-5f35-a3ac-7738b8cd6948', 'Annotation Transactional trong Spring hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Đánh dấu method hoặc class cần chạy trong transaction
+- Spring tạo proxy bọc bean, mở transaction trước khi gọi method và commit hoặc rollback sau đó
+- Có thể cấu hình propagation, isolation, timeout, readOnly, rollbackFor
+- Thường đặt ở tầng service, nơi chứa nghiệp vụ
+- Chỉ có tác dụng khi gọi qua proxy, với method public', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('1ee7c980-0121-5eb3-b986-2a5a5465570e', 'Mặc định Spring rollback transaction với những exception nào? Làm sao rollback với checked exception?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mặc định rollback với unchecked exception (RuntimeException) và Error
+- Checked exception mặc định không làm rollback, transaction vẫn commit
+- Cấu hình rollbackFor để rollback với checked exception cụ thể
+- Có thể dùng noRollbackFor để không rollback với một số runtime exception
+- Nếu exception bị bắt và nuốt trong method thì transaction không rollback', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('16833fe3-750e-5b04-8354-dfa17feb5d39', 'Transaction readOnly là gì và có tác dụng gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Đánh dấu transaction chỉ đọc dữ liệu
+- Hibernate có thể bỏ qua dirty checking và flush, giảm tốn bộ nhớ và CPU
+- Một số driver và cơ sở dữ liệu tối ưu cho truy vấn chỉ đọc
+- Có thể dùng để định tuyến truy vấn sang bản sao đọc (read replica)
+- Là gợi ý, không phải cơ chế bảo vệ chắc chắn chống ghi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0ab9fe02-c823-5b7f-aa02-c0f30278ba7e', 'Điều gì xảy ra khi một method gọi method có Transactional khác trong cùng class?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Lời gọi nội bộ (self-invocation) đi thẳng tới đối tượng thật, không qua proxy
+- Do đó cấu hình transaction của method được gọi không được áp dụng
+- Ví dụ REQUIRES_NEW hoặc readOnly bị bỏ qua
+- Khắc phục: tách method sang bean khác, hoặc tự inject proxy của chính bean
+- Hoặc dùng AspectJ weaving thay vì proxy', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('7a00fab1-c4f4-554b-8598-6b2f9970ffcf', 'String pool trong Java hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- String pool là vùng lưu các chuỗi literal dùng chung để tiết kiệm bộ nhớ
+- Chuỗi literal giống nhau trỏ tới cùng một object trong pool
+- Tạo bằng new String luôn tạo object mới ngoài pool
+- Phương thức intern trả về chuỗi tương ứng trong pool, thêm vào nếu chưa có
+- Từ Java 7, string pool nằm trong heap', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('15a9afe7-5757-589a-9a02-1a51ce9e87d6', 'Vì sao String trong Java là bất biến?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Cho phép dùng chung chuỗi trong string pool an toàn
+- An toàn luồng mà không cần đồng bộ
+- Có thể cache hashCode, giúp String là key tốt cho HashMap
+- Bảo mật: tham số như đường dẫn file, URL, tên lớp không bị thay đổi sau khi kiểm tra
+- Đổi lại mỗi lần sửa chuỗi đều tạo object mới', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('20b74a86-c0b3-5fac-8216-2c2fccf64e7b', 'Khi nào dùng StringBuilder và khi nào dùng StringBuffer?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Cả hai là chuỗi có thể thay đổi, dùng khi cần ghép chuỗi nhiều lần
+- StringBuffer đồng bộ các method nên an toàn luồng nhưng chậm hơn
+- StringBuilder không đồng bộ, nhanh hơn
+- Hầu hết trường hợp dùng StringBuilder vì chuỗi thường chỉ dùng trong một luồng
+- StringBuffer chủ yếu còn trong code cũ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('eadcb04a-2d77-54df-9b1b-b2625ad7a4f9', 'Điều gì xảy ra khi nối chuỗi bằng toán tử cộng trong Java? Vì sao nối trong vòng lặp lại chậm?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Vì String bất biến, mỗi lần nối tạo ra một object chuỗi mới
+- Trình biên dịch tối ưu biểu thức nối đơn lẻ (dùng StringBuilder hoặc invokedynamic từ Java 9)
+- Trong vòng lặp, mỗi vòng tạo chuỗi mới và sao chép dữ liệu cũ, tổng chi phí O(n bình phương)
+- Nên dùng StringBuilder khi nối trong vòng lặp
+- Hoặc dùng String.join, Collectors.joining', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('7839105a-9d9b-5ab7-a887-9c2a754a408d', 'So sánh chuỗi bằng toán tử == và equals khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- == so sánh tham chiếu, kiểm tra hai biến có trỏ cùng một object
+- equals so sánh nội dung ký tự của chuỗi
+- Hai chuỗi literal giống nhau có thể == là true do string pool, nhưng không nên dựa vào đó
+- Chuỗi tạo lúc chạy (new, nối chuỗi, đọc từ input) thường == là false dù nội dung giống
+- Luôn dùng equals hoặc equalsIgnoreCase để so sánh nội dung', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('2f9e857a-f670-5163-a70e-200a6afe5f21', 'Immutable object là gì và mang lại những lợi ích gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là object không thể thay đổi trạng thái sau khi được tạo
+- An toàn luồng mà không cần đồng bộ
+- Dễ hiểu, dễ dự đoán, không lo bị sửa ngoài ý muốn khi truyền đi
+- An toàn khi làm key cho HashMap, phần tử cho HashSet, dễ cache
+- Ví dụ trong Java: String, Integer, LocalDate, record', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c30d94fe-2caf-5994-96cd-2a6fce4b80a5', 'Làm thế nào để tạo một class bất biến trong Java?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Khai báo class là final để không bị kế thừa
+- Mọi trường là private final, gán giá trị trong constructor
+- Không cung cấp setter hay method làm thay đổi trạng thái
+- Với trường tham chiếu tới object mutable, sao chép phòng thủ khi nhận vào và khi trả ra
+- Có thể dùng record cho các class dữ liệu đơn giản', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('03c73286-fc6c-5d9f-bf30-9fea1a57cf9a', 'Chỉ khai báo mọi trường là final có đủ để class bất biến không?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Không đủ
+- final chỉ ngăn gán lại tham chiếu, không ngăn sửa nội dung object được tham chiếu
+- Trường là List hoặc Date vẫn có thể bị sửa qua getter hoặc qua tham chiếu bên ngoài
+- Cần sao chép phòng thủ và trả về bản sao hoặc view không sửa được
+- Class cũng cần là final để lớp con không phá vỡ tính bất biến', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('32eaa19a-7930-533f-9f53-80c84939cb15', 'Defensive copy là gì và khi nào cần dùng?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là tạo bản sao của object mutable thay vì giữ hoặc trả về tham chiếu gốc
+- Dùng trong constructor khi nhận tham số mutable, để bên ngoài không sửa được trạng thái nội bộ
+- Dùng trong getter khi trả về trường mutable
+- Cần thiết khi xây class bất biến hoặc bảo vệ bất biến của đối tượng
+- Với collection có thể dùng List.copyOf để vừa sao chép vừa không sửa được', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e97683df-5855-544a-badd-8926cc2795a2', 'Collections.unmodifiableList khác gì với một danh sách thật sự bất biến như List.copyOf?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- unmodifiableList trả về view chỉ đọc bọc quanh danh sách gốc
+- Mọi thao tác sửa qua view ném UnsupportedOperationException
+- Nhưng nếu danh sách gốc bị sửa, view vẫn thấy thay đổi
+- List.copyOf hoặc List.of tạo bản sao độc lập, thật sự bất biến, không chấp nhận null
+- Muốn bảo vệ trạng thái nội bộ nên sao chép rồi mới bọc, hoặc dùng List.copyOf', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('2c9f29b7-d483-51f6-8d30-60d46cbde49e', 'Shallow copy và deep copy khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Shallow copy tạo object mới nhưng các trường tham chiếu vẫn trỏ cùng object con với bản gốc
+- Sửa object con qua bản sao sẽ ảnh hưởng bản gốc
+- Deep copy sao chép đệ quy cả các object con, hai bản hoàn toàn độc lập
+- Deep copy tốn chi phí hơn, cần cẩn thận với tham chiếu vòng
+- clone mặc định của Java là shallow copy', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('3e70762c-7497-5966-a915-874cc6b9f8a3', 'Vì sao class bất biến nên được khai báo final?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Nếu không final, lớp con có thể thêm trạng thái mutable
+- Lớp con có thể override method để trả về giá trị khác hoặc làm lộ trạng thái
+- Code nhận kiểu của lớp cha sẽ tưởng object bất biến nhưng thực ra không
+- Thay thế: để constructor private và dùng factory method
+- Record trong Java mặc định là final', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ddad7ca0-c526-50e7-8f42-907eb4100214', 'Record trong Java là gì và giúp gì cho việc tạo class bất biến?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Record (từ Java 16) là class dữ liệu ngắn gọn, khai báo các thành phần trong phần header
+- Tự sinh constructor, các method truy cập, equals, hashCode, toString
+- Các trường là private final và record là final
+- Có thể thêm kiểm tra trong compact constructor
+- Bất biến nông: thành phần là object mutable vẫn cần sao chép phòng thủ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c52df108-89f9-51bd-b934-c44d090a3da3', 'Object bất biến có những nhược điểm gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mỗi thay đổi tạo object mới nên tốn bộ nhớ và tăng áp lực cho garbage collector
+- Cập nhật cấu trúc lồng nhau dài dòng
+- Không phù hợp với object thay đổi thường xuyên hoặc rất lớn
+- Thường giảm thiểu bằng builder, tái sử dụng object hoặc cấu trúc dữ liệu persistent
+- Trong phần lớn trường hợp, lợi ích về an toàn và đơn giản lớn hơn chi phí', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ce3f4b93-7330-5618-b9f0-b29a8fd56c92', 'Container hoá là gì và vì sao các ứng dụng backend cần nó?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Container hoá đóng gói ứng dụng cùng thư viện và cấu hình vào một image chạy độc lập
+- Chạy nhất quán giữa máy dev, test và production
+- Nhẹ hơn máy ảo vì dùng chung kernel của máy chủ, khởi động nhanh
+- Dễ triển khai, mở rộng và rollback theo phiên bản image
+- Là nền tảng cho microservices và điều phối bằng Kubernetes', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ba49e126-11ee-5bee-9ee0-e5ad33ef879d', 'Dockerfile là gì? Những chỉ thị chính trong Dockerfile là gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dockerfile là file mô tả các bước xây dựng một Docker image
+- FROM chọn image nền; WORKDIR đặt thư mục làm việc
+- COPY đưa file vào image; RUN chạy lệnh lúc build như cài thư viện
+- ENV đặt biến môi trường; EXPOSE khai báo port
+- CMD và ENTRYPOINT quy định lệnh chạy khi container khởi động; mỗi chỉ thị tạo một layer có thể cache', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('11b1abd2-e4bf-5024-ba4e-83480982e0dc', 'CMD và ENTRYPOINT trong Dockerfile khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- ENTRYPOINT quy định chương trình chính luôn được chạy khi container khởi động
+- CMD cung cấp lệnh hoặc tham số mặc định, dễ bị ghi đè khi chạy container
+- Khi dùng cả hai, CMD trở thành tham số mặc định cho ENTRYPOINT
+- Nên dùng dạng mảng (exec form) để tiến trình là PID 1 và nhận tín hiệu dừng đúng
+- Ví dụ ENTRYPOINT là java -jar app.jar, CMD là các tham số mặc định', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0dc5a21b-5bbb-532d-88eb-b20c933249dd', 'Multi-stage build trong Docker là gì và có lợi ích gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dùng nhiều câu lệnh FROM trong một Dockerfile, mỗi stage có môi trường riêng
+- Stage build chứa công cụ build như JDK, Maven để biên dịch
+- Stage cuối chỉ sao chép artifact cần thiết sang image nền nhỏ như JRE
+- Image cuối nhỏ hơn, ít lỗ hổng bảo mật hơn vì không chứa công cụ build
+- Tận dụng cache layer để build nhanh hơn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('096062dd-17ff-5b23-877e-c70166f5eed4', 'Docker Compose là gì và dùng khi nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Docker Compose định nghĩa và chạy ứng dụng nhiều container bằng một file YAML
+- Khai báo service, image, port, biến môi trường, volume, mạng và phụ thuộc giữa các service
+- Một lệnh để khởi động hoặc dừng toàn bộ hệ thống
+- Phù hợp cho môi trường dev, test, ví dụ chạy ứng dụng kèm PostgreSQL, Redis
+- Không thay thế được công cụ điều phối như Kubernetes cho production quy mô lớn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('70a1879c-d5cc-5a11-9512-f980cae2d094', 'Kubernetes là gì và vì sao cần nó?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Kubernetes là nền tảng điều phối container trên một cụm nhiều máy
+- Tự động triển khai, mở rộng và khởi động lại container lỗi
+- Phân phối tải, phát hiện dịch vụ, cấu hình và quản lý bí mật
+- Rolling update và rollback không gián đoạn
+- Mô tả trạng thái mong muốn bằng khai báo, Kubernetes liên tục đưa hệ thống về trạng thái đó', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('a387de34-6620-5454-ab6a-fb7a9eb6ea05', 'Pod trong Kubernetes là gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Pod là đơn vị triển khai nhỏ nhất trong Kubernetes
+- Chứa một hoặc nhiều container dùng chung mạng (cùng địa chỉ IP) và volume
+- Thường mỗi pod chạy một container chính, có thể kèm sidecar
+- Pod là tạm thời, có thể bị xoá và tạo lại với IP khác
+- Thường được quản lý qua Deployment hoặc StatefulSet thay vì tạo trực tiếp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0dbb88e9-e7f1-5cbf-b9f0-6e3519a45c75', 'Service trong Kubernetes là gì? Có những loại Service nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Service cung cấp địa chỉ và tên DNS ổn định cho một nhóm pod được chọn bằng label
+- Cân bằng tải giữa các pod phía sau
+- ClusterIP (mặc định): chỉ truy cập trong cụm
+- NodePort: mở một port trên mọi node để truy cập từ ngoài
+- LoadBalancer: tạo cân bằng tải của nhà cung cấp cloud; ngoài ra có ExternalName', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ab52fc3e-6a57-588c-bbf7-4f3908ac209f', 'Mở rộng (scaling) trong Kubernetes hoạt động như thế nào? HorizontalPodAutoscaler là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mở rộng ngang bằng cách tăng giảm số bản sao pod của Deployment
+- Có thể chỉnh số bản sao thủ công
+- HorizontalPodAutoscaler tự điều chỉnh số pod dựa trên chỉ số như CPU, bộ nhớ hoặc chỉ số tuỳ chỉnh
+- Cần đặt resource request cho container để autoscaler tính toán đúng
+- Cluster autoscaler thêm bớt node khi cụm thiếu hoặc thừa tài nguyên', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('27c974f6-ac15-5e0d-903b-8705e04bd4f0', 'ConfigMap và Secret trong Kubernetes khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Cả hai tách cấu hình khỏi image, đưa vào pod qua biến môi trường hoặc file
+- ConfigMap lưu cấu hình không nhạy cảm như URL, cờ tính năng
+- Secret lưu dữ liệu nhạy cảm như mật khẩu, token, chứng chỉ
+- Secret mặc định chỉ mã hoá base64, cần bật mã hoá khi lưu và phân quyền chặt
+- Có thể tích hợp kho bí mật bên ngoài như Vault', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('23ba6c80-3b4e-57f6-aae8-220a5ae86eed', 'Liveness probe và readiness probe khác nhau như thế nào? Vì sao cần health check?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Liveness probe kiểm tra container còn sống không; thất bại thì Kubernetes khởi động lại container
+- Readiness probe kiểm tra container sẵn sàng nhận request chưa; thất bại thì bị loại khỏi Service
+- Startup probe dùng cho ứng dụng khởi động chậm
+- Health check giúp tự phục hồi và tránh gửi request tới instance chưa sẵn sàng
+- Liveness không nên phụ thuộc dịch vụ bên ngoài để tránh khởi động lại hàng loạt', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('6f9d9747-57f1-5f91-a81f-c0e180f94d90', 'Ingress trong Kubernetes là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Ingress định nghĩa luật định tuyến HTTP và HTTPS từ bên ngoài vào các Service trong cụm
+- Định tuyến theo tên miền và đường dẫn
+- Hỗ trợ kết thúc TLS tập trung
+- Cần một Ingress controller (ví dụ Nginx Ingress) để thực thi luật
+- Giúp dùng một điểm vào cho nhiều service thay vì nhiều LoadBalancer', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('abab1ef0-2d38-53e8-8c3f-a3781745ab45', 'Rolling update trong Kubernetes được thực hiện như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Deployment thay dần pod cũ bằng pod mới thay vì dừng tất cả cùng lúc
+- maxSurge và maxUnavailable kiểm soát số pod thêm và số pod được phép không sẵn sàng
+- Readiness probe đảm bảo pod mới sẵn sàng trước khi nhận tải
+- Theo dõi tiến trình rollout và có thể rollback về phiên bản trước
+- Ứng dụng cần tương thích ngược (ví dụ thay đổi cơ sở dữ liệu) vì hai phiên bản chạy song song', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f4403ead-cfbc-57d6-991a-d20695d2dfb0', 'StatefulSet là gì và khi nào nên dùng?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- StatefulSet quản lý các pod cần định danh và lưu trữ ổn định
+- Mỗi pod có tên cố định theo thứ tự và volume riêng giữ lại khi pod được tạo lại
+- Pod được tạo, cập nhật và xoá theo thứ tự
+- Dùng cho ứng dụng có trạng thái như cơ sở dữ liệu, Kafka, Zookeeper
+- Ứng dụng không trạng thái nên dùng Deployment', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('6d141e98-7157-5875-a35d-abc296471fea', 'Bạn giám sát ứng dụng chạy trên Kubernetes như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Thu thập metrics bằng Prometheus, hiển thị bằng Grafana
+- Ứng dụng xuất metrics, ví dụ Spring Boot Actuator với Micrometer
+- Gom log tập trung bằng ELK, Loki hoặc dịch vụ cloud
+- Tracing phân tán bằng OpenTelemetry, Jaeger
+- Thiết lập cảnh báo dựa trên chỉ số quan trọng như tỉ lệ lỗi, độ trễ, tài nguyên', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c7c7be5e-b1cc-59f4-aaf2-35d8b40990a6', 'Topic và partition trong Kafka là gì? Vì sao cần partition?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Topic là kênh logic chứa các message cùng loại
+- Mỗi topic chia thành nhiều partition, mỗi partition là log có thứ tự, chỉ ghi nối thêm
+- Partition cho phép phân tán dữ liệu trên nhiều broker và xử lý song song
+- Thứ tự message chỉ được đảm bảo trong một partition
+- Số partition giới hạn mức song song tối đa của consumer group', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('8f7c7d76-2257-5019-99f5-db0340d2804b', 'Message key trong Kafka ảnh hưởng tới việc phân bổ partition như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Message có key được đưa vào partition theo hash của key
+- Mọi message cùng key luôn vào cùng partition nên giữ được thứ tự theo key
+- Message không có key được phân bổ theo cơ chế mặc định (sticky hoặc round robin)
+- Chọn key phù hợp, ví dụ mã đơn hàng, để đảm bảo thứ tự cho từng thực thể
+- Key phân bố lệch có thể làm một partition quá tải', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d1dd1a70-1e26-5b4e-8636-e3ecc32edfe8', 'Consumer group trong Kafka là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Consumer group là nhóm consumer cùng đọc một topic để chia tải
+- Mỗi partition chỉ được giao cho một consumer trong nhóm tại một thời điểm
+- Nhiều group khác nhau có thể đọc cùng topic độc lập, mỗi group có offset riêng
+- Thêm consumer giúp xử lý song song, tối đa bằng số partition
+- Kafka tự phân bổ lại partition khi consumer tham gia hoặc rời nhóm', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('cbb631a0-89d1-5319-8d7e-e4ee90e8a0ad', 'Nếu số consumer trong group nhiều hơn số partition thì điều gì xảy ra?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mỗi partition chỉ giao cho một consumer trong group
+- Các consumer dư sẽ không được giao partition nào và đứng chờ
+- Chúng chỉ hữu ích như dự phòng khi consumer khác lỗi
+- Muốn tăng song song cần tăng số partition
+- Nên lên kế hoạch số partition từ đầu vì tăng sau có thể làm thay đổi phân bổ theo key', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('85214ced-0536-53c7-9ede-977a068065c9', 'Các đảm bảo giao nhận at-most-once, at-least-once và exactly-once khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- At-most-once: message có thể mất nhưng không bao giờ xử lý lặp (commit offset trước khi xử lý)
+- At-least-once: không mất message nhưng có thể xử lý lặp (commit sau khi xử lý), phổ biến nhất
+- Exactly-once: mỗi message có tác động đúng một lần
+- Kafka hỗ trợ exactly-once trong phạm vi Kafka bằng idempotent producer và transaction
+- Với hệ thống bên ngoài, thường dùng at-least-once kèm xử lý idempotent', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5256fde9-5699-5a87-a5f4-779f5fff8c14', 'Làm thế nào để cấu hình exactly-once semantics trong Kafka?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Bật idempotent producer để broker loại bỏ message trùng do retry
+- Dùng transactional producer với transactional id để ghi nhiều partition một cách nguyên tử
+- Gửi offset của consumer vào cùng transaction (mô hình đọc, xử lý, ghi)
+- Consumer đặt isolation level là read_committed để chỉ đọc message đã commit
+- Với ghi ra hệ thống ngoài Kafka cần idempotency ở phía đích hoặc lưu offset cùng dữ liệu', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d6ad42ab-48fd-53c8-a138-caf9eb534385', 'Offset trong Kafka là gì? Commit offset hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Offset là vị trí tuần tự của message trong một partition
+- Consumer group lưu offset đã xử lý vào topic nội bộ của Kafka
+- Khi consumer khởi động lại hoặc partition được giao cho consumer khác, việc đọc tiếp tục từ offset đã commit
+- Commit trước khi xử lý có thể mất message; commit sau khi xử lý có thể xử lý lặp
+- auto.offset.reset quy định đọc từ đầu hay từ mới nhất khi chưa có offset', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('cbcc166a-52f7-5ab5-83de-667245f075e3', 'Auto commit và manual commit offset trong Kafka khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Auto commit định kỳ commit offset của các message đã poll, đơn giản
+- Auto commit có thể commit message chưa xử lý xong, dẫn tới mất message khi lỗi
+- Manual commit để ứng dụng tự commit sau khi xử lý thành công
+- Manual commit có dạng đồng bộ (chắc chắn hơn) và bất đồng bộ (nhanh hơn)
+- Hệ thống cần độ tin cậy cao nên dùng manual commit kèm xử lý idempotent', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('86863471-742c-5496-a999-545fb1cb5501', 'Rebalancing trong Kafka là gì và khi nào xảy ra?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Rebalancing là quá trình phân bổ lại partition giữa các consumer trong group
+- Xảy ra khi consumer tham gia, rời đi, bị coi là chết do không gửi heartbeat hoặc xử lý quá lâu, hoặc khi số partition thay đổi
+- Trong lúc rebalance, việc tiêu thụ có thể bị tạm dừng
+- Có thể gây xử lý lặp nếu offset chưa được commit
+- Giảm ảnh hưởng bằng cooperative rebalancing, static membership, chỉnh thời gian poll hợp lý', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('26314ac9-7fdc-5d85-a4ed-9b37b3885cca', 'ISR (In-Sync Replicas) trong Kafka là gì?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mỗi partition có một leader và các follower nhân bản dữ liệu
+- ISR là tập các bản sao đang bắt kịp leader
+- Bản sao tụt lại quá lâu bị loại khỏi ISR
+- Với acks=all, message chỉ được xác nhận khi mọi bản sao trong ISR đã ghi
+- min.insync.replicas quy định số bản sao tối thiểu trong ISR để chấp nhận ghi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('93c06661-9760-555b-853f-34a4fe687bdc', 'Kafka đảm bảo khả năng chịu lỗi như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mỗi partition được nhân bản trên nhiều broker theo replication factor
+- Một bản sao là leader xử lý đọc ghi, các follower đồng bộ dữ liệu
+- Khi leader lỗi, một bản sao trong ISR được bầu làm leader mới
+- Producer dùng acks=all và min.insync.replicas để không mất dữ liệu đã xác nhận
+- Dữ liệu được ghi xuống đĩa và giữ theo chính sách retention', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('9ab47e2a-67ce-5ab4-ba07-4b5699fe2c96', 'Cấu hình acks của Kafka producer (0, 1, all) có ý nghĩa gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- acks=0: producer không chờ xác nhận, nhanh nhất nhưng dễ mất message
+- acks=1: chờ leader ghi xong; mất message nếu leader lỗi trước khi follower sao chép
+- acks=all: chờ mọi bản sao trong ISR ghi xong, an toàn nhất nhưng độ trễ cao hơn
+- acks=all nên đi kèm min.insync.replicas lớn hơn 1
+- Chọn theo mức độ quan trọng của dữ liệu và yêu cầu độ trễ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('edb5965e-033d-5bf4-aee9-6e3a141d8fa4', 'Idempotent producer trong Kafka là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là producer đảm bảo retry không tạo message trùng trong một partition
+- Mỗi producer có id và mỗi message có số thứ tự, broker loại bỏ message trùng
+- Bật bằng enable.idempotence, mặc định bật từ các phiên bản Kafka mới
+- Yêu cầu acks=all
+- Là nền tảng cho exactly-once khi kết hợp transaction', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('46b461a3-e8a9-5313-bfd5-2a05f05750c8', 'Dead Letter Queue (DLQ) là gì? Bạn xử lý lỗi khi consumer đọc message như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- DLQ là topic hoặc hàng đợi riêng chứa các message xử lý thất bại
+- Lỗi tạm thời thì retry có giới hạn, thường kèm backoff
+- Lỗi vĩnh viễn (dữ liệu sai định dạng) thì chuyển sang DLQ thay vì chặn cả partition
+- Lưu kèm thông tin lỗi để phân tích và xử lý lại sau
+- Theo dõi và cảnh báo khi DLQ có message', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c971822d-7923-5637-92c8-d42aaeee36a5', 'Consumer lag trong Kafka là gì và bạn giám sát nó như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Consumer lag là khoảng cách giữa offset mới nhất của partition và offset consumer đã commit
+- Lag tăng liên tục nghĩa là consumer xử lý chậm hơn tốc độ ghi
+- Giám sát bằng công cụ dòng lệnh của Kafka, Burrow, Prometheus exporter, Grafana
+- Đặt cảnh báo theo ngưỡng lag hoặc thời gian trễ
+- Xử lý bằng tăng consumer và partition hoặc tối ưu logic xử lý', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b76b0c89-3521-548f-9f0d-b2500f9193a0', 'Retention policy trong Kafka là gì? Message cũ bị xoá như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Kafka giữ message theo thời gian hoặc dung lượng, không xoá khi đã được đọc
+- Cấu hình retention.ms và retention.bytes
+- Dữ liệu được lưu theo segment; cả segment cũ hết hạn mới bị xoá
+- Log compaction giữ lại message mới nhất cho mỗi key thay vì xoá theo thời gian
+- Cho phép đọc lại dữ liệu cũ khi cần xử lý lại', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f8d86431-b9af-56bb-9ed4-4b65254b401f', 'Vấn đề N+1 trong Hibernate/JPA là gì và giải quyết thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Xảy ra khi tải danh sách N entity rồi mỗi entity lại chạy thêm một truy vấn để tải quan hệ
+- Tổng cộng N+1 truy vấn, rất chậm khi N lớn
+- Giải quyết bằng JOIN FETCH trong JPQL hoặc EntityGraph
+- Dùng batch fetching (BatchSize) để tải quan hệ theo lô
+- Hoặc dùng projection/DTO chỉ lấy dữ liệu cần; phát hiện bằng cách bật log SQL', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c201bc7e-f90a-5750-9e31-6008967f256d', 'Lazy loading và eager loading khác nhau như thế nào? Khi nào dùng loại nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Lazy loading chỉ tải quan hệ khi lần đầu truy cập, eager loading tải ngay cùng entity cha
+- Lazy tiết kiệm truy vấn khi không cần quan hệ nhưng dễ gây N+1 và LazyInitializationException
+- Eager dễ tải thừa dữ liệu, khó tắt khi không cần
+- Mặc định nên dùng lazy, rồi chủ động fetch theo từng use case bằng JOIN FETCH hoặc EntityGraph
+- Trong JPA, quan hệ ToOne mặc định eager, ToMany mặc định lazy', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0522def3-7de2-5ffe-b98a-2137b9176119', 'LazyInitializationException là gì và làm sao tránh?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Xảy ra khi truy cập quan hệ lazy sau khi session hoặc persistence context đã đóng
+- Thường gặp khi trả entity ra controller hoặc serialize ngoài transaction
+- Tránh bằng cách fetch đủ dữ liệu cần trong transaction (JOIN FETCH, EntityGraph)
+- Chuyển entity sang DTO trong tầng service
+- Không nên dựa vào open-session-in-view hay chuyển hết sang eager', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('4c8f4e23-0bf9-5fad-9098-65907ec831cc', 'Vòng đời của entity trong Hibernate gồm những trạng thái nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Transient: object mới tạo, chưa gắn với persistence context, chưa có trong cơ sở dữ liệu
+- Persistent (managed): được persistence context quản lý, thay đổi tự động được đồng bộ
+- Detached: đã từng được quản lý nhưng context đã đóng hoặc bị tách ra
+- Removed: đã đánh dấu xoá, sẽ bị xoá khi flush
+- Chuyển trạng thái qua persist, merge, detach, remove', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f90c6c48-36d8-541e-8b04-d258d8079263', 'First-level cache và second-level cache trong Hibernate khác nhau như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- First-level cache gắn với một session hoặc persistence context, luôn bật
+- Trong cùng session, tải cùng entity theo id hai lần chỉ truy vấn một lần
+- Second-level cache dùng chung giữa các session, phải cấu hình thêm (ví dụ Ehcache, Caffeine)
+- Hợp với dữ liệu đọc nhiều, ít thay đổi như danh mục
+- Cần chú ý tính nhất quán khi dữ liệu bị sửa ngoài Hibernate hoặc chạy nhiều instance', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('3209ab6e-c6f2-53fd-b401-391e2d857f75', 'Dirty checking và cơ chế flush trong Hibernate hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Hibernate giữ bản chụp trạng thái của entity khi tải vào persistence context
+- Khi flush, so sánh trạng thái hiện tại với bản chụp để tìm entity bị thay đổi
+- Tự sinh câu UPDATE cho entity thay đổi mà không cần gọi save
+- Flush xảy ra khi commit transaction, trước một số truy vấn, hoặc khi gọi flush thủ công
+- Transaction readOnly có thể bỏ qua dirty checking để tiết kiệm tài nguyên', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0ec3cfb5-3039-5496-ab72-9fc4f6959d9c', 'persist và merge trong JPA khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- persist chuyển entity mới (transient) sang trạng thái managed, chính object đó được quản lý
+- persist với entity detached sẽ báo lỗi
+- merge sao chép trạng thái của object (thường detached) vào một entity managed và trả về entity đó
+- Object truyền vào merge vẫn không được quản lý, phải dùng giá trị trả về
+- save của Spring Data gọi persist với entity mới và merge với entity đã có id', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('a0048501-3b49-519a-98d2-2656503d68e8', 'Optimistic locking và pessimistic locking trong JPA khác nhau như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Optimistic locking không khoá dữ liệu, kiểm tra xung đột khi cập nhật bằng cột version
+- Nếu version đã thay đổi thì ném OptimisticLockException, ứng dụng cần retry hoặc báo người dùng
+- Phù hợp khi xung đột hiếm, hệ thống đọc nhiều
+- Pessimistic locking khoá dòng khi đọc (SELECT FOR UPDATE), transaction khác phải chờ
+- Phù hợp khi xung đột thường xuyên và chi phí retry cao; cần chú ý deadlock và timeout', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('1acdc0ff-f117-5481-9a2a-753f5d2dfe08', 'Cascade trong JPA là gì? Orphan removal là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Cascade lan truyền thao tác từ entity cha sang entity con như persist, merge, remove
+- Các loại: PERSIST, MERGE, REMOVE, REFRESH, DETACH, ALL
+- Orphan removal tự xoá entity con khi nó bị gỡ khỏi collection của cha
+- Dùng cho quan hệ sở hữu chặt, ví dụ đơn hàng và các dòng đơn hàng
+- Không nên cascade REMOVE trên quan hệ dùng chung hoặc ManyToOne', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('8587d8c1-7032-5ddb-8f03-5ca6f602183d', 'Bạn sử dụng quan hệ OneToMany và ManyToOne trong JPA đúng cách như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Phía ManyToOne giữ khoá ngoại và thường là phía sở hữu quan hệ
+- Quan hệ hai chiều dùng mappedBy ở phía OneToMany
+- Cập nhật cả hai phía bằng method tiện ích để giữ đồng bộ trong bộ nhớ
+- Mặc định dùng lazy và fetch theo nhu cầu
+- Tránh vòng lặp vô hạn khi serialize bằng cách dùng DTO thay vì trả entity trực tiếp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('2d59a22f-1eac-5c51-8563-b90d6c5d9419', 'JPQL là gì và khác SQL như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- JPQL là ngôn ngữ truy vấn của JPA, làm việc trên entity và thuộc tính thay vì bảng và cột
+- Không phụ thuộc hệ quản trị cơ sở dữ liệu, được dịch sang SQL tương ứng
+- Hỗ trợ điều hướng quan hệ và JOIN FETCH
+- Hạn chế hơn SQL thuần với tính năng đặc thù của từng hệ quản trị
+- Khi cần có thể dùng native query', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('13ee5945-ce03-5742-a310-019f19eea482', 'Projection trong JPA là gì và khi nào nên dùng?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Projection chỉ lấy một phần dữ liệu thay vì toàn bộ entity
+- Có thể dùng DTO qua constructor expression, interface projection của Spring Data, hoặc tuple
+- Giảm dữ liệu truyền tải và không đưa entity vào persistence context
+- Phù hợp cho truy vấn chỉ đọc, màn hình danh sách, báo cáo
+- Tránh được LazyInitializationException và N+1 khi chỉ cần vài trường', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('118234d1-d63f-567f-ad65-b503aa7b7617', 'JPA hỗ trợ những chiến lược ánh xạ kế thừa nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- SINGLE_TABLE: mọi lớp con chung một bảng với cột phân loại; nhanh nhưng nhiều cột null
+- JOINED: mỗi lớp một bảng, join khi truy vấn; chuẩn hoá nhưng truy vấn chậm hơn
+- TABLE_PER_CLASS: mỗi lớp cụ thể một bảng đầy đủ cột; truy vấn đa hình cần UNION
+- MappedSuperclass chỉ chia sẻ ánh xạ trường, không phải entity
+- Chọn theo nhu cầu truy vấn đa hình và tính toàn vẹn dữ liệu', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('bd57b19f-9325-5456-aa13-d66b1ed99ec4', 'Saga pattern là gì và khi nào nên dùng? Choreography và orchestration khác nhau ra sao?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Saga quản lý transaction trải dài nhiều service bằng chuỗi transaction cục bộ
+- Mỗi bước thất bại sẽ kích hoạt các transaction bù trừ để hoàn tác bước trước
+- Choreography: các service phát và lắng nghe sự kiện, không có bộ điều phối trung tâm
+- Orchestration: một orchestrator ra lệnh cho từng service và theo dõi trạng thái
+- Dùng khi không thể hoặc không nên dùng transaction phân tán hai pha; đổi lại chỉ có nhất quán cuối cùng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ed275e1c-0ce5-57fe-bb06-17ab6b10a2fc', 'Bạn xử lý transaction phân tán giữa các microservice như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Tránh transaction phân tán khi có thể bằng thiết kế ranh giới service hợp lý
+- Two-phase commit đảm bảo nhất quán mạnh nhưng chậm, khoá lâu và kém sẵn sàng
+- Saga với các transaction bù trừ là cách phổ biến
+- Outbox pattern để ghi dữ liệu và phát sự kiện một cách tin cậy
+- Consumer xử lý idempotent để chịu được message lặp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('692779cd-8939-5982-b1a0-d25bbca73c2a', 'Circuit breaker pattern là gì và hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Circuit breaker ngăn gọi liên tục tới service đang lỗi để tránh lỗi lan truyền
+- Closed: gọi bình thường, đếm lỗi
+- Open: khi lỗi vượt ngưỡng thì chặn gọi, trả lỗi hoặc fallback ngay
+- Half-open: sau một thời gian cho thử vài request, thành công thì đóng lại, thất bại thì mở tiếp
+- Thư viện phổ biến: Resilience4j', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('28804cc0-5fbf-5dad-92c7-55aea1619786', 'Service discovery là gì và vì sao cần nó?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Trong microservices, địa chỉ instance thay đổi liên tục do mở rộng và triển khai lại
+- Service discovery giúp tìm địa chỉ instance đang hoạt động của một service theo tên
+- Client-side discovery: client hỏi registry rồi tự chọn instance (Eureka)
+- Server-side discovery: client gọi qua load balancer hoặc router, nó tra registry (Kubernetes Service)
+- Registry dựa vào health check để loại instance lỗi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('50f81cfe-252c-58c1-b8f1-554440a489fd', 'API Gateway là gì và giải quyết những vấn đề gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- API Gateway là điểm vào duy nhất cho client gọi tới các microservice
+- Định tuyến request tới service phù hợp
+- Xử lý tập trung xác thực, giới hạn tốc độ, CORS, ghi log
+- Có thể gộp dữ liệu từ nhiều service, chuyển đổi giao thức
+- Cần thiết kế để không thành điểm lỗi đơn lẻ hay nút thắt hiệu năng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b8bcc3f0-076b-5e77-8d86-ca0db340679a', 'Sharding là gì? Sharding và partitioning khác nhau như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Sharding chia dữ liệu theo dòng ra nhiều cơ sở dữ liệu hoặc máy chủ khác nhau
+- Partitioning thường là chia bảng thành nhiều phần trong cùng một cơ sở dữ liệu
+- Sharding giúp mở rộng ngang khả năng lưu trữ và ghi
+- Chọn shard key quan trọng để phân bố đều và tránh truy vấn chéo shard
+- Nhược điểm: join và transaction chéo shard phức tạp, khó chia lại shard', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('eb338f8c-bdb6-566a-b7d9-4a9f85b67b33', 'Làm thế nào để mở rộng ngang (horizontal scaling) một microservice?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Chạy nhiều instance phía sau load balancer
+- Service phải stateless: session, file, cache chung lưu ở hệ thống ngoài như Redis, object storage
+- Tự động mở rộng theo tải (ví dụ HPA của Kubernetes)
+- Chú ý nút thắt ở cơ sở dữ liệu: read replica, cache, sharding
+- Xử lý tác vụ nặng bất đồng bộ qua hàng đợi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('741b6236-39bd-5c2d-9a46-77b8f35cece9', 'Database per service là gì? Dùng chung một cơ sở dữ liệu giữa các microservice có vấn đề gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mỗi service sở hữu cơ sở dữ liệu riêng, service khác chỉ truy cập qua API hoặc sự kiện
+- Giúp service độc lập về triển khai, thay đổi schema và chọn công nghệ lưu trữ
+- Dùng chung cơ sở dữ liệu tạo ràng buộc chặt: đổi schema ảnh hưởng nhiều service
+- Khó xác định ai sở hữu dữ liệu, dễ tranh chấp tải và khoá
+- Đổi lại phải xử lý dữ liệu phân tán, truy vấn chéo service và nhất quán cuối cùng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ad3a4ba6-268d-53ba-8337-f7554471d018', 'Các microservice giao tiếp với nhau như thế nào? Giao tiếp đồng bộ và bất đồng bộ khác nhau ra sao?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Đồng bộ: REST hoặc gRPC, bên gọi chờ phản hồi
+- Đồng bộ đơn giản, phản hồi ngay nhưng tạo phụ thuộc thời gian chạy, lỗi dễ lan truyền
+- Bất đồng bộ: qua message broker như Kafka, RabbitMQ
+- Bất đồng bộ giảm phụ thuộc, chịu tải tốt nhưng phức tạp hơn và chỉ nhất quán cuối cùng
+- Chọn theo nhu cầu: truy vấn cần kết quả ngay dùng đồng bộ, sự kiện nghiệp vụ dùng bất đồng bộ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('61fddeaa-b0df-5a87-acb9-f2545e7e55de', 'Bạn đảm bảo khả năng chịu lỗi cho microservices như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Timeout cho mọi lời gọi ra ngoài
+- Retry có giới hạn kèm exponential backoff và jitter, chỉ với thao tác idempotent
+- Circuit breaker và fallback
+- Bulkhead: cô lập tài nguyên (thread pool, kết nối) theo từng phụ thuộc
+- Nhiều instance, health check, giao tiếp bất đồng bộ khi phù hợp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('abccf74a-911a-5246-9349-e43cad2cc04e', 'Retry pattern là gì và dùng như thế nào cho đúng? Exponential backoff là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Retry thử lại thao tác thất bại do lỗi tạm thời như mất mạng, timeout
+- Chỉ retry thao tác idempotent hoặc có idempotency key
+- Giới hạn số lần thử
+- Exponential backoff tăng thời gian chờ theo cấp số nhân giữa các lần thử, thêm jitter ngẫu nhiên để tránh dồn tải
+- Kết hợp circuit breaker để không retry vào service đang sập', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f9543497-1ad5-5278-ba2f-7757a4833366', 'Distributed tracing là gì? Bạn giám sát hệ thống microservices như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Distributed tracing theo dõi một request đi qua nhiều service bằng trace id được truyền theo
+- Mỗi bước là một span có thời gian, giúp tìm service chậm hoặc lỗi
+- Công cụ: OpenTelemetry, Jaeger, Zipkin
+- Kết hợp metrics (Prometheus, Grafana) và log tập trung có kèm trace id
+- Đặt cảnh báo theo tỉ lệ lỗi, độ trễ, độ bão hoà tài nguyên', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('fd892baa-e89b-573a-aad1-3a5920580f4c', 'Bạn triển khai xác thực và phân quyền trong hệ thống microservices như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Xác thực tập trung qua identity provider dùng OAuth2 hoặc OpenID Connect
+- Client gửi access token (thường là JWT); API Gateway kiểm tra token
+- Các service tự kiểm tra chữ ký và quyền trong token, không cần gọi lại máy chủ xác thực
+- Phân quyền dựa trên role hoặc scope, kiểm tra ở từng service
+- Giao tiếp giữa service dùng token của service hoặc mTLS', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('2f58bd74-7865-5cff-bf53-802bddc4e65a', 'Strangler fig pattern là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là cách chuyển dần hệ thống cũ (monolith) sang hệ thống mới
+- Đặt một lớp định tuyến phía trước, chuyển từng chức năng sang service mới
+- Chức năng nào đã chuyển thì định tuyến sang hệ thống mới
+- Hệ thống cũ thu hẹp dần cho tới khi gỡ bỏ hoàn toàn
+- Giảm rủi ro so với viết lại toàn bộ một lần', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('cf479396-ab19-5cff-87a9-9b6c3640e130', 'Bạn kiểm thử microservices như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Unit test cho logic nghiệp vụ trong từng service
+- Integration test với cơ sở dữ liệu và broker thật, ví dụ bằng Testcontainers
+- Contract test giữa bên gọi và bên cung cấp API (Spring Cloud Contract, Pact)
+- End-to-end test cho một số luồng quan trọng
+- Kiểm thử khả năng chịu lỗi và theo dõi trên môi trường staging', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('29e7a6c0-a4e0-5253-96f3-7c15bba16a04', 'Nguyên tắc Single Responsibility là gì? Làm sao biết một class đang vi phạm?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mỗi class chỉ nên có một lý do để thay đổi, tức chịu trách nhiệm cho một phần chức năng
+- Dấu hiệu vi phạm: class quá lớn, có nhiều nhóm method phục vụ các mục đích khác nhau
+- Thay đổi một yêu cầu kéo theo sửa nhiều phần không liên quan trong class
+- Ví dụ class vừa xử lý nghiệp vụ, vừa truy cập cơ sở dữ liệu, vừa gửi email
+- Khắc phục bằng cách tách thành các class nhỏ có độ gắn kết cao', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('74feb982-2b91-519a-947f-3aadd475a014', 'Nguyên tắc Open/Closed là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Module nên mở để mở rộng nhưng đóng để sửa đổi
+- Thêm hành vi mới bằng cách thêm code mới thay vì sửa code đã ổn định
+- Thực hiện qua interface, đa hình, Strategy pattern, plugin
+- Ví dụ thay chuỗi if-else theo loại thanh toán bằng các class triển khai chung một interface
+- Giảm rủi ro làm hỏng chức năng cũ khi mở rộng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('7ab05b3a-e562-5954-9729-50e772571998', 'Nguyên tắc Liskov Substitution là gì? Hãy cho ví dụ vi phạm.', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Object của lớp con phải thay thế được lớp cha mà không làm sai hành vi của chương trình
+- Lớp con không được làm yếu hậu điều kiện hay tăng tiền điều kiện so với lớp cha
+- Ví dụ kinh điển: Square kế thừa Rectangle làm sai khi đặt riêng chiều rộng và chiều cao
+- Ví dụ khác: lớp con ném UnsupportedOperationException cho method của lớp cha
+- Vi phạm thường là dấu hiệu nên dùng composition hoặc tách interface', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('45570829-5946-5bb6-bd00-c7a9dfe37e07', 'Nguyên tắc Interface Segregation là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Client không nên bị buộc phụ thuộc vào method mà nó không dùng
+- Nên chia interface lớn thành nhiều interface nhỏ, chuyên biệt
+- Tránh class triển khai phải để trống hoặc ném lỗi cho method không liên quan
+- Giảm ảnh hưởng khi interface thay đổi
+- Ví dụ tách interface đọc và ghi của một repository', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('a2d18445-03c7-534c-9e73-8792b3900eeb', 'Nguyên tắc Dependency Inversion là gì? Nó liên quan gì tới Dependency Injection?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Module cấp cao không phụ thuộc module cấp thấp, cả hai phụ thuộc vào abstraction
+- Abstraction không phụ thuộc chi tiết, chi tiết phụ thuộc abstraction
+- Ví dụ service phụ thuộc interface repository thay vì class truy cập cơ sở dữ liệu cụ thể
+- Dependency Injection là kỹ thuật hiện thực hoá nguyên tắc này, cung cấp phụ thuộc từ bên ngoài
+- Giúp dễ thay thế triển khai và dễ test bằng mock', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('7677dbf3-cb0b-5fba-aac0-9ef0cfc77b92', 'Vì sao cần tuân theo các nguyên tắc SOLID? Có nên áp dụng tuyệt đối không?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- SOLID giúp code dễ bảo trì, dễ mở rộng và dễ đọc
+- Giảm phụ thuộc chặt giữa các thành phần, thay đổi ít ảnh hưởng lan
+- Dễ viết unit test vì các thành phần nhỏ và có thể thay thế
+- Không nên áp dụng máy móc: quá nhiều abstraction gây phức tạp không cần thiết
+- Cân nhắc theo quy mô và tốc độ thay đổi của dự án', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('378cf19e-f432-5b6c-80ad-7a805b5b237d', 'Composition và inheritance khác nhau như thế nào? Khi nào nên ưu tiên composition?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Inheritance là quan hệ là một: lớp con kế thừa hành vi lớp cha
+- Composition là quan hệ có một: object chứa và uỷ quyền cho object khác
+- Inheritance gắn chặt lớp con với chi tiết lớp cha, thay đổi lớp cha dễ phá lớp con
+- Composition linh hoạt hơn, có thể thay đổi hành vi lúc chạy và dễ test
+- Ưu tiên composition khi chỉ cần tái sử dụng hành vi; dùng inheritance khi thật sự có quan hệ là một và tuân thủ Liskov', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c2c9a916-fe5d-5bfa-be6c-7c5bc1380cf5', 'Law of Demeter (nguyên tắc biết ít nhất) là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Một object chỉ nên gọi method của chính nó, tham số, object nó tạo ra và các thành phần trực tiếp
+- Tránh chuỗi gọi dài qua nhiều object, ví dụ lấy đơn hàng rồi lấy khách hàng rồi lấy địa chỉ
+- Giảm phụ thuộc vào cấu trúc bên trong của object khác
+- Code dễ thay đổi hơn khi cấu trúc nội bộ thay đổi
+- Khắc phục bằng cách thêm method uỷ quyền phù hợp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5f406030-e1f8-575f-a1b7-9be55a944d8d', 'God object là gì và bạn refactor nó như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- God object là class biết và làm quá nhiều việc, vi phạm Single Responsibility
+- Khó hiểu, khó test, thay đổi nhỏ dễ gây lỗi
+- Viết test bao quanh hành vi hiện tại trước khi refactor
+- Xác định các nhóm trách nhiệm và tách dần thành class riêng
+- Thực hiện từng bước nhỏ, giữ hệ thống chạy được sau mỗi bước', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('424ce423-c46c-504b-81d4-228d69bb78db', 'CompletableFuture là gì và có ưu điểm gì so với Future?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Future chỉ cho phép chờ kết quả bằng get (chặn luồng) và kiểm tra hoàn thành
+- CompletableFuture cho phép nối chuỗi xử lý không chặn bằng các callback
+- Kết hợp nhiều tác vụ (thenCombine, allOf, anyOf)
+- Xử lý lỗi trong chuỗi (exceptionally, handle)
+- Có thể hoàn thành thủ công và chỉ định executor riêng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d25a547e-22cc-5f8f-9152-e9acb135ae21', 'thenApply và thenCompose trong CompletableFuture khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- thenApply biến đổi kết quả bằng hàm trả về giá trị thường, giống map
+- thenCompose dùng khi hàm trả về một CompletableFuture khác, giống flatMap
+- Dùng thenApply với hàm trả về future sẽ tạo future lồng nhau
+- thenCompose dùng để nối các tác vụ bất đồng bộ phụ thuộc nhau
+- thenCombine dùng để gộp kết quả của hai future độc lập', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('354bf299-8089-5d30-9455-139b536f1dc4', 'Xử lý exception trong chuỗi CompletableFuture như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Khi một bước lỗi, các bước phụ thuộc phía sau bị bỏ qua và future hoàn thành với lỗi
+- exceptionally chỉ chạy khi có lỗi, trả về giá trị thay thế
+- handle luôn chạy, nhận cả kết quả và lỗi, có thể đổi kết quả
+- whenComplete luôn chạy để làm tác vụ phụ, không đổi kết quả
+- Lỗi thường được bọc trong CompletionException', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d7c24de5-b1fd-589b-b8d8-de0b12f14ded', 'Bạn thực hiện nhiều request song song tới các microservice và gộp kết quả như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Khởi chạy mỗi lời gọi bằng supplyAsync với executor riêng phù hợp cho I/O
+- Dùng allOf để chờ tất cả hoàn thành rồi lấy kết quả từng future
+- Dùng anyOf khi chỉ cần kết quả nhanh nhất
+- Đặt timeout cho từng lời gọi và xử lý lỗi riêng (fallback) để một lỗi không làm hỏng toàn bộ
+- Giới hạn số lời gọi đồng thời để không quá tải service đích', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('cb7fc3d1-2f56-58b4-ae33-6526fa67e9b0', 'Các method async của CompletableFuture mặc định dùng thread pool nào? Vì sao nên tự chỉ định executor?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mặc định dùng ForkJoinPool.commonPool, dùng chung toàn ứng dụng
+- Common pool có số luồng xấp xỉ số nhân CPU, thiết kế cho tác vụ tính toán
+- Tác vụ chặn như gọi mạng, truy vấn cơ sở dữ liệu có thể làm cạn common pool, ảnh hưởng phần khác
+- Nên truyền executor riêng cho tác vụ I/O, có kích thước và tên luồng phù hợp
+- Với Java 21 có thể cân nhắc virtual thread cho tác vụ I/O', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f1079272-686d-589e-bddc-3e95388c6576', 'Code chặn (blocking) và không chặn (non-blocking) khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Code chặn giữ luồng đứng chờ cho tới khi thao tác như I/O hoàn thành
+- Code không chặn trả quyền điều khiển ngay, kết quả được xử lý qua callback hoặc future
+- Code chặn với nhiều request đồng thời cần nhiều luồng, tốn bộ nhớ và chi phí chuyển ngữ cảnh
+- Không nên gọi thao tác chặn trong luồng của event loop hoặc pool dùng chung
+- Virtual thread trong Java giúp viết code kiểu chặn mà vẫn mở rộng tốt', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('6e0700b1-e8b1-57a6-b026-0fb77451d064', 'Làm thế nào để đặt timeout cho CompletableFuture?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Từ Java 9 dùng orTimeout: hoàn thành với TimeoutException nếu quá thời gian
+- completeOnTimeout: hoàn thành với giá trị mặc định nếu quá thời gian
+- Timeout không tự huỷ tác vụ bên dưới, cần đặt timeout ở chính client gọi mạng
+- Trước Java 9 có thể dùng get có timeout (chặn) hoặc tự lập lịch hoàn thành
+- Kết hợp xử lý lỗi để trả fallback', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('6d30f403-e92c-5986-bda2-6f0f36cce125', 'Khi nào nên dùng CompletableFuture và khi nào nên dùng lập trình reactive?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- CompletableFuture phù hợp với một kết quả bất đồng bộ và vài tác vụ cần kết hợp
+- Reactive (Reactor, RxJava) phù hợp với luồng dữ liệu nhiều phần tử, có backpressure
+- Reactive hợp với hệ thống cần xử lý rất nhiều kết nối đồng thời với ít luồng (WebFlux)
+- Reactive khó học, khó debug hơn
+- Với Java 21, virtual thread là lựa chọn đơn giản cho nhiều trường hợp I/O', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('67092464-1042-586c-bfc9-459c7ea8c3e6', 'Design pattern là gì? Có những nhóm design pattern nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Design pattern là giải pháp đã được kiểm chứng cho các vấn đề thiết kế thường gặp
+- Giúp chia sẻ từ vựng chung và tránh tự phát minh lại
+- Nhóm khởi tạo (creational): Singleton, Factory Method, Abstract Factory, Builder, Prototype
+- Nhóm cấu trúc (structural): Adapter, Decorator, Proxy, Facade, Composite
+- Nhóm hành vi (behavioral): Strategy, Observer, Command, State, Template Method', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('db93a16f-67fb-5f4a-91dd-44b63d5249d5', 'Singleton là gì? Làm sao triển khai Singleton an toàn luồng và Singleton có những vấn đề gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Singleton đảm bảo một class chỉ có một instance và có điểm truy cập toàn cục
+- Cách an toàn luồng: khởi tạo sớm, enum, holder class, hoặc double-checked locking với volatile
+- Vấn đề: trạng thái toàn cục, phụ thuộc ẩn, khó test và khó thay thế
+- Có thể bị phá qua reflection hoặc serialization nếu không dùng enum
+- Trong Spring, bean mặc định là singleton do container quản lý nên ít khi cần tự viết', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('91fbeb68-b24d-5975-8383-4ec29a1456c8', 'Factory Method và Abstract Factory khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Factory Method để lớp con quyết định tạo object cụ thể nào qua một method
+- Abstract Factory cung cấp interface để tạo cả một họ object liên quan
+- Factory Method tạo một sản phẩm; Abstract Factory tạo nhiều sản phẩm đồng bộ với nhau
+- Ví dụ Abstract Factory tạo bộ nút và hộp thoại cùng phong cách giao diện
+- Cả hai giúp code phụ thuộc vào abstraction thay vì class cụ thể', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('4dacaee9-4bca-5cdc-a9d8-f4efb1726778', 'Khi nào nên dùng Builder pattern?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Khi object có nhiều tham số, nhất là nhiều tham số tuỳ chọn
+- Tránh constructor quá dài hoặc nhiều constructor nạp chồng
+- Code tạo object dễ đọc nhờ đặt tên từng bước
+- Có thể kiểm tra tính hợp lệ trước khi tạo và tạo object bất biến
+- Trong Java thường dùng Lombok Builder để giảm code mẫu', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('8d496d49-7c51-5adf-8910-eed139da3e70', 'Strategy pattern là gì và khi nào nên dùng? Strategy khác State như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Strategy đóng gói các thuật toán thay thế được lẫn nhau sau một interface chung
+- Dùng khi có nhiều cách thực hiện một việc và muốn chọn lúc chạy, thay cho chuỗi if-else
+- Ví dụ tính phí vận chuyển theo nhiều phương thức
+- State thay đổi hành vi theo trạng thái nội bộ, và các trạng thái tự chuyển sang nhau
+- Strategy thường do client chọn; cấu trúc hai pattern giống nhau nhưng mục đích khác', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('fa0a7a35-6525-5bed-9e1a-b12bb5dac7db', 'Observer pattern là gì và thường được áp dụng như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Observer cho phép nhiều đối tượng đăng ký nhận thông báo khi đối tượng khác thay đổi
+- Bên phát không cần biết chi tiết bên nhận, giảm phụ thuộc
+- Trong Spring có ApplicationEvent và EventListener
+- Là nền tảng của hệ thống hướng sự kiện, message broker, lập trình reactive
+- Cần chú ý rò rỉ bộ nhớ khi không huỷ đăng ký và thứ tự xử lý', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c6821b47-a093-5238-bae8-33eeb5af05aa', 'Decorator pattern có ưu điểm gì so với kế thừa?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Decorator bọc object để thêm hành vi mà không sửa class gốc
+- Có thể kết hợp nhiều decorator linh hoạt lúc chạy
+- Kế thừa phải tạo lớp con cho mỗi tổ hợp tính năng, dễ bùng nổ số lớp
+- Tuân thủ nguyên tắc Open/Closed
+- Ví dụ: các luồng I/O trong Java, thêm cache hoặc log quanh một service', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('24ad7ee7-94bb-5464-be50-48a6d73a954b', 'Proxy pattern là gì? Có những loại proxy nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Proxy là đối tượng đại diện kiểm soát truy cập tới đối tượng thật
+- Virtual proxy: trì hoãn tạo object tốn kém (lazy loading của Hibernate)
+- Protection proxy: kiểm tra quyền truy cập
+- Remote proxy: đại diện cho object ở xa; caching proxy: lưu kết quả
+- Spring dùng proxy (JDK dynamic proxy hoặc CGLIB) cho Transactional, AOP', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('7c2d78dc-50eb-5675-808a-9a76aff9b0c7', 'Bạn biết những anti-pattern nào trong thiết kế phần mềm?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- God object: class làm quá nhiều việc
+- Spaghetti code: luồng xử lý rối, không cấu trúc
+- Copy-paste code, magic number, hard-code cấu hình
+- Anemic domain model khi nghiệp vụ bị rải khắp các service
+- Over-engineering: thêm abstraction và pattern không cần thiết', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('6409c519-6c6f-5c5a-abf0-3217f092c0d7', 'Record khác class thông thường như thế nào trong Java?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Record là class dữ liệu bất biến, khai báo ngắn gọn các thành phần
+- Tự sinh constructor, method truy cập, equals, hashCode, toString
+- Record là final và không kế thừa được class khác, nhưng triển khai được interface
+- Không có trường instance ngoài các thành phần đã khai báo
+- Phù hợp làm DTO, giá trị trả về, key trong map', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('36e316ac-a578-5fba-8061-4b0d710ed8ee', 'Generics trong Java là gì và có lợi ích gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Generics cho phép class, interface, method làm việc với kiểu dữ liệu được tham số hoá
+- Kiểm tra kiểu lúc biên dịch, phát hiện lỗi sớm
+- Không cần ép kiểu thủ công khi lấy dữ liệu
+- Tái sử dụng code cho nhiều kiểu, ví dụ List, Map, Optional
+- Không dùng được kiểu nguyên thuỷ trực tiếp, phải dùng lớp bao như Integer', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b6392611-61f5-54bf-b5d1-623a006047cb', 'Type erasure trong Java là gì và gây ra những hạn chế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Thông tin kiểu generic bị xoá khi biên dịch, thay bằng kiểu giới hạn hoặc Object
+- Lúc chạy, List of String và List of Integer là cùng một class
+- Không thể tạo object new T, tạo mảng generic, hay kiểm tra instanceof với kiểu tham số
+- Không nạp chồng được method chỉ khác nhau tham số generic
+- Lý do là tương thích ngược với code Java trước khi có generics', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('8809f9c0-d0e4-525b-9c25-73df97e4ee93', 'Wildcard extends và super trong generics khác nhau như thế nào? Nguyên tắc PECS là gì?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Wildcard extends T chấp nhận T hoặc lớp con, dùng để đọc giá trị kiểu T
+- Wildcard super T chấp nhận T hoặc lớp cha, dùng để ghi giá trị kiểu T vào
+- PECS: Producer Extends, Consumer Super
+- Ví dụ method sao chép: nguồn dùng extends, đích dùng super
+- Giúp API linh hoạt hơn mà vẫn an toàn kiểu', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('bb442283-6694-5cf3-8a08-c502af2f3157', 'Heap và stack trong JVM khác nhau như thế nào? Mỗi vùng lưu những gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Stack là vùng nhớ riêng của mỗi luồng, lưu các frame gọi method với biến cục bộ và tham chiếu
+- Heap dùng chung giữa các luồng, lưu object và mảng
+- Stack cấp phát và giải phóng tự động theo lời gọi method, rất nhanh
+- Heap được dọn bởi garbage collector
+- Lỗi tương ứng: StackOverflowError khi đệ quy quá sâu, OutOfMemoryError khi heap đầy', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e8adf959-4578-5ec1-909b-c5d2013768d2', 'Bạn biết những thuật toán GC nào trong JVM? G1 và ZGC khác nhau thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Serial GC cho ứng dụng nhỏ; Parallel GC tối ưu thông lượng
+- G1 là mặc định từ Java 9, chia heap thành nhiều region, cân bằng giữa thông lượng và thời gian dừng
+- ZGC và Shenandoah làm hầu hết công việc đồng thời với ứng dụng, thời gian dừng chỉ vài mili giây kể cả heap rất lớn
+- Stop-the-world là thời điểm mọi luồng ứng dụng bị dừng để GC làm việc
+- Chọn theo ưu tiên độ trễ hay thông lượng và kích thước heap', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e5b8980b-b96a-5e38-819f-c18e9183f5a6', 'Tham số -Xms và -Xmx của JVM là gì? Bạn đặt chúng như thế nào khi chạy trong container?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Xms là kích thước heap ban đầu, Xmx là kích thước heap tối đa
+- Đặt bằng nhau giúp tránh chi phí mở rộng heap lúc chạy
+- Bộ nhớ của tiến trình Java lớn hơn heap (metaspace, stack của luồng, bộ nhớ native)
+- Trong container nên dùng MaxRAMPercentage để JVM tự tính theo giới hạn của container
+- Để dư địa cho bộ nhớ ngoài heap để tránh container bị kill vì vượt giới hạn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('cfcc74bd-28c0-5b87-92c5-bb9cc64d1d8a', 'Có những loại OutOfMemoryError nào trong Java? Khi gặp lỗi này bạn làm gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Java heap space: heap không đủ chỗ cho object mới
+- Metaspace: quá nhiều class được nạp, thường do rò rỉ classloader
+- GC overhead limit exceeded: GC chạy liên tục mà thu hồi được rất ít
+- Unable to create new native thread: hết tài nguyên tạo luồng
+- Xử lý: bật tự động tạo heap dump khi OOM, phân tích tìm nguyên nhân, sửa rò rỉ hoặc điều chỉnh bộ nhớ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('976cf839-2c43-503d-9641-16e88cf75353', 'Rò rỉ bộ nhớ trong Java là gì, xảy ra như thế nào và làm sao phát hiện?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Rò rỉ bộ nhớ là khi object không còn cần nhưng vẫn bị tham chiếu nên GC không thu hồi được
+- Nguyên nhân thường gặp: collection static tăng mãi, cache không giới hạn, listener không huỷ đăng ký
+- ThreadLocal không được dọn trong thread pool, tài nguyên không được đóng
+- Dấu hiệu: bộ nhớ old generation tăng dần sau mỗi lần GC, cuối cùng OutOfMemoryError
+- Phát hiện bằng giám sát bộ nhớ và phân tích heap dump với công cụ như Eclipse MAT, VisualVM', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('0df15b92-114b-5ef6-bb5f-d3fcce096344', 'Heap dump là gì? Làm sao lấy và phân tích heap dump?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Heap dump là ảnh chụp toàn bộ object trong heap tại một thời điểm
+- Lấy bằng jcmd, jmap hoặc tự động khi OOM với HeapDumpOnOutOfMemoryError
+- Phân tích bằng Eclipse MAT, VisualVM, IntelliJ để tìm object chiếm nhiều bộ nhớ và đường giữ tham chiếu
+- Lấy heap dump có thể làm dừng ứng dụng, cần cẩn thận trên production
+- File có thể chứa dữ liệu nhạy cảm', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ad701172-db1a-59bf-a3c3-506dae2794d0', 'Có thể gọi GC thủ công không? Vì sao không nên gọi System.gc?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- System.gc chỉ là gợi ý, JVM có thể bỏ qua
+- Nếu chạy, thường kích hoạt full GC gây dừng ứng dụng lâu
+- JVM tự quyết định thời điểm GC tốt hơn dựa trên tình trạng bộ nhớ
+- Gọi GC thủ công thường che giấu vấn đề thật như rò rỉ bộ nhớ
+- Có thể tắt bằng tham số DisableExplicitGC', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('261bd1a5-adfc-5ee0-bbf1-52c2b3d7a6c2', 'Garbage collection trong Java là gì? Khi nào một object đủ điều kiện bị thu hồi?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Garbage collection tự động thu hồi bộ nhớ của object không còn được dùng
+- Object đủ điều kiện thu hồi khi không còn đường tham chiếu nào tới nó từ GC roots
+- GC roots gồm biến cục bộ trên stack, biến static, luồng đang chạy, tham chiếu JNI
+- Lập trình viên không giải phóng bộ nhớ thủ công nhưng vẫn có thể gây rò rỉ bằng cách giữ tham chiếu
+- Gọi System.gc chỉ là gợi ý và không nên dùng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c08ef902-77ec-5b2a-be91-f2b228bf82f5', 'Các thế hệ (generation) trong GC là gì? Vì sao chia heap thành young và old generation?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dựa trên giả thuyết đa số object chết sớm
+- Young generation chứa object mới tạo, gồm Eden và các vùng Survivor
+- Minor GC dọn young generation thường xuyên và nhanh
+- Object sống qua nhiều lần GC được chuyển lên old generation
+- Old generation được dọn ít hơn bằng major hoặc full GC, thường tốn thời gian hơn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('074bf6e8-dd91-5ca0-abe6-b67ecf32d621', 'Collection Framework trong Java có những interface chính nào? List, Set và Queue khác nhau ra sao?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Các interface chính: Collection, List, Set, Queue, Deque và Map (không kế thừa Collection)
+- List có thứ tự, cho phép phần tử trùng, truy cập theo chỉ số
+- Set không cho phép phần tử trùng
+- Queue xử lý theo thứ tự lấy ra, thường là FIFO; Deque thêm bớt ở cả hai đầu
+- Map lưu cặp key và value với key duy nhất', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('093f0375-3858-5fd8-b1ac-348527f4dec2', 'HashSet, LinkedHashSet và TreeSet khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- HashSet dựa trên HashMap, không giữ thứ tự, thao tác trung bình O(1)
+- LinkedHashSet giữ thứ tự thêm vào nhờ danh sách liên kết, chậm hơn chút
+- TreeSet dựa trên cây đỏ đen, phần tử được sắp xếp, thao tác O(log n)
+- TreeSet cần phần tử Comparable hoặc Comparator
+- HashSet và LinkedHashSet dựa vào equals và hashCode, TreeSet dựa vào so sánh', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e291c481-c3f3-58e9-8ebf-caa1e8da77db', 'CopyOnWriteArrayList là gì và khi nào nên dùng? Còn các collection synchronized thì sao?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- CopyOnWriteArrayList tạo bản sao mảng mới mỗi lần ghi
+- Đọc và duyệt không cần khoá, không ném ConcurrentModificationException
+- Phù hợp khi đọc rất nhiều, ghi rất ít, ví dụ danh sách listener
+- Ghi tốn kém với danh sách lớn
+- Collections.synchronizedList khoá toàn bộ mỗi thao tác, khi duyệt vẫn phải tự đồng bộ; thường nên chọn collection trong java.util.concurrent', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('59b7fe3c-b7d7-572b-9f9b-a018dfca3942', 'Iterator fail-fast và fail-safe khác nhau như thế nào? ConcurrentModificationException xảy ra khi nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Fail-fast iterator ném ConcurrentModificationException khi collection bị sửa cấu trúc trong lúc duyệt
+- Ví dụ xoá phần tử trong vòng for-each của ArrayList
+- Fail-safe iterator duyệt trên bản sao hoặc cấu trúc đồng thời nên không ném lỗi, có thể không thấy thay đổi mới
+- Ví dụ CopyOnWriteArrayList, ConcurrentHashMap
+- Xoá đúng cách khi duyệt: dùng iterator.remove hoặc removeIf', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('370ebcf8-0c6d-54b6-a3f3-5d441b3e107b', 'Comparable và Comparator khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Comparable định nghĩa thứ tự tự nhiên ngay trong class qua compareTo
+- Comparator là đối tượng so sánh tách rời, định nghĩa nhiều cách sắp xếp khác nhau
+- Một class chỉ có một thứ tự tự nhiên nhưng có nhiều Comparator
+- Comparator hỗ trợ kết hợp như comparing, thenComparing, reversed
+- Thứ tự nên nhất quán với equals khi dùng trong TreeSet, TreeMap', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d296374b-f826-5b80-81e1-5e4d61949063', 'ArrayList và LinkedList khác nhau như thế nào? Khi nào dùng loại nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- ArrayList dựa trên mảng động, truy cập theo chỉ số O(1)
+- Thêm hoặc xoá ở giữa ArrayList phải dịch phần tử, O(n); thêm cuối trung bình O(1)
+- LinkedList là danh sách liên kết đôi, thêm xoá ở đầu cuối O(1), truy cập theo chỉ số O(n)
+- LinkedList tốn bộ nhớ hơn và kém thân thiện với cache CPU
+- Thực tế hầu hết trường hợp dùng ArrayList; cần hàng đợi hai đầu thì dùng ArrayDeque', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('454334f4-13b3-5a71-9326-6a0a7191239a', 'Dependency Injection là gì và vì sao hữu ích?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dependency Injection là việc đối tượng nhận các phụ thuộc từ bên ngoài thay vì tự tạo bằng new
+- Là cách hiện thực Inversion of Control: container quản lý việc tạo và nối các đối tượng
+- Giảm phụ thuộc chặt giữa các class, phụ thuộc vào interface
+- Dễ thay đổi triển khai và dễ unit test bằng mock
+- Trong Spring, IoC container tạo bean và inject theo cấu hình hoặc annotation', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('eedb6b5f-cb41-56d7-ae06-fb0d1807765c', 'Constructor injection, setter injection và field injection khác nhau như thế nào? Nên dùng loại nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Constructor injection truyền phụ thuộc qua constructor, có thể khai báo final
+- Setter injection qua setter, phù hợp với phụ thuộc tuỳ chọn
+- Field injection dùng Autowired trên trường, ngắn gọn nhưng ẩn phụ thuộc và khó test
+- Constructor injection được khuyến nghị: bắt buộc đủ phụ thuộc khi tạo, object bất biến, dễ test không cần container
+- Constructor quá nhiều tham số là dấu hiệu class làm quá nhiều việc', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f26bb034-2499-57e1-bdee-68e9cad2bc85', 'Bean trong Spring là gì và có những cách nào để tạo bean?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Bean là đối tượng được Spring IoC container tạo và quản lý vòng đời
+- Đánh dấu class bằng Component, Service, Repository, Controller để component scan tự phát hiện
+- Khai báo method có annotation Bean trong class Configuration
+- Spring Boot auto-configuration tự tạo nhiều bean theo thư viện có trên classpath
+- Bean có tên, scope và có thể được inject vào bean khác', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ba42dab2-1612-5fa9-b6a5-bba6e6688ece', 'Vòng đời của một bean trong Spring gồm những giai đoạn nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Container tạo instance, thường qua constructor
+- Inject các phụ thuộc
+- Gọi các callback Aware và BeanPostProcessor trước khởi tạo
+- Gọi method khởi tạo (PostConstruct, afterPropertiesSet, initMethod), rồi BeanPostProcessor sau khởi tạo (tạo proxy ở đây)
+- Bean sẵn sàng dùng; khi đóng context gọi PreDestroy và destroy method', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ca8aa61b-2d40-5011-abb6-b9654140a524', 'BeanPostProcessor trong Spring là gì?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là interface cho phép can thiệp vào bean trước và sau khi khởi tạo
+- Áp dụng cho mọi bean trong container
+- Spring dùng nó để xử lý annotation như Autowired và tạo proxy cho AOP, Transactional
+- Có thể trả về object khác (proxy) thay cho bean gốc
+- Dùng khi cần thêm hành vi chung cho nhiều bean', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('4716766c-45bf-5bad-9618-cb99e144f002', 'Bean scope trong Spring là gì? Singleton và prototype khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Scope quyết định số instance và thời gian sống của bean
+- Singleton (mặc định): một instance cho mỗi container, dùng chung
+- Prototype: mỗi lần yêu cầu tạo instance mới, container không quản lý việc huỷ
+- Scope web: request, session, application
+- Inject prototype vào singleton chỉ tạo một lần, cần ObjectProvider hoặc lookup method nếu muốn mới mỗi lần; bean singleton phải không có trạng thái thay đổi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e038b4bb-cc3a-554a-8497-2c412c8a0b11', 'Proxy trong Spring là gì và khi nào Spring tạo proxy?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Proxy là đối tượng bọc bean thật để thêm hành vi trước và sau khi gọi method
+- Spring tạo proxy cho Transactional, Cacheable, Async, PreAuthorize và các aspect AOP
+- Dùng JDK dynamic proxy khi bean triển khai interface hoặc CGLIB tạo lớp con
+- Chỉ lời gọi đi qua proxy mới được áp dụng hành vi, lời gọi nội bộ trong class thì không
+- CGLIB không proxy được method final hay private', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('4b3da63b-b467-5d89-87ae-82e2216cabcb', 'AOP là gì? Giải thích các khái niệm aspect, advice, pointcut và join point.', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- AOP (lập trình hướng khía cạnh) tách các mối quan tâm cắt ngang như log, bảo mật, transaction khỏi nghiệp vụ
+- Aspect là module chứa logic cắt ngang
+- Join point là điểm trong chương trình có thể chèn logic, trong Spring là lời gọi method
+- Pointcut là biểu thức chọn các join point áp dụng
+- Advice là đoạn code chạy tại join point: before, after, around', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('23326e06-0234-5166-b560-b00809078e36', 'Vì sao Transactional không có tác dụng khi gọi method trong cùng một class, và cách khắc phục?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Spring áp dụng Transactional qua proxy bọc bean
+- Lời gọi từ method này sang method khác trong cùng class đi qua this, không qua proxy
+- Vì vậy transaction của method được gọi không được mở hoặc cấu hình bị bỏ qua
+- Khắc phục: tách method sang bean khác và inject vào
+- Hoặc inject chính proxy của bean (self-injection), dùng TransactionTemplate, hoặc AspectJ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ce348c99-e722-51a1-b981-372f19089da3', 'Auto-configuration trong Spring Boot là gì và hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Spring Boot tự cấu hình bean dựa trên thư viện có trên classpath và thuộc tính cấu hình
+- Các lớp auto-configuration được khai báo trong file metadata của các starter
+- Dùng điều kiện như ConditionalOnClass, ConditionalOnMissingBean, ConditionalOnProperty
+- Bean do người dùng khai báo được ưu tiên, auto-configuration lùi lại
+- Xem báo cáo điều kiện bằng chế độ debug hoặc endpoint actuator để biết cấu hình nào được áp dụng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5df9381d-7e58-5d0b-8438-63a90af9c509', 'Annotation SpringBootApplication hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là annotation gộp của Configuration, EnableAutoConfiguration và ComponentScan
+- Configuration cho phép khai báo bean trong class
+- EnableAutoConfiguration bật cơ chế tự cấu hình
+- ComponentScan quét các component trong package của class và các package con
+- Vì vậy class main nên đặt ở package gốc của ứng dụng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('7f9fb4cb-ec59-5fec-8f8f-c23419403a8b', 'Starter trong Spring Boot là gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Starter là gói dependency gom sẵn các thư viện cần cho một chức năng
+- Ví dụ spring-boot-starter-web, spring-boot-starter-data-jpa, spring-boot-starter-security
+- Phiên bản các thư viện đã được kiểm tra tương thích với nhau
+- Đi kèm auto-configuration nên chỉ cần thêm dependency là dùng được
+- Giảm cấu hình thủ công và xung đột phiên bản', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('bc12ab84-829f-5dc8-ada8-adcd4bdc5b04', 'Các annotation Component, Service, Repository và Controller khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Cả bốn đều đánh dấu class là bean để component scan phát hiện
+- Service, Repository, Controller là chuyên biệt hoá của Component theo tầng
+- Repository bật chuyển đổi exception truy cập dữ liệu sang hệ exception của Spring
+- Controller (và RestController) đánh dấu class xử lý request web
+- Dùng đúng annotation giúp code rõ tầng và cho phép áp dụng xử lý riêng theo tầng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b8df225f-1860-546c-b5d7-8a6bb2f5a729', 'Nếu có nhiều bean cùng kiểu thì Spring inject bean nào? Bạn xử lý tình huống này thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Spring báo lỗi vì không xác định được bean duy nhất
+- Dùng Qualifier để chỉ định tên bean cần inject
+- Đánh dấu Primary cho bean mặc định
+- Inject List hoặc Map để nhận tất cả bean cùng kiểu, ví dụ để chọn strategy lúc chạy
+- Tên tham số trùng tên bean cũng có thể được dùng để phân giải', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('49fc01a4-b4d0-5cf1-9648-bd0dc3f25f5e', 'Profile trong Spring là gì và dùng khi nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Profile cho phép kích hoạt cấu hình và bean khác nhau theo môi trường
+- Ví dụ dev, test, prod với cơ sở dữ liệu và mức log khác nhau
+- Khai báo file cấu hình riêng theo profile và đánh dấu bean bằng annotation Profile
+- Kích hoạt bằng thuộc tính spring.profiles.active hoặc biến môi trường
+- Thông tin bí mật nên lấy từ biến môi trường hoặc kho bí mật thay vì ghi vào file', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('69a10b4b-859b-5222-8ad1-47c31c95e29c', 'REST là gì? Stateless trong REST nghĩa là gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- REST là phong cách kiến trúc cho API dựa trên tài nguyên, dùng các phương thức HTTP chuẩn
+- Tài nguyên được định danh bằng URL, biểu diễn thường là JSON
+- Stateless: mỗi request chứa đủ thông tin để xử lý, server không lưu trạng thái phiên của client
+- Nhờ stateless, dễ mở rộng ngang và cân bằng tải
+- Các ràng buộc khác: client-server, cacheable, giao diện thống nhất, hệ thống phân lớp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5e55810a-d105-5732-bf32-0c7ba3a3c5df', 'PUT và PATCH khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- PUT thay thế toàn bộ tài nguyên bằng dữ liệu gửi lên
+- Trường không gửi trong PUT có thể bị xoá hoặc đặt mặc định
+- PATCH chỉ cập nhật một phần các trường được gửi
+- PUT là idempotent; PATCH không nhất thiết idempotent tuỳ cách cài đặt
+- Chọn PATCH cho cập nhật một vài trường để giảm dữ liệu gửi đi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5ffe876b-890e-5413-a35d-39b182e7cb9a', 'Idempotency là gì? Những HTTP method nào là idempotent, POST có idempotent không?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Idempotent là gọi một lần hay nhiều lần cùng request thì trạng thái server vẫn như nhau
+- GET, HEAD, PUT, DELETE, OPTIONS là idempotent; GET còn là safe vì không thay đổi dữ liệu
+- POST không idempotent: gửi lặp có thể tạo nhiều bản ghi
+- Quan trọng khi client retry do mất mạng
+- Làm POST an toàn khi retry bằng idempotency key do client gửi kèm', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5ccfa5e3-0f55-5e6b-b9aa-d544bca15cbf', 'Những mã trạng thái HTTP nào bạn hay dùng khi thiết kế API? Mã 401 và 403 khác nhau ra sao?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- 2xx thành công: 200 OK, 201 Created, 202 Accepted cho xử lý bất đồng bộ, 204 No Content
+- 4xx lỗi phía client: 400 dữ liệu sai, 404 không tìm thấy, 409 xung đột, 422 không xử lý được, 429 quá nhiều request
+- 5xx lỗi phía server: 500, 502, 503, 504
+- 401 Unauthorized: chưa xác thực hoặc token không hợp lệ
+- 403 Forbidden: đã xác thực nhưng không có quyền thực hiện', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('8354527c-0572-569a-b7c8-d27d99c78c37', 'Bạn thiết kế RESTful API như thế nào cho tốt? Đặt tên endpoint ra sao?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dùng danh từ số nhiều cho tài nguyên, không dùng động từ trong URL (ví dụ /orders, /orders/{id})
+- Dùng đúng HTTP method cho hành động và đúng mã trạng thái
+- Quan hệ lồng nhau vừa phải, ví dụ /orders/{id}/items
+- Hỗ trợ phân trang, lọc, sắp xếp qua query parameter
+- Định dạng lỗi thống nhất, có versioning và tài liệu (OpenAPI)', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('6bddd7ce-b18c-5ada-ab66-fa419f3cf2c8', 'HATEOAS là gì?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- HATEOAS là ràng buộc của REST: response chứa liên kết tới các hành động liên quan tiếp theo
+- Client khám phá API qua liên kết thay vì cứng URL
+- Ví dụ đơn hàng trả kèm liên kết huỷ, thanh toán khi trạng thái cho phép
+- Spring HATEOAS hỗ trợ xây dựng response dạng này
+- Thực tế ít API áp dụng đầy đủ vì tăng độ phức tạp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('99b1475c-ea44-5eb1-82cd-8a306850d29e', 'Bạn tổ chức versioning cho REST API như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Version trong URL (ví dụ /v1/orders): rõ ràng, dễ dùng, phổ biến nhất
+- Version qua header hoặc media type: URL sạch nhưng khó thử nghiệm hơn
+- Version qua query parameter
+- Ưu tiên thay đổi tương thích ngược để hạn chế tăng version
+- Thông báo và giữ version cũ một thời gian trước khi ngừng hỗ trợ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('721aa6c1-bf33-511d-a95a-018cee3b3e3c', 'Header Content-Type và Accept khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Content-Type mô tả định dạng dữ liệu của phần thân request hoặc response đang gửi
+- Accept do client gửi để cho biết định dạng response mong muốn
+- Server dựa vào Accept để chọn định dạng trả về (content negotiation)
+- Không hỗ trợ định dạng yêu cầu thì trả 406; không hỗ trợ Content-Type gửi lên thì trả 415
+- Ví dụ application/json, multipart/form-data', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5a5b8443-3dda-5b01-ac36-49a0b72f1f9e', 'Checked exception và unchecked exception khác nhau như thế nào? Khi nào dùng loại nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Checked exception bắt buộc phải bắt hoặc khai báo throws, trình biên dịch kiểm tra
+- Unchecked exception (RuntimeException và lớp con) không bắt buộc
+- Checked dùng cho tình huống có thể phục hồi mà bên gọi nên xử lý, ví dụ lỗi I/O
+- Unchecked dùng cho lỗi lập trình hoặc vi phạm điều kiện như tham số không hợp lệ
+- Nhiều framework như Spring ưa dùng unchecked để code gọn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('cafba9f2-afe8-5e63-a593-c4d1912ddcc7', 'Hệ thống phân cấp exception trong Java như thế nào? Error và Exception khác nhau ra sao?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Gốc là Throwable, có hai nhánh Error và Exception
+- Error là lỗi nghiêm trọng của JVM như OutOfMemoryError, StackOverflowError, ứng dụng thường không nên bắt
+- Exception là lỗi ứng dụng có thể xử lý
+- RuntimeException là nhánh unchecked của Exception
+- Các Exception còn lại là checked', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('082df946-9deb-5ea2-b50b-1895f3368436', 'Khối finally có luôn được thực thi không? Điều gì xảy ra nếu exception xảy ra trong finally?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- finally chạy dù try kết thúc bình thường, có exception hay có return
+- Không chạy nếu JVM dừng (System.exit, crash) hoặc luồng bị huỷ đột ngột
+- Exception ném ra trong finally sẽ thay thế exception gốc, làm mất thông tin lỗi ban đầu
+- return trong finally cũng ghi đè giá trị trả về hoặc nuốt exception
+- Nên dùng try-with-resources thay cho finally để đóng tài nguyên', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('86e57e4b-5caa-53de-882b-a1a375493dbf', 'try-with-resources là gì? Suppressed exception là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- try-with-resources tự động đóng tài nguyên khai báo trong ngoặc khi khối try kết thúc
+- Tài nguyên phải triển khai AutoCloseable (Closeable là trường hợp riêng cho I/O)
+- Tài nguyên được đóng theo thứ tự ngược với khi khai báo
+- Nếu cả khối try và close đều ném exception, exception khi close được gắn vào exception chính dưới dạng suppressed
+- Code gọn và an toàn hơn so với tự đóng trong finally', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('024460ad-8246-5a34-a2bb-6bda84ef1644', 'Khi nào nên tạo exception riêng? Nên kế thừa Exception hay RuntimeException?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Tạo exception riêng khi cần biểu diễn lỗi nghiệp vụ rõ nghĩa, ví dụ không đủ số dư
+- Giúp bên gọi xử lý phân biệt và ánh xạ sang mã lỗi API phù hợp
+- Thường kế thừa RuntimeException cho lỗi nghiệp vụ trong ứng dụng Spring
+- Kế thừa Exception (checked) khi muốn buộc bên gọi xử lý
+- Kèm thông điệp rõ ràng và giữ nguyên exception gốc (cause)', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('bff8730d-25ea-5c6d-90e9-894ac8aa1724', 'Bạn ghi log exception đúng cách như thế nào? Vì sao không nên nuốt exception?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dùng framework log (SLF4J) và truyền exception làm tham số để giữ stack trace
+- Không dùng printStackTrace trong code thực tế
+- Log kèm ngữ cảnh như id request, id người dùng, nhưng không log dữ liệu nhạy cảm
+- Chỉ log một lần ở nơi xử lý để tránh log trùng
+- Nuốt exception (bắt rồi bỏ qua) che giấu lỗi, làm dữ liệu sai mà không ai biết', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('918227e8-f49e-5284-8c10-112d03f1c563', 'Exception wrapping và exception chaining là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là bắt exception cấp thấp rồi ném exception cấp cao hơn có ý nghĩa với tầng hiện tại
+- Exception gốc được giữ làm cause để không mất thông tin
+- Giúp tầng trên không phụ thuộc chi tiết cài đặt như SQLException
+- Stack trace hiển thị cả chuỗi nguyên nhân
+- Ví dụ bọc lỗi truy cập dữ liệu thành exception nghiệp vụ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c8dc33a9-cadf-54e4-b891-e5bce14348fd', 'Khi có nhiều khối catch, thứ tự của chúng có quan trọng không? Multi-catch là gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Có, exception được so khớp với các catch theo thứ tự từ trên xuống
+- Phải đặt exception cụ thể (lớp con) trước exception tổng quát (lớp cha)
+- Đặt ngược thì trình biên dịch báo lỗi vì catch phía sau không bao giờ chạy tới
+- Multi-catch bắt nhiều loại exception không liên quan trong một khối bằng dấu gạch đứng
+- Giúp tránh lặp code xử lý giống nhau', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('cefbc650-d4ba-5230-a621-702ebd3d2f0d', 'Stream API trong Java mang lại những lợi ích gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Xử lý collection theo phong cách khai báo, ngắn gọn và dễ đọc hơn vòng lặp
+- Kết hợp các thao tác như filter, map, reduce thành pipeline
+- Đánh giá lười, chỉ xử lý phần tử cần thiết
+- Dễ chuyển sang xử lý song song
+- Khuyến khích tránh thay đổi trạng thái bên ngoài', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b2371fe4-b380-5c8d-ac26-220834261e7e', 'Thao tác intermediate và terminal trong Stream khác nhau như thế nào? Lazy evaluation là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Intermediate operation như filter, map, sorted trả về stream mới và không chạy ngay
+- Terminal operation như collect, forEach, count, reduce kích hoạt việc xử lý và kết thúc stream
+- Lazy evaluation: pipeline chỉ chạy khi có terminal operation
+- Các phần tử đi qua toàn bộ pipeline từng cái một, kết hợp short-circuit như findFirst, limit
+- Stream chỉ dùng được một lần', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('01a015e5-09b4-57d5-9269-87f3a81ca653', 'map và flatMap trong Stream khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- map biến đổi mỗi phần tử thành đúng một phần tử khác
+- flatMap biến mỗi phần tử thành một stream rồi làm phẳng tất cả thành một stream
+- Dùng flatMap khi mỗi phần tử chứa danh sách con, ví dụ lấy tất cả sản phẩm trong các đơn hàng
+- map với hàm trả về stream sẽ tạo stream lồng stream
+- Optional cũng có map và flatMap với ý nghĩa tương tự', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b87a4e5f-d0ba-5884-a4e1-0ec1a01de438', 'Parallel stream là gì? Khi nào nên dùng và có những vấn đề gì?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Parallel stream chia dữ liệu và xử lý trên nhiều luồng của ForkJoinPool.commonPool
+- Phù hợp với dữ liệu lớn, thao tác tính toán nặng, độc lập, nguồn dễ chia như ArrayList
+- Không phù hợp với tác vụ I/O, dữ liệu nhỏ hoặc nguồn khó chia như LinkedList
+- Thao tác có trạng thái chung hoặc side effect gây race condition
+- Dùng chung common pool nên có thể ảnh hưởng phần khác của ứng dụng; cần đo trước khi dùng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('a53dfc6b-8874-513b-9d61-15f84a73c6b3', 'Side effect trong Stream là gì và vì sao nên tránh?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Side effect là thao tác thay đổi trạng thái bên ngoài stream, ví dụ thêm vào list bên ngoài trong forEach hoặc map
+- Lambda trong stream chỉ dùng được biến effectively final nhưng vẫn có thể sửa object bên ngoài
+- Gây lỗi khó đoán, đặc biệt với parallel stream
+- Làm code khó đọc và khó test
+- Nên dùng collect, reduce để tạo kết quả thay vì sửa trạng thái ngoài', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('313e241b-bb02-5e07-8172-7852116cebc0', 'reduce và collect trong Stream khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- reduce gộp các phần tử thành một giá trị bằng phép kết hợp bất biến, ví dụ tính tổng
+- collect gộp vào một vùng chứa có thể thay đổi như List, Map, StringBuilder
+- Dùng reduce để tạo collection mới sẽ tốn kém vì tạo nhiều object trung gian
+- Collectors cung cấp sẵn toList, groupingBy, joining, toMap
+- Với số học nên dùng sum, count hoặc mapToInt', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('662f8d89-50c9-517c-ae14-4e7b98874b81', 'Thu thập stream vào Map như thế nào? Xử lý trùng key ra sao?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dùng Collectors.toMap với hàm lấy key và hàm lấy value
+- Nếu trùng key, toMap mặc định ném IllegalStateException
+- Truyền thêm hàm merge để quyết định giữ giá trị nào hoặc gộp giá trị
+- Có thể chỉ định loại Map, ví dụ LinkedHashMap để giữ thứ tự
+- groupingBy dùng khi muốn gom nhiều phần tử theo cùng key', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('dc3dcd48-f0b7-5ed1-8c13-efe4034c48e5', 'synchronized và volatile khác nhau như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- volatile đảm bảo khả năng hiển thị: thay đổi của một luồng được luồng khác thấy ngay, và ngăn sắp xếp lại lệnh
+- volatile không đảm bảo tính nguyên tử cho thao tác ghép như tăng biến đếm
+- synchronized đảm bảo cả loại trừ lẫn nhau và khả năng hiển thị
+- synchronized có chi phí khoá, có thể gây tranh chấp
+- volatile dùng cho cờ trạng thái; synchronized hoặc lớp Atomic dùng cho thao tác phức hợp', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('48e5acbe-ad92-5f34-b948-17248b1bf56b', 'Quan hệ happens-before và vấn đề visibility trong Java Memory Model là gì?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Do cache CPU và tối ưu của trình biên dịch, giá trị một luồng ghi có thể không được luồng khác thấy (visibility problem)
+- Happens-before là quy tắc đảm bảo kết quả của thao tác A được thấy bởi thao tác B
+- Ví dụ: mở khoá monitor happens-before lần khoá tiếp theo; ghi volatile happens-before đọc volatile đó
+- Thread.start và join cũng tạo quan hệ happens-before
+- Không có quan hệ này thì chương trình đa luồng có thể đọc dữ liệu cũ hoặc không nhất quán', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5cc3a7ba-fbe5-5cbe-bd48-b7ef31dd1309', 'Monitor trong Java là gì và synchronized hoạt động như thế nào? synchronized method khác synchronized block ra sao?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Mỗi object có một monitor (khoá nội tại); synchronized giành monitor trước khi vào và trả khi ra
+- Chỉ một luồng giữ monitor tại một thời điểm, luồng khác phải chờ
+- synchronized method khoá trên this (hoặc class với method static)
+- synchronized block khoá trên object chỉ định và chỉ bao phần code cần thiết, giảm tranh chấp
+- Khoá nội tại có tính reentrant: luồng đang giữ có thể vào lại', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('71e9fd9c-2891-573c-aeb0-f6ba81e375b9', 'ReentrantLock là gì và khác synchronized ở điểm nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- ReentrantLock là khoá tường minh trong java.util.concurrent, cùng tính reentrant như synchronized
+- Hỗ trợ tryLock có timeout, khoá có thể bị ngắt (lockInterruptibly)
+- Hỗ trợ chế độ công bằng và nhiều Condition
+- Phải tự gọi unlock trong finally, dễ quên gây treo
+- Dùng khi cần tính năng nâng cao; trường hợp đơn giản synchronized là đủ', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b61ab239-1d66-52e0-9eb4-551f1bbf7078', 'CAS (Compare-And-Swap) là gì? Các lớp Atomic hoạt động như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- CAS là lệnh nguyên tử của CPU: chỉ cập nhật giá trị nếu giá trị hiện tại bằng giá trị mong đợi
+- Các lớp như AtomicInteger dùng CAS trong vòng lặp để cập nhật không cần khoá
+- Không chặn luồng nên hiệu năng tốt khi tranh chấp thấp
+- Khi tranh chấp cao, vòng lặp thử lại có thể tốn CPU; LongAdder phù hợp hơn cho biến đếm
+- Vấn đề ABA có thể giải bằng AtomicStampedReference', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('ef6114d2-f81f-52e1-83b2-4d20427aea50', 'Thread pool là gì? ExecutorService dùng để làm gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Thread pool là tập luồng tạo sẵn và tái sử dụng để chạy nhiều tác vụ
+- Tránh chi phí tạo và huỷ luồng liên tục, giới hạn số luồng đồng thời
+- ExecutorService nhận tác vụ Runnable hoặc Callable, trả về Future
+- Cần shutdown khi không dùng nữa để giải phóng tài nguyên
+- Nên tự cấu hình ThreadPoolExecutor với hàng đợi có giới hạn và chính sách từ chối rõ ràng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('3a5446c6-920a-58d8-9b3d-72d21613e002', 'newFixedThreadPool và newCachedThreadPool khác nhau như thế nào? Rủi ro của từng loại?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Fixed thread pool có số luồng cố định và hàng đợi không giới hạn
+- Rủi ro của fixed: tác vụ dồn vào hàng đợi vô hạn có thể gây hết bộ nhớ
+- Cached thread pool tạo luồng mới khi cần và thu hồi luồng rảnh
+- Rủi ro của cached: tải tăng đột biến có thể tạo quá nhiều luồng
+- Thực tế nên tự cấu hình ThreadPoolExecutor với giới hạn rõ ràng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('8e5ca66f-cef6-52f1-aa7f-64eca25998e5', 'Deadlock là gì? Điều kiện xảy ra và cách phòng tránh?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Deadlock là khi các luồng chờ nhau giải phóng khoá mãi mãi
+- Bốn điều kiện: loại trừ lẫn nhau, giữ và chờ, không thể cưỡng đoạt, chờ vòng tròn
+- Phòng tránh bằng cách luôn lấy các khoá theo cùng một thứ tự
+- Dùng tryLock có timeout, giảm phạm vi và thời gian giữ khoá
+- Phát hiện bằng thread dump (jstack) để thấy các luồng đang chờ nhau', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('a7509e00-4eef-5fbb-a1aa-071c6985376f', 'Race condition là gì và làm sao tránh?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Race condition xảy ra khi kết quả phụ thuộc thứ tự thực thi không xác định của nhiều luồng truy cập dữ liệu chung
+- Ví dụ hai luồng cùng tăng một biến đếm và mất một lần cập nhật
+- Tránh bằng đồng bộ hoá (synchronized, lock) cho vùng găng
+- Dùng lớp Atomic hoặc collection đồng thời
+- Ưu tiên object bất biến và tránh chia sẻ trạng thái thay đổi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('492bd9cd-b150-5087-815d-dd5ea2272022', 'Virtual thread trong Java 21 là gì? Nó có ưu điểm gì và khi nào nên dùng?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Virtual thread là luồng nhẹ do JVM quản lý, chạy trên một số ít luồng hệ điều hành (carrier thread)
+- Tạo rất rẻ, có thể chạy hàng triệu luồng
+- Khi gặp thao tác chặn như I/O, virtual thread nhả carrier thread cho việc khác
+- Cho phép viết code kiểu chặn đơn giản mà vẫn mở rộng tốt như code bất đồng bộ
+- Phù hợp với tác vụ I/O nhiều; không tăng tốc tác vụ tính toán nặng; chú ý pinning khi giữ khoá synchronized lâu', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('31028b85-76a8-5600-bfbd-367275a20b50', 'Runnable, Callable và Future khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Runnable là tác vụ không trả về kết quả và không ném checked exception
+- Callable trả về kết quả và có thể ném exception
+- Gửi tác vụ vào ExecutorService sẽ nhận về Future
+- Future cho phép lấy kết quả (get, có thể chờ), kiểm tra hoàn thành, huỷ tác vụ
+- Thread là luồng thực thi, còn Runnable là công việc được giao cho luồng', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d8649a06-7ae0-5635-b7c1-460389490591', 'Node.js là gì? Vì sao Node.js chạy đơn luồng mà vẫn xử lý được nhiều request?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Node.js là môi trường chạy JavaScript phía server, xây trên engine V8
+- Mã JavaScript chạy trên một luồng chính với event loop
+- I/O được xử lý bất đồng bộ, không chặn, qua libuv và thread pool của nó
+- Một luồng phục vụ được rất nhiều kết nối vì không phải chờ I/O
+- Không phù hợp với tác vụ nặng CPU vì làm chặn event loop', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('fa1d3e82-e71a-593f-8ae0-580e2fe9780d', 'Callback hell là gì và làm sao tránh trong Node.js?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Callback hell là khi các callback lồng nhau nhiều tầng, code khó đọc và khó xử lý lỗi
+- Tách callback thành các hàm có tên
+- Dùng Promise để nối chuỗi
+- Dùng async/await để viết code bất đồng bộ như tuần tự
+- Xử lý lỗi tập trung bằng try/catch với async/await', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('27e8b98b-57ab-59b2-aa79-463066c67f5f', 'Khi nào nên dùng background job hoặc worker process trong backend?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Khi tác vụ tốn thời gian và không cần trả kết quả ngay cho người dùng, ví dụ gửi email, xử lý ảnh, xuất báo cáo
+- Giúp API phản hồi nhanh, không bị timeout
+- Dùng hàng đợi như RabbitMQ, Kafka, Redis để giao việc cho worker
+- Worker có thể mở rộng độc lập và retry khi lỗi
+- Cần theo dõi trạng thái job và xử lý idempotent', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('2641eb33-5d9f-56b8-8775-133bb80c2ae8', 'Stream trong Node.js là gì? Có những loại stream nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Stream xử lý dữ liệu theo từng phần thay vì đọc hết vào bộ nhớ
+- Readable để đọc, Writable để ghi
+- Duplex vừa đọc vừa ghi, ví dụ socket
+- Transform là Duplex biến đổi dữ liệu, ví dụ nén
+- Dùng pipe hoặc pipeline để nối stream và xử lý backpressure, tiết kiệm bộ nhớ với file lớn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d86bfd5c-9067-5d3d-9493-4ae51aeec349', 'Bạn áp dụng những biện pháp bảo mật nào cho ứng dụng Node.js?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Validate và làm sạch đầu vào, dùng truy vấn tham số hoá để chống injection
+- Đặt security header (ví dụ helmet), cấu hình CORS chặt
+- Xác thực và phân quyền đúng, băm mật khẩu bằng bcrypt hoặc argon2
+- Giới hạn tốc độ request, kích thước body
+- Cập nhật và quét lỗ hổng dependency, lưu bí mật trong biến môi trường', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('60666ef8-7948-5b18-8ee5-8d9376fc5c4a', 'Middleware trong Node.js/Express là gì? Middleware có thể làm những việc gì?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Middleware là hàm nhận request, response và next, chạy trong chuỗi xử lý request
+- Có thể đọc hoặc sửa request và response
+- Có thể kết thúc request hoặc gọi next để chuyển cho middleware tiếp theo
+- Dùng cho log, xác thực, parse body, CORS, xử lý lỗi
+- Thứ tự đăng ký middleware quyết định thứ tự chạy', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f4a57d2b-6db4-5fe1-8fd2-3b18e8f986c4', 'libuv là gì và vai trò của nó trong Node.js?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- libuv là thư viện C cung cấp event loop và I/O bất đồng bộ cho Node.js
+- Trừu tượng hoá cơ chế I/O của từng hệ điều hành (epoll, kqueue, IOCP)
+- Có thread pool cho tác vụ không có API bất đồng bộ như file system, DNS, mã hoá
+- Quản lý timer, socket, tiến trình con
+- Các pha của event loop do libuv điều phối', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('9ab3ce97-9b32-55b3-986e-8d501463a322', 'spawn và fork trong module child_process của Node.js khác nhau như thế nào?', 'IT', 'Backend Developer', 'HARD', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- spawn chạy một lệnh bất kỳ trong tiến trình mới, dữ liệu trả về qua stream
+- fork là trường hợp riêng để chạy một module Node.js mới
+- fork tạo kênh giao tiếp IPC để gửi message giữa tiến trình cha và con
+- exec chạy lệnh qua shell và trả về toàn bộ output trong buffer
+- Dùng để tách tác vụ nặng hoặc chạy chương trình bên ngoài mà không chặn event loop', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('67f8351f-0d49-5e71-b718-5f0f5bd02ef8', 'Vì sao nên tách phần khởi tạo ứng dụng Express (app) và phần khởi động server?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- App chứa định nghĩa route và middleware, server lo lắng nghe port
+- Tách ra giúp test API mà không cần mở port thật
+- Dễ tái sử dụng app trong nhiều môi trường như serverless, cluster
+- Cấu hình khởi động (port, TLS) tách biệt khỏi logic
+- Code rõ trách nhiệm hơn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('188c92fe-c63d-566c-ba29-fe964f36243b', 'Node.js chạy đơn luồng, vậy làm sao tận dụng CPU nhiều nhân?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Chạy nhiều tiến trình bằng module cluster hoặc trình quản lý như PM2, mỗi tiến trình một nhân
+- Các tiến trình dùng chung port, request được phân phối giữa chúng
+- Worker threads cho tác vụ tính toán nặng trong cùng tiến trình
+- Trong container thường chạy nhiều instance phía sau load balancer
+- Trạng thái chung phải lưu ngoài tiến trình như Redis', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d4fee5a1-c27a-58a4-bcdb-f7bd442f0eb9', 'Node.js phù hợp và không phù hợp với những loại ứng dụng nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Phù hợp với ứng dụng I/O nhiều, nhiều kết nối đồng thời: API, ứng dụng thời gian thực, chat
+- Phù hợp với streaming dữ liệu, BFF, công cụ dòng lệnh
+- Dùng chung JavaScript với frontend
+- Không phù hợp với tác vụ tính toán nặng CPU vì chặn event loop
+- Với tác vụ nặng cần worker threads hoặc tách sang service khác', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('4bea39bb-fda8-5315-8eb5-62e2823bc3a3', 'EventEmitter trong Node.js là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- EventEmitter là lớp cho phép phát và lắng nghe sự kiện theo tên
+- Đăng ký listener bằng on hoặc once, phát sự kiện bằng emit
+- Nhiều module lõi như stream, HTTP server kế thừa EventEmitter
+- Là cách hiện thực Observer pattern
+- Cần gỡ listener khi không dùng để tránh rò rỉ bộ nhớ; sự kiện error không có listener sẽ làm sập tiến trình', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('8c36ef78-3a1c-59d2-8f8d-4a012c036146', 'Express.js là gì và có những tính năng chính nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Express là framework web tối giản cho Node.js
+- Định tuyến theo HTTP method và đường dẫn
+- Hệ thống middleware để xử lý request theo chuỗi
+- Tiện ích làm việc với request, response, phục vụ file tĩnh
+- Linh hoạt, kết hợp được nhiều thư viện bên ngoài', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('17446111-9e67-525e-bf70-7cb252e4d11f', 'Express có những loại middleware nào? Middleware xử lý lỗi hoạt động thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Middleware cấp ứng dụng, đăng ký cho toàn app
+- Middleware cấp router, áp dụng cho một nhóm route
+- Middleware có sẵn và của bên thứ ba như parse JSON, CORS, cookie
+- Middleware xử lý lỗi có bốn tham số (err, req, res, next), đặt sau cùng
+- Gọi next kèm lỗi để chuyển tới middleware xử lý lỗi', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('d683be2f-839e-5821-ab0e-ff17247a908f', 'Bạn quản lý session trong ứng dụng Express như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dùng middleware session, lưu id phiên trong cookie, dữ liệu phiên ở server
+- Production không dùng bộ nhớ trong tiến trình, mà lưu ở Redis hoặc cơ sở dữ liệu
+- Cookie đặt HttpOnly, Secure, SameSite
+- Tạo lại id phiên sau khi đăng nhập để chống session fixation
+- Đặt thời gian hết hạn và huỷ phiên khi đăng xuất', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e5a79f85-8e34-5b4a-8cbe-22371354200f', 'Bạn cấu hình CORS cho API Express như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Dùng middleware cors hoặc tự đặt các header Access-Control-Allow
+- Chỉ cho phép danh sách origin cụ thể, tránh dùng dấu sao với API cần xác thực
+- Cấu hình method, header được phép và credentials khi cần
+- Xử lý preflight request với method OPTIONS
+- CORS chỉ bảo vệ ở trình duyệt, vẫn cần xác thực và phân quyền ở server', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('efe5c7da-fd5a-536d-971f-2483d211aadc', 'MongoDB là gì? Cơ sở dữ liệu NoSQL và SQL khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- MongoDB là cơ sở dữ liệu NoSQL dạng document, lưu dữ liệu dạng JSON (BSON) trong collection
+- SQL dùng bảng với schema cố định, quan hệ chặt, hỗ trợ join và transaction mạnh
+- NoSQL schema linh hoạt, dễ mở rộng ngang
+- SQL phù hợp dữ liệu có quan hệ phức tạp cần nhất quán cao, ví dụ tài chính
+- NoSQL phù hợp dữ liệu thay đổi cấu trúc, khối lượng lớn, truy cập theo document', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('e1bd31cd-bc44-5997-b20c-894600670c5c', 'Populate trong Mongoose là gì? Khi nào nên nhúng (embed) và khi nào nên tham chiếu (reference) trong MongoDB?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Populate thay id tham chiếu bằng document thật từ collection khác, tương tự join
+- Populate tạo thêm truy vấn nên cẩn thận với hiệu năng
+- Embed khi dữ liệu con gắn chặt với cha và luôn đọc cùng nhau
+- Reference khi dữ liệu dùng chung nhiều nơi, lớn hoặc tăng không giới hạn
+- Thiết kế theo cách dữ liệu được truy vấn', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('975f72af-1ee9-5103-b75b-ddd11fcc3bf0', 'Bạn lưu mật khẩu người dùng an toàn như thế nào? Salt và pepper là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Không lưu mật khẩu dạng gốc hay mã hoá hai chiều, mà băm bằng hàm chậm như bcrypt, argon2
+- Salt là chuỗi ngẫu nhiên riêng cho mỗi mật khẩu, lưu cùng hash, chống rainbow table và làm hash khác nhau dù cùng mật khẩu
+- Pepper là giá trị bí mật chung lưu ngoài cơ sở dữ liệu, thêm một lớp bảo vệ khi cơ sở dữ liệu bị lộ
+- Hàm băm chậm có cost factor làm việc dò mật khẩu tốn kém
+- Không dùng MD5 hay SHA-1 để băm mật khẩu', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('40f31291-4b56-50e9-aafe-20c41a995bfa', 'JWT là gì và hoạt động như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- JWT (JSON Web Token) gồm ba phần: header, payload và chữ ký, mã hoá base64url
+- Payload chứa claim như id người dùng, vai trò, thời gian hết hạn
+- Chữ ký giúp server kiểm tra token không bị sửa mà không cần lưu phiên
+- Payload không được mã hoá nên không chứa thông tin nhạy cảm
+- Client gửi token trong header Authorization dạng Bearer', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('2735c45a-89df-5b4b-991b-ea105e9a4764', 'Xác thực dựa trên session và dựa trên JWT có ưu nhược điểm gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Session: server lưu trạng thái phiên, dễ thu hồi ngay, nhưng cần lưu trữ chung khi chạy nhiều instance
+- JWT: stateless, dễ mở rộng, phù hợp microservices và mobile
+- Nhược điểm JWT: khó thu hồi trước hạn, token lớn hơn, lộ token thì bị dùng tới khi hết hạn
+- Khắc phục bằng access token ngắn hạn kèm refresh token, danh sách thu hồi
+- Cả hai đều cần chống XSS, CSRF tuỳ nơi lưu token', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('f8380f41-4eb2-5c30-a01f-656de5bf5565', 'Go (Golang) là gì? Ưu nhược điểm và loại dự án phù hợp?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Go là ngôn ngữ biên dịch, kiểu tĩnh do Google phát triển
+- Ưu điểm: cú pháp đơn giản, biên dịch nhanh ra một file chạy, hiệu năng tốt
+- Hỗ trợ đồng thời có sẵn với goroutine và channel
+- Nhược điểm: ít tính năng trừu tượng, xử lý lỗi dài dòng, generics mới có gần đây
+- Phù hợp với dịch vụ mạng, microservices, công cụ hạ tầng như Docker, Kubernetes', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('5ff26146-7fa2-5b73-93e4-9d8d0cce298e', 'Go có phải ngôn ngữ hướng đối tượng không? Vì sao Go không có class?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Go không có class và kế thừa theo kiểu truyền thống
+- Dùng struct kết hợp method để gắn hành vi với dữ liệu
+- Dùng embedding để tái sử dụng (composition thay vì inheritance)
+- Interface được thoả mãn ngầm định, không cần khai báo implements
+- Thiết kế này nhằm giữ ngôn ngữ đơn giản và khuyến khích composition', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('b8c91a72-0c3c-54cb-9b06-a74b3055000a', 'Goroutine là gì? Goroutine khác thread như thế nào?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Goroutine là luồng thực thi nhẹ do runtime của Go quản lý
+- Khởi tạo rất rẻ với stack nhỏ (vài KB) có thể tự giãn
+- Runtime ánh xạ nhiều goroutine lên ít luồng hệ điều hành (mô hình M:N)
+- Chuyển ngữ cảnh do runtime thực hiện nên nhanh hơn thread hệ điều hành
+- Có thể chạy hàng trăm nghìn goroutine cùng lúc', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('59fe1373-e314-5878-9626-977ae49e10fd', 'Array và slice trong Go khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Array có độ dài cố định là một phần của kiểu, truyền đi bằng cách sao chép
+- Slice là view động trên một array bên dưới, gồm con trỏ, độ dài và capacity
+- Slice có thể tăng kích thước bằng append, khi vượt capacity sẽ cấp phát array mới
+- Nhiều slice có thể dùng chung array bên dưới nên sửa một slice có thể ảnh hưởng slice khác
+- Thực tế slice được dùng phổ biến hơn array', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('064587db-9100-55be-8959-b3c8f5a74087', 'Interface trong Go là gì và vì sao dùng nó?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Interface là tập các method mà một kiểu cần có
+- Một kiểu thoả mãn interface ngầm định khi có đủ method, không cần khai báo
+- Giúp tách phụ thuộc và viết code đa hình
+- Dễ thay thế triển khai và mock khi test
+- Nên định nghĩa interface nhỏ, tại nơi sử dụng, ví dụ io.Reader, io.Writer', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('1f2a85c2-e405-53ab-8992-c2dc80784b0b', 'Concurrency và parallelism khác nhau như thế nào?', 'IT', 'Backend Developer', 'EASY', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Concurrency là cấu trúc chương trình xử lý nhiều việc xen kẽ, đan xen theo thời gian
+- Parallelism là thực sự chạy nhiều việc cùng lúc trên nhiều nhân CPU
+- Chương trình concurrent có thể chạy trên một nhân
+- Parallelism cần phần cứng nhiều nhân
+- Concurrency giúp phản hồi tốt với I/O, parallelism giúp tăng tốc tính toán', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('c29dce0a-ef62-5cfd-9eb2-949e1bf2c7f7', 'Channel trong Go dùng để làm gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Channel là kênh để các goroutine gửi và nhận dữ liệu, đồng bộ với nhau
+- Theo triết lý chia sẻ bộ nhớ bằng cách giao tiếp thay vì giao tiếp bằng chia sẻ bộ nhớ
+- Channel không buffer chặn cho tới khi cả bên gửi và nhận sẵn sàng
+- Channel có buffer cho phép gửi tới khi đầy
+- select dùng để chờ trên nhiều channel; đóng channel để báo hết dữ liệu', 'ACTIVE', '00000000-0000-0000-0000-000000000001'),
+('615545ff-ed35-59c0-9b66-8fede84f9bfe', 'Eventual consistency (nhất quán cuối cùng) là gì?', 'IT', 'Backend Developer', 'MEDIUM', 'TECHNICAL', 'Nêu khái niệm -> giải thích cách hoạt động hoặc nguyên nhân -> lấy ví dụ thực tế khi vận hành hệ thống.', '- Là mô hình nhất quán trong đó các bản sao có thể tạm thời khác nhau
+- Nếu không có cập nhật mới, cuối cùng mọi bản sao sẽ hội tụ về cùng giá trị
+- Đánh đổi nhất quán tức thời lấy tính sẵn sàng và hiệu năng (theo định lý CAP)
+- Thường gặp trong hệ thống phân tán, NoSQL, giao tiếp hướng sự kiện giữa microservices
+- Ứng dụng cần xử lý việc đọc dữ liệu cũ và xung đột', 'ACTIVE', '00000000-0000-0000-0000-000000000001');

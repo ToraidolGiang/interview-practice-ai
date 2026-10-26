@@ -7,12 +7,13 @@ Thu thập câu hỏi phỏng vấn (tiếng Anh) từ các repo GitHub có lice
 ```bash
 python scripts/dataset/collect_github_questions.py                    # chạy tất cả nguồn
 python scripts/dataset/collect_github_questions.py --only sysadmin-skills --refresh
+python scripts/dataset/collect_github_questions.py --only java-backend-qa --out /tmp/new.jsonl  # thêm nguồn mới vào file riêng
 ```
 
 Yêu cầu Python 3.9+, không cần cài thêm thư viện. Đặt `GITHUB_TOKEN` nếu bị GitHub API giới hạn (60 request/giờ khi không đăng nhập; mỗi lần chạy dùng khoảng 10 request).
 
 - File gốc cache tại `data/raw/github/<repo>/<commit>/...` (đã gitignore), tải theo commit SHA cố định nên kết quả tái lập được.
-- Đầu ra: `data/interim/github_questions.jsonl`.
+- Đầu ra: `data/interim/github_questions.jsonl`. Script ghi đè cả file và tải commit mới nhất của từng nguồn; khi thêm nguồn mới nên chạy `--only <key> --out <file tạm>` rồi nối các dòng có id mới vào file chính, để không làm đổi các câu đã chuẩn hoá.
 - Repo có license không thuộc `ALLOWED_LICENSES` sẽ bị bỏ qua.
 
 ### Nguồn hiện có
@@ -24,8 +25,10 @@ Yêu cầu Python 3.9+, không cần cài thêm thư viện. Đặt `GITHUB_TOKE
 | `react-interview-questions` | sudheerj/reactjs-interview-questions | MIT | Frontend Developer | Có đáp án |
 | `data-science-interviews` | alexeygrigorev/data-science-interviews | CC-BY-4.0 | Data Scientist | Có đáp án và độ khó (👶/⭐️/🚀); chỉ lấy `theory.md` |
 | `sysadmin-skills` | trimstray/test-your-sysadmin-skills | MIT | System Administrator / DevOps | Có đáp án; độ khó theo cấp Junior/Regular/Senior/Guru |
+| `java-backend-qa` | ViacheslavChernyshov/java-interview-questions-and-answers | MIT | Backend Developer | Java, Spring Boot, SQL, JPA, Kafka, microservices; mỗi câu một file trong `eng/`, có đáp án |
+| `backend-node-go` | Gauthamjm007/Backend-NodeJS-Golang-Interview_QA | MIT | Backend Developer | Node.js, Express, MongoDB, Golang, database; có đáp án |
 
-Đã loại vì không có license: `sudheerj/javascript-interview-questions`, `chiphuyen/ml-interviews-book`, `bregman-arie/devops-exercises`, các repo `learning-zone/*`.
+Đã loại vì license copyleft (GPL, CC-BY-SA): `arialdomartini/Back-End-Developer-Interview-Questions`, `doocs/advanced-java`. Đã loại vì không có license: `sudheerj/javascript-interview-questions`, `chiphuyen/ml-interviews-book`, `bregman-arie/devops-exercises`, các repo `learning-zone/*`.
 
 ### Định dạng mỗi dòng JSONL
 
@@ -58,7 +61,7 @@ python scripts/dataset/normalize_questions.py                       # chạy h�
 - Ghi nối tiếp vào `data/interim/questions_vi.jsonl` và bỏ qua id đã xử lý, nên chạy lại được khi bị ngắt hoặc hết quota.
 - Kết quả từng câu được kiểm tra (enum, trường bắt buộc, câu hỏi không chứa ký hiệu markdown/code vì được đọc bằng TTS, `reference_answer` của TECHNICAL gồm 3-6 dòng bắt đầu bằng `- `); câu lỗi được gọi lại riêng 1 lần, vẫn lỗi thì ghi vào `questions_vi.errors.jsonl`.
 - Mọi câu có `review_status: "PENDING"`, **phải có người duyệt** trước khi seed vào bảng `questions`. `industry`/`position` theo `docs/business/Danh_Muc_Nganh_Vi_Tri.md`; câu không phải `TECHNICAL` gán vị trí `Chung`.
-- Khi Gemini hết quota, có thể chuẩn hoá thủ công theo đúng quy tắc trong `SYSTEM_PROMPT`; bản ghi vẫn qua `validate()`/`to_output_record()` và ghi rõ người làm trong `generated_by.model`. Hiện tại cả 1151 câu được chuẩn hoá thủ công (`claude-opus-5-5 (thủ công)`), câu trùng ý giữa các nguồn đã loại với `drop_reason: LOW_QUALITY`.
+- Khi Gemini hết quota, có thể chuẩn hoá thủ công theo đúng quy tắc trong `SYSTEM_PROMPT`; bản ghi vẫn qua `validate()`/`to_output_record()` và ghi rõ người làm trong `generated_by.model`. Hiện tại cả 1783 câu (5 nguồn ban đầu + 2 nguồn Backend) được chuẩn hoá thủ công (`claude-opus-5-5 (thủ công)`), câu trùng ý giữa các nguồn đã loại với `drop_reason: LOW_QUALITY`.
 
 ## `review_questions.py`
 

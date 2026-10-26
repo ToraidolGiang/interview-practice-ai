@@ -15,6 +15,9 @@ dist-ssr/
 .vite/
 *.local
 
+# Dataset: file gốc tải về (tái tạo được bằng scripts/dataset)
+data/raw/
+
 # IDE
 .idea/
 *.iml
@@ -29,6 +32,9 @@ Thumbs.db
 .claude/
 CLAUDE.md
 scripts/commit-msg-hook.sh
+
+# Dataset: file CSV tạm khi duyệt câu hỏi (nguồn chính là questions_vi.jsonl)
+data/interim/review.csv
 
 # Mock spec sinh tu docs/api/openapi.yaml
 frontend/mock/.generated/

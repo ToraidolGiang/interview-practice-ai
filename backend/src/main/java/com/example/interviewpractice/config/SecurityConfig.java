@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -33,11 +32,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter,
+            JsonMapper mapper) throws Exception {
+        // Chưa bật CORS: frontend gọi qua proxy /api cùng origin. Nếu deploy tách origin (#132) thì thêm
+        // CorsConfigurationSource ở đây.
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login", "/auth/forgot-password",
@@ -47,22 +47,21 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint((req, res, ex) -> writeError(res, HttpStatus.UNAUTHORIZED,
+                        .authenticationEntryPoint((req, res, ex) -> writeError(mapper, res, HttpStatus.UNAUTHORIZED,
                                 "UNAUTHORIZED", "Cần đăng nhập để thực hiện thao tác này"))
-                        .accessDeniedHandler((req, res, ex) -> writeError(res, HttpStatus.FORBIDDEN,
+                        .accessDeniedHandler((req, res, ex) -> writeError(mapper, res, HttpStatus.FORBIDDEN,
                                 "FORBIDDEN", "Không có quyền thực hiện thao tác này")))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    private static final JsonMapper MAPPER = JsonMapper.builder().build();
-
-    // Lỗi sinh ra trong filter chain không qua GlobalExceptionHandler nên tự ghi ErrorResponse
-    private static void writeError(HttpServletResponse res, HttpStatus status, String code, String message)
-            throws IOException {
+    // Lỗi sinh ra trong filter chain không qua GlobalExceptionHandler nên tự ghi ErrorResponse,
+    // dùng JsonMapper của Spring để cùng cấu hình (định dạng thời gian...) với các response khác
+    private static void writeError(JsonMapper mapper, HttpServletResponse res, HttpStatus status, String code,
+            String message) throws IOException {
         res.setStatus(status.value());
         res.setContentType(MediaType.APPLICATION_JSON_VALUE);
         res.setCharacterEncoding("UTF-8");
-        res.getWriter().write(MAPPER.writeValueAsString(ErrorResponse.of(code, message)));
+        res.getWriter().write(mapper.writeValueAsString(ErrorResponse.of(code, message)));
     }
 }

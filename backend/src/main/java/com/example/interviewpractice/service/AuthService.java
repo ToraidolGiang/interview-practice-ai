@@ -54,7 +54,7 @@ public class AuthService {
                     List.of(new ErrorResponse.FieldError("confirmPassword", "Mật khẩu nhập lại không khớp")));
         }
         String email = normalize(request.email());
-        if (users.existsByEmailIgnoreCase(email)) {
+        if (users.existsByEmail(email)) {
             throw new ApiException(HttpStatus.CONFLICT, "EMAIL_EXISTS", "Email đã được đăng ký");
         }
         User user = new User();
@@ -74,7 +74,7 @@ public class AuthService {
     @Transactional(noRollbackFor = ApiException.class)
     public LoginResponse login(LoginRequest request) {
         Instant now = clock.instant();
-        User user = users.findByEmailIgnoreCase(normalize(request.email())).orElseThrow(AuthService::badCredentials);
+        User user = users.findByEmailForUpdate(normalize(request.email())).orElseThrow(AuthService::badCredentials);
 
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(now)) {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "ACCOUNT_LOCKED",

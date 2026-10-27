@@ -56,7 +56,7 @@ class AuthServiceTest {
         user.setFullName("Nguyễn Văn A");
         user.setEmail("cand@example.com");
         user.setPasswordHash(encoder.encode(PASSWORD));
-        when(users.findByEmailIgnoreCase("cand@example.com")).thenReturn(Optional.of(user));
+        when(users.findByEmailForUpdate("cand@example.com")).thenReturn(Optional.of(user));
     }
 
     private void useClock(Instant instant) {
@@ -70,7 +70,7 @@ class AuthServiceTest {
 
     @Test
     void registerStoresHashedPasswordAndNormalizedEmail() {
-        when(users.existsByEmailIgnoreCase("new@example.com")).thenReturn(false);
+        when(users.existsByEmail("new@example.com")).thenReturn(false);
         when(users.saveAndFlush(any(User.class))).thenAnswer(inv -> {
             User saved = inv.getArgument(0);
             saved.setId(UUID.randomUUID());
@@ -90,7 +90,7 @@ class AuthServiceTest {
 
     @Test
     void registerRejectsDuplicateEmail() {
-        when(users.existsByEmailIgnoreCase("cand@example.com")).thenReturn(true);
+        when(users.existsByEmail("cand@example.com")).thenReturn(true);
 
         ApiException e = assertThrows(ApiException.class, () -> service.register(
                 new RegisterRequest("A", "cand@example.com", PASSWORD, PASSWORD)));
@@ -124,7 +124,7 @@ class AuthServiceTest {
 
     @Test
     void loginWithUnknownEmailGivesSameErrorAsWrongPassword() {
-        when(users.findByEmailIgnoreCase("nobody@example.com")).thenReturn(Optional.empty());
+        when(users.findByEmailForUpdate("nobody@example.com")).thenReturn(Optional.empty());
 
         ApiException unknown = assertThrows(ApiException.class,
                 () -> service.login(new LoginRequest("nobody@example.com", PASSWORD)));
@@ -169,7 +169,7 @@ class AuthServiceTest {
 
     @Test
     void registerReturnsConflictWhenUniqueIndexRejectsConcurrentDuplicate() {
-        when(users.existsByEmailIgnoreCase("new@example.com")).thenReturn(false);
+        when(users.existsByEmail("new@example.com")).thenReturn(false);
         when(users.saveAndFlush(any(User.class))).thenThrow(new DataIntegrityViolationException("uq_users_email"));
 
         ApiException e = assertThrows(ApiException.class, () -> service.register(
@@ -185,7 +185,7 @@ class AuthServiceTest {
         try {
             // Locale Thổ Nhĩ Kỳ biến "I" thành "ı" nếu toLowerCase không chỉ định Locale
             Locale.setDefault(Locale.forLanguageTag("tr-TR"));
-            when(users.existsByEmailIgnoreCase("info@example.com")).thenReturn(true);
+            when(users.existsByEmail("info@example.com")).thenReturn(true);
 
             ApiException e = assertThrows(ApiException.class, () -> service.register(
                     new RegisterRequest("A", "INFO@Example.com", PASSWORD, PASSWORD)));

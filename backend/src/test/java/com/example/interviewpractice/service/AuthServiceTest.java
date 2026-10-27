@@ -15,11 +15,13 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -69,7 +71,7 @@ class AuthServiceTest {
     @Test
     void registerStoresHashedPasswordAndNormalizedEmail() {
         when(users.existsByEmailIgnoreCase("new@example.com")).thenReturn(false);
-        when(users.save(any(User.class))).thenAnswer(inv -> {
+        when(users.saveAndFlush(any(User.class))).thenAnswer(inv -> {
             User saved = inv.getArgument(0);
             saved.setId(UUID.randomUUID());
             return saved;
@@ -79,7 +81,7 @@ class AuthServiceTest {
                 new RegisterRequest(" Trần B ", " New@Example.com ", PASSWORD, PASSWORD));
 
         assertEquals("new@example.com", response.email());
-        verify(users).save(argThat(u ->
+        verify(users).saveAndFlush(argThat(u ->
                 u.getFullName().equals("Trần B")
                         && !u.getPasswordHash().equals(PASSWORD)
                         && encoder.matches(PASSWORD, u.getPasswordHash())
@@ -95,7 +97,7 @@ class AuthServiceTest {
 
         assertEquals(HttpStatus.CONFLICT, e.getStatus());
         assertEquals("EMAIL_EXISTS", e.getCode());
-        verify(users, never()).save(any());
+        verify(users, never()).saveAndFlush(any());
     }
 
     @Test
@@ -105,7 +107,7 @@ class AuthServiceTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
         assertEquals("confirmPassword", e.getFieldErrors().get(0).field());
-        verify(users, never()).save(any());
+        verify(users, never()).saveAndFlush(any());
     }
 
     @Test
@@ -163,5 +165,34 @@ class AuthServiceTest {
         user.setStatus(User.Status.LOCKED);
 
         assertEquals(HttpStatus.UNAUTHORIZED, failLogin(PASSWORD).getStatus());
+    }
+
+    @Test
+    void registerReturnsConflictWhenUniqueIndexRejectsConcurrentDuplicate() {
+        when(users.existsByEmailIgnoreCase("new@example.com")).thenReturn(false);
+        when(users.saveAndFlush(any(User.class))).thenThrow(new DataIntegrityViolationException("uq_users_email"));
+
+        ApiException e = assertThrows(ApiException.class, () -> service.register(
+                new RegisterRequest("A", "new@example.com", PASSWORD, PASSWORD)));
+
+        assertEquals(HttpStatus.CONFLICT, e.getStatus());
+        assertEquals("EMAIL_EXISTS", e.getCode());
+    }
+
+    @Test
+    void emailNormalizationIgnoresDefaultLocale() {
+        Locale original = Locale.getDefault();
+        try {
+            // Locale Thổ Nhĩ Kỳ biến "I" thành "ı" nếu toLowerCase không chỉ định Locale
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            when(users.existsByEmailIgnoreCase("info@example.com")).thenReturn(true);
+
+            ApiException e = assertThrows(ApiException.class, () -> service.register(
+                    new RegisterRequest("A", "INFO@Example.com", PASSWORD, PASSWORD)));
+
+            assertEquals("EMAIL_EXISTS", e.getCode());
+        } finally {
+            Locale.setDefault(original);
+        }
     }
 }

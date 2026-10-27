@@ -4,7 +4,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,8 +61,13 @@ public class AuthService {
         user.setFullName(request.fullName().trim());
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
-        User saved = users.save(user);
-        return new RegisterResponse(saved.getId(), saved.getEmail());
+        try {
+            // saveAndFlush để vi phạm chỉ mục uq_users_email lộ ra tại đây (hai request đăng ký cùng lúc)
+            User saved = users.saveAndFlush(user);
+            return new RegisterResponse(saved.getId(), saved.getEmail());
+        } catch (DataIntegrityViolationException e) {
+            throw new ApiException(HttpStatus.CONFLICT, "EMAIL_EXISTS", "Email đã được đăng ký");
+        }
     }
 
     // Lần đăng nhập sai phải được lưu dù trả lỗi, nên không rollback khi ném ApiException
@@ -96,7 +103,7 @@ public class AuthService {
     }
 
     private static String normalize(String email) {
-        return email.trim().toLowerCase();
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     private static ApiException badCredentials() {

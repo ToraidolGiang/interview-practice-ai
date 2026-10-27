@@ -5,7 +5,7 @@ Sinh tự động từ `docs/api/openapi.yaml` (phiên bản 0.2.0); không sử
 ## Quy ước chung
 
 - **Base path:** `/api` (domain chốt khi triển khai trên Render). Dữ liệu JSON, UTF-8; riêng nộp audio dùng `multipart/form-data`.
-- **Xác thực:** header `Authorization: Bearer <JWT>` (hạn 24 giờ, claim `role`). Endpoint `Công khai` không cần token; `/admin/**` yêu cầu role ADMIN.
+- **Xác thực:** header `Authorization: Bearer <JWT>` (hạn 24 giờ). Server nạp lại `status` và `role` từ CSDL mỗi request nên tài khoản bị khóa/xóa bị từ chối 401 ngay và đổi role có hiệu lực ngay. Endpoint `Công khai` không cần token; `/admin/**` yêu cầu role ADMIN.
 - **Lỗi:** mọi lỗi trả `ErrorResponse {code, message, timestamp, fieldErrors?}`. 401 thiếu/sai token, 403 không đủ quyền hoặc không phải chủ sở hữu, 404 không tìm thấy, 409 xung đột trạng thái.
 - **Phân trang:** query `page` (từ 0) và `size` (1-100, mặc định 20); phản hồi gồm `content`, `page`, `size`, `totalElements`, `totalPages`.
 - **Chấm điểm bất đồng bộ:** `POST /practice-sessions/{id}/evaluate` trả **202** và chuyển phiên sang `PROCESSING`. Client polling `GET /practice-sessions/{id}` (đề xuất mỗi 2 giây) tới `SCORED` hoặc `FAILED` (kèm `errorCode`), rồi `GET /practice-sessions/{id}/result`. Chấm lại bằng `POST /practice-sessions/{id}/rescore` (transcript đã sửa, không gọi lại STT).

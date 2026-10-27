@@ -4,9 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +45,7 @@ class AuthServiceTest {
     private static final Instant NOW = Instant.parse("2026-10-27T03:00:00Z");
     private static final String PASSWORD = "Matkhau123";
 
-    private final PasswordEncoder encoder = new BCryptPasswordEncoder(4);
+    private final PasswordEncoder encoder = spy(new BCryptPasswordEncoder(4));
     private final JwtProperties properties = new JwtProperties("test-secret-test-secret-test-secret-123456", 24);
     private final UserRepository users = mock(UserRepository.class);
     private Clock clock;
@@ -194,5 +198,42 @@ class AuthServiceTest {
         } finally {
             Locale.setDefault(original);
         }
+    }
+
+    @Test
+    void lockedMessageShowsRemainingMinutes() {
+        for (int i = 0; i < AuthService.MAX_FAILED_LOGINS; i++) {
+            failLogin("sai-mat-khau");
+        }
+
+        useClock(NOW.plus(Duration.ofMinutes(10)));
+        ApiException locked = failLogin(PASSWORD);
+
+        assertEquals("ACCOUNT_LOCKED", locked.getCode());
+        assertTrue(locked.getMessage().contains("sau 5 phút"), locked.getMessage());
+    }
+
+    @Test
+    void unknownEmailStillRunsPasswordHashSoTimingDoesNotRevealEmail() {
+        when(users.findByEmailForUpdate("nobody@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(ApiException.class, () -> service.login(new LoginRequest("nobody@example.com", PASSWORD)));
+
+        verify(encoder).matches(eq(PASSWORD), anyString());
+    }
+
+    @Test
+    void loginWithPasswordOver72BytesIsBadCredentialsNotServerError() {
+        // 14 ký tự có dấu x 5 = 70 ký tự nhưng hơn 72 byte
+        String tooLong = "mậtkhẩuđặcbiệt".repeat(5);
+
+        ApiException e = failLogin(tooLong);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, e.getStatus());
+    }
+
+    @Test
+    void bcryptRefusesToEncodeMoreThan72BytesSoRegistrationMustRejectThem() {
+        assertThrows(IllegalArgumentException.class, () -> new BCryptPasswordEncoder(4).encode("a".repeat(73)));
     }
 }

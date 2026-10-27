@@ -36,11 +36,14 @@ public class AuthService {
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
     private final Clock clock;
+    private final String dummyHash;
 
     public AuthService(UserRepository users, PasswordEncoder passwordEncoder, JwtService jwtService,
             JwtProperties jwtProperties, Clock clock) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
+        // Cùng thuật toán và cost với hash thật để thời gian so sánh tương đương
+        this.dummyHash = passwordEncoder.encode("khong-ai-dung-mat-khau-nay");
         this.jwtService = jwtService;
         this.jwtProperties = jwtProperties;
         this.clock = clock;
@@ -74,12 +77,18 @@ public class AuthService {
     @Transactional(noRollbackFor = ApiException.class)
     public LoginResponse login(LoginRequest request) {
         Instant now = clock.instant();
-        User user = users.findByEmailForUpdate(normalize(request.email())).orElseThrow(AuthService::badCredentials);
+        User user = users.findByEmailForUpdate(normalize(request.email())).orElse(null);
+        if (user == null) {
+            // Vẫn băm một lần để thời gian phản hồi không lộ email nào đã đăng ký
+            passwordEncoder.matches(request.password(), dummyHash);
+            throw badCredentials();
+        }
 
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(now)) {
+            long secondsLeft = Duration.between(now, user.getLockedUntil()).toSeconds();
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "ACCOUNT_LOCKED",
                     "Tài khoản tạm khóa do đăng nhập sai quá " + MAX_FAILED_LOGINS + " lần, vui lòng thử lại sau "
-                            + LOCK_DURATION.toMinutes() + " phút");
+                            + minutesCeil(secondsLeft) + " phút");
         }
         // Tài khoản bị quản trị khóa (hoặc tài khoản hệ thống) không đăng nhập được
         if (user.getStatus() != User.Status.ACTIVE
@@ -100,6 +109,10 @@ public class AuthService {
             failures = 0;
         }
         user.setFailedLoginCount(failures);
+    }
+
+    private static long minutesCeil(long seconds) {
+        return Math.max(1, (seconds + 59) / 60);
     }
 
     private static String normalize(String email) {

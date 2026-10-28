@@ -3,6 +3,7 @@ package com.example.interviewpractice.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,11 +19,13 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -174,13 +177,27 @@ class AuthServiceTest {
     @Test
     void registerReturnsConflictWhenUniqueIndexRejectsConcurrentDuplicate() {
         when(users.existsByEmail("new@example.com")).thenReturn(false);
-        when(users.saveAndFlush(any(User.class))).thenThrow(new DataIntegrityViolationException("uq_users_email"));
+        when(users.saveAndFlush(any(User.class))).thenThrow(new DataIntegrityViolationException("duplicate",
+                new ConstraintViolationException("duplicate", new SQLException(), "uq_users_email")));
 
         ApiException e = assertThrows(ApiException.class, () -> service.register(
                 new RegisterRequest("A", "new@example.com", PASSWORD, PASSWORD)));
 
         assertEquals(HttpStatus.CONFLICT, e.getStatus());
         assertEquals("EMAIL_EXISTS", e.getCode());
+    }
+
+    @Test
+    void registerRethrowsIntegrityErrorsUnrelatedToEmailIndex() {
+        when(users.existsByEmail("new@example.com")).thenReturn(false);
+        DataIntegrityViolationException other = new DataIntegrityViolationException("null value",
+                new ConstraintViolationException("null value", new SQLException(), "users_full_name_key"));
+        when(users.saveAndFlush(any(User.class))).thenThrow(other);
+
+        DataIntegrityViolationException thrown = assertThrows(DataIntegrityViolationException.class,
+                () -> service.register(new RegisterRequest("A", "new@example.com", PASSWORD, PASSWORD)));
+
+        assertSame(other, thrown);
     }
 
     @Test

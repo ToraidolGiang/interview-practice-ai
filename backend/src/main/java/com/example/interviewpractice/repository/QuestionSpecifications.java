@@ -1,7 +1,5 @@
 package com.example.interviewpractice.repository;
 
-import java.util.Locale;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -13,6 +11,8 @@ public final class QuestionSpecifications {
     /** Vị trí dùng chung của mọi vị trí trong một ngành (taxonomy-v1.0). */
     public static final String COMMON_POSITION = "Chung";
     public static final int MAX_KEYWORD_LENGTH = 200;
+    /** page * size (size tối đa 100) phải vừa int vì Hibernate đặt offset kiểu int. */
+    public static final int MAX_PAGE = 1_000_000;
 
     /** Mới nhất trước, thêm id để thứ tự ổn định giữa các trang. */
     public static final Sort NEWEST_FIRST = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.asc("id"));
@@ -57,10 +57,13 @@ public final class QuestionSpecifications {
         return (root, query, cb) -> cb.equal(root.get("questionType"), type);
     }
 
-    /** Không phân biệt hoa thường; '%', '_' và '\' trong từ khóa là ký tự thường. */
+    /**
+     * Không phân biệt hoa thường; '%', '_' và '\' trong từ khóa là ký tự thường. Cả cột lẫn từ khóa đều được
+     * lower() ở CSDL để cùng một quy tắc locale (hạ chữ ở Java trước sẽ lệch với CSDL dùng locale C).
+     */
     public static Specification<Question> contentContains(String keyword) {
-        String pattern = "%" + escapeLike(keyword.toLowerCase(Locale.ROOT)) + "%";
-        return (root, query, cb) -> cb.like(cb.lower(root.get("content")), pattern, ESCAPE);
+        String pattern = "%" + escapeLike(keyword) + "%";
+        return (root, query, cb) -> cb.like(cb.lower(root.get("content")), cb.lower(cb.literal(pattern)), ESCAPE);
     }
 
     static String escapeLike(String raw) {

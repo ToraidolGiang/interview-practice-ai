@@ -114,6 +114,14 @@ class QuestionControllerTest {
     }
 
     @Test
+    void hugePageIs400BecauseTheOffsetWouldOverflowAnInt() throws Exception {
+        mvc.perform(get("/questions").param("page", "100000000").param("size", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("page"));
+        verifyNoInteractions(service);
+    }
+
+    @Test
     void nonNumericPageIs400() throws Exception {
         mvc.perform(get("/questions").param("page", "abc"))
                 .andExpect(status().isBadRequest())

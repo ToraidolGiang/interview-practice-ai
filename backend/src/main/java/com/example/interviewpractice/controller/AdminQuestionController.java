@@ -44,7 +44,9 @@ public class AdminQuestionController {
             @RequestParam(required = false) Question.Status status,
             @RequestParam(required = false)
             @Size(max = QuestionSpecifications.MAX_KEYWORD_LENGTH, message = "Từ khóa tối đa 200 ký tự") String keyword,
-            @RequestParam(defaultValue = "0") @Min(value = 0, message = "page phải từ 0 trở lên") int page,
+            @RequestParam(defaultValue = "0")
+            @Min(value = 0, message = "page phải từ 0 đến 1000000")
+            @Max(value = QuestionSpecifications.MAX_PAGE, message = "page phải từ 0 đến 1000000") int page,
             @RequestParam(defaultValue = "20")
             @Min(value = 1, message = "size phải từ 1 đến 100")
             @Max(value = 100, message = "size phải từ 1 đến 100") int size) {

@@ -94,8 +94,10 @@ public class AdminQuestionService {
     private void removeOrHide(UUID id, AuthUser admin, boolean forceHide) {
         Question question = questions.findById(id).orElseThrow(AdminQuestionService::notFound);
         if (forceHide || sessions.existsByQuestionId(id)) {
-            question.setStatus(Question.Status.HIDDEN);
-            questions.saveAndFlush(question);
+            if (question.getStatus() != Question.Status.HIDDEN) {
+                question.setStatus(Question.Status.HIDDEN);
+                questions.saveAndFlush(question);
+            }
         } else {
             questions.delete(question);
             // flush để vi phạm khóa ngoại lộ ra tại đây thay vì lúc commit
@@ -129,8 +131,11 @@ public class AdminQuestionService {
             if (!DbConstraints.violates(e, DUPLICATE_INDEX)) {
                 throw e;
             }
-            throw new ApiException(HttpStatus.CONFLICT, "DUPLICATE_QUESTION",
-                    "Câu hỏi này đã có trong vị trí " + question.getPosition());
+            // Chỉ mục không có cột industry: vị trí Chung dùng chung nên trùng cả với câu Chung của ngành khác
+            String where = QuestionSpecifications.COMMON_POSITION.equals(question.getPosition())
+                    ? "vị trí Chung (dùng chung cho mọi ngành)"
+                    : "vị trí " + question.getPosition();
+            throw new ApiException(HttpStatus.CONFLICT, "DUPLICATE_QUESTION", "Câu hỏi này đã có trong " + where);
         }
     }
 

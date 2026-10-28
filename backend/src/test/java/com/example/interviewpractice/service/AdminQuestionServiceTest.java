@@ -148,6 +148,15 @@ class AdminQuestionServiceTest {
     }
 
     @Test
+    void duplicateInCommonPositionExplainsThatItIsSharedAcrossIndustries() {
+        when(questions.saveAndFlush(any(Question.class))).thenThrow(violation("uq_questions_position_content"));
+
+        ApiException e = assertThrows(ApiException.class, () -> service.create(request("Marketing", "Chung"), admin));
+
+        assertEquals("Câu hỏi này đã có trong vị trí Chung (dùng chung cho mọi ngành)", e.getMessage());
+    }
+
+    @Test
     void createRethrowsIntegrityErrorsFromOtherConstraints() {
         DataIntegrityViolationException other = violation("ck_questions_level");
         when(questions.saveAndFlush(any(Question.class))).thenThrow(other);
@@ -207,6 +216,20 @@ class AdminQuestionServiceTest {
         AuditLog audit = savedAudit();
         assertEquals("DELETE", audit.getAction());
         assertEquals(id, audit.getEntityId());
+    }
+
+    @Test
+    void deletingAnAlreadyHiddenUsedQuestionDoesNotSaveAgain() {
+        UUID id = UUID.randomUUID();
+        Question q = existing(id);
+        q.setStatus(Question.Status.HIDDEN);
+        when(questions.findById(id)).thenReturn(Optional.of(q));
+        when(sessions.existsByQuestionId(id)).thenReturn(true);
+
+        service.delete(id, admin);
+
+        verify(questions, never()).saveAndFlush(any(Question.class));
+        assertEquals("DELETE", savedAudit().getAction());
     }
 
     @Test

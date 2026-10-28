@@ -48,7 +48,11 @@ public class QuestionService {
         // Chọn một vị trí ngẫu nhiên trong tập đã lọc; số dòng thay đổi giữa hai truy vấn thì có thể rỗng
         int offset = random.nextInt((int) Math.min(total, Integer.MAX_VALUE));
         return questions.findAll(spec, PageRequest.of(offset, 1, QuestionSpecifications.NEWEST_FIRST))
-                .stream().findFirst().map(QuestionDto::from).orElseThrow(QuestionService::notFound);
+                .stream().findFirst()
+                // Có dòng bị ẩn giữa lúc đếm và lúc lấy: lấy dòng đầu thay vì trả 404 khi bộ lọc vẫn còn câu
+                .or(() -> questions.findAll(spec, PageRequest.of(0, 1, QuestionSpecifications.NEWEST_FIRST))
+                        .stream().findFirst())
+                .map(QuestionDto::from).orElseThrow(QuestionService::notFound);
     }
 
     public QuestionDto get(UUID id) {

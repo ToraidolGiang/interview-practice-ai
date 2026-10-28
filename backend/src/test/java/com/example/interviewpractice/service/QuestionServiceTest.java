@@ -120,6 +120,22 @@ class QuestionServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
+    void randomFallsBackToFirstRowWhenTheChosenOffsetDisappeared() {
+        Question q = question(Question.Status.ACTIVE);
+        when(questions.count(any(Specification.class))).thenReturn(3L);
+        when(random.nextInt(3)).thenReturn(2);
+        when(questions.findAll(any(Specification.class), eq(PageRequest.of(2, 1,
+                com.example.interviewpractice.repository.QuestionSpecifications.NEWEST_FIRST))))
+                .thenReturn(Page.empty());
+        when(questions.findAll(any(Specification.class), eq(PageRequest.of(0, 1,
+                com.example.interviewpractice.repository.QuestionSpecifications.NEWEST_FIRST))))
+                .thenReturn(new PageImpl<>(List.of(q), PageRequest.of(0, 1), 2));
+
+        assertEquals(q.getId(), service.random("IT", null, null).id());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
     void randomIs404WhenRowsDisappearBetweenCountAndFetch() {
         when(questions.count(any(Specification.class))).thenReturn(3L);
         when(random.nextInt(3)).thenReturn(2);

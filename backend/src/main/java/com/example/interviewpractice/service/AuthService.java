@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,7 @@ public class AuthService {
 
     public static final int MAX_FAILED_LOGINS = 5;
     public static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+    private static final String EMAIL_UNIQUE_INDEX = "uq_users_email";
 
     private final UserRepository users;
     private final PasswordEncoder passwordEncoder;
@@ -69,8 +71,22 @@ public class AuthService {
             User saved = users.saveAndFlush(user);
             return new RegisterResponse(saved.getId(), saved.getEmail());
         } catch (DataIntegrityViolationException e) {
+            // Chỉ vi phạm chỉ mục email mới là trùng email; lỗi toàn vẹn khác (NOT NULL, độ dài...) ném tiếp
+            if (!violatesEmailIndex(e)) {
+                throw e;
+            }
             throw new ApiException(HttpStatus.CONFLICT, "EMAIL_EXISTS", "Email đã được đăng ký");
         }
+    }
+
+    private static boolean violatesEmailIndex(DataIntegrityViolationException e) {
+        for (Throwable cause = e; cause != null; cause = cause.getCause()) {
+            if (cause instanceof ConstraintViolationException violation
+                    && EMAIL_UNIQUE_INDEX.equalsIgnoreCase(violation.getConstraintName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Lần đăng nhập sai phải được lưu dù trả lỗi, nên không rollback khi ném ApiException

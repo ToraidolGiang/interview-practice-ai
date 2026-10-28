@@ -20,9 +20,12 @@ Job nền bị mất. Khi khởi động, phiên `PROCESSING` quá hạn đượ
 Đo 14 mẫu audio dài 10–131 giây trên pipeline gọi LLM đúng 1 lần; ban đầu dự kiến 8 giây nhưng thực đo không đạt. Với bất đồng bộ, API phản hồi ≤ 1 giây còn 12 giây là từ lúc nộp tới `SCORED`.
 
 **Bảo mật được xử lý thế nào?**
-JWT 24 giờ có claim `role`, `JwtAuthFilter` xác thực mọi request, `/admin/**` yêu cầu ADMIN, phiên và lịch sử chỉ trả cho chủ sở hữu, mật khẩu băm BCrypt, khóa tài khoản sau 5 lần sai (trả 429), bí mật chỉ đọc từ biến môi trường. (Hình 5)
+JWT 24 giờ, `JwtAuthenticationFilter` xác thực mọi request và nạp lại trạng thái, role của người dùng từ CSDL (xem câu hỏi bên dưới), `/admin/**` yêu cầu ADMIN, phiên và lịch sử chỉ trả cho chủ sở hữu, mật khẩu băm BCrypt, khóa tài khoản 15 phút sau 5 lần sai (trả 429, khóa dòng để request song song không vượt được giới hạn), bí mật chỉ đọc từ biến môi trường. (Hình 5)
 
-**Hạn chế nên nói thẳng:** JWT không thu hồi được trước hạn (stateless); chưa có rate limit ngoài khóa đăng nhập; Gemini bậc miễn phí có giới hạn request/phút.
+**Tài khoản bị khóa hoặc đổi role thì token đang dùng ra sao?**
+Token chỉ chứng minh danh tính. Mỗi request, bộ lọc tra `users` theo khóa chính (một truy vấn trên chỉ mục khóa chính) để lấy `status` và `role` hiện tại: tài khoản bị quản trị khóa (`LOCKED`) hoặc bị xóa thì bị từ chối 401 ngay, đổi role có hiệu lực ngay, không chờ token hết hạn. Đánh đổi: thêm một truy vấn nhỏ mỗi request, đổi lấy việc thu hồi được quyền tức thì; ở quy mô đồ án chi phí này không đáng kể. Khóa tạm do đăng nhập sai không làm mất hiệu lực token đang dùng.
+
+**Hạn chế nên nói thẳng:** chưa có rate limit ngoài khóa đăng nhập; token chưa bị thu hồi khi người dùng tự đổi mật khẩu (chỉ thu hồi khi tài khoản bị khóa hoặc xóa); Gemini bậc miễn phí có giới hạn request/phút.
 
 ## 2. Cơ sở dữ liệu
 

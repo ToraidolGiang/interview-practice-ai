@@ -1,3 +1,8 @@
+server:
+  servlet:
+    # Khớp servers.url trong openapi.yaml và proxy /api của frontend
+    context-path: /api
+
 spring:
   application:
     name: backend

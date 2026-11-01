@@ -1,98 +1,73 @@
 .bar {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
-  margin-top: 48px;
-  padding: 16px;
-  border-radius: 16px;
-  background: #fff;
-  font-size: 14px;
-  color: var(--color-text-muted);
 }
 
-.summary strong {
-  font-weight: 600;
-  color: var(--color-text-heading);
+.noAside {
+  grid-template-columns: 1fr auto;
+}
+
+.summary,
+.aside {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.aside {
+  text-align: right;
 }
 
 .pages {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
-.page,
-.arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
+.page {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
   padding: 0 8px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--color-surface-tint);
-  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--color-text-heading);
-  cursor: pointer;
+  color: var(--text-strong);
 }
 
-.arrow {
-  min-width: 0;
-  width: 24px;
-  height: 31px;
-  padding: 0;
+.page:hover:not(:disabled):not(.active) {
+  border-color: var(--primary-muted);
+  color: var(--primary);
 }
 
-.arrow:disabled {
-  opacity: 0.4;
-  cursor: default;
+.page:disabled {
+  color: var(--text-subtle);
+  opacity: 0.6;
 }
 
-.page:hover {
-  background: var(--color-brand-soft);
-}
-
-.pageActive,
-.pageActive:hover {
-  background: var(--color-brand-dark);
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
-  font-weight: 700;
+.active {
+  background: var(--primary);
+  border-color: var(--primary);
   color: #fff;
 }
 
 .gap {
-  padding: 0 8px;
-  font-size: 12px;
+  padding: 0 6px;
+  color: var(--text-muted);
 }
 
-.jump {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
+@media (max-width: 720px) {
+  .bar,
+  .noAside {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
 
-.jump input {
-  width: 64px;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--color-surface-tint);
-  text-align: center;
-  font-size: 13px;
-}
-
-.jump button {
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--color-brand-soft);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-brand-dark);
-  cursor: pointer;
+  .aside {
+    text-align: center;
+  }
 }

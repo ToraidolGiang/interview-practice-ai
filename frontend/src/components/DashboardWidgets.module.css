@@ -1,0 +1,125 @@
+.suggestions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 18px 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.tags {
+  display: flex;
+  gap: 6px;
+}
+
+.tags span {
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tagIndigo {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.tag_EASY {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.tag_MEDIUM {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.tag_HARD {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.suggestion h3 {
+  display: -webkit-box;
+  margin-top: 14px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  font-family: var(--font-heading);
+  font-size: 14.5px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.suggestion p {
+  display: -webkit-box;
+  margin-top: 14px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--text-muted);
+}
+
+.suggestion :global(.link) {
+  margin-top: 12px;
+  font-size: 13.5px;
+}
+
+.recent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recent a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.recent a:hover strong {
+  color: var(--primary);
+}
+
+.recentText {
+  flex: 1;
+  min-width: 0;
+}
+
+.recentText strong {
+  display: block;
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-strong);
+}
+
+.recentText small {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.recent :global(.pill) {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .suggestions {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,33 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import iconLock from '../assets/figma/icon-lock.svg'
-import iconMail from '../assets/figma/icon-mail.svg'
-import iconUserPlus from '../assets/figma/icon-user-plus.svg'
-import iconUser from '../assets/figma/icon-user.svg'
 import { register } from '../api/auth'
 import { toFieldErrors, validateRegister } from '../auth/validation'
-import {
-  AuthCard,
-  Checkbox,
-  Divider,
-  FormAlert,
-  GoogleButton,
-  SubmitButton,
-  TextField,
-} from '../components/AuthForm'
+import { AuthCard, Checkbox, Divider, FormAlert, GoogleButton, SubmitButton, TextField } from '../components/AuthForm'
 import styles from '../components/AuthForm.module.css'
 import AuthLayout from '../layouts/AuthLayout'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    agreed: false,
-  })
+  const [form, setForm] = useState({ fullName: '', email: '', password: '', confirmPassword: '', agreed: false })
   const [errors, setErrors] = useState({})
+  const [emailTaken, setEmailTaken] = useState(false)
   const [formError, setFormError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -35,6 +18,7 @@ export default function RegisterPage() {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setForm((f) => ({ ...f, [field]: value }))
     setErrors((errs) => ({ ...errs, [field]: undefined }))
+    if (field === 'email') setEmailTaken(false)
   }
 
   async function handleSubmit(e) {
@@ -56,7 +40,7 @@ export default function RegisterPage() {
       navigate('/login', { replace: true, state: { registeredEmail: email } })
     } catch (err) {
       if (err.code === 'EMAIL_EXISTS' || err.status === 409) {
-        setErrors({ email: 'Email này đã được đăng ký' })
+        setEmailTaken(true)
       } else {
         setErrors(toFieldErrors(err))
         if (err.status !== 400) setFormError(err.message)
@@ -69,13 +53,13 @@ export default function RegisterPage() {
     <AuthLayout
       heroTitle="Bắt đầu hành trình chinh phục phỏng vấn"
       heroSubtitle="Tham gia cùng hàng nghìn ứng viên đã cải thiện kỹ năng phỏng vấn với các buổi luyện tập AI và phản hồi theo thời gian thực."
-      heroFooter="© 2026 TalentSTAR AI. Bảo lưu mọi quyền."
-      bottomNote="Hệ thống đánh giá năng lực phỏng vấn trực tuyến TalentSTAR AI"
+      heroFooter="© 2026 InterviewAI. Bảo lưu mọi quyền."
+      bottomNote="Hệ thống đánh giá năng lực phỏng vấn trực tuyến InterviewAI"
     >
       <AuthCard
         wide
         title="Tạo tài khoản"
-        subtitle="Đăng ký để bắt đầu sử dụng TalentSTAR AI"
+        subtitle="Đăng ký để bắt đầu sử dụng InterviewAI"
         footer={
           <>
             Bạn đã có tài khoản?
@@ -83,12 +67,12 @@ export default function RegisterPage() {
           </>
         }
       >
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <FormAlert>{formError}</FormAlert>
+        <form onSubmit={handleSubmit} noValidate>
+          {formError && <FormAlert title="Không đăng ký được">{formError}</FormAlert>}
 
           <TextField
             label="Họ và tên"
-            icon={iconUser}
+            icon="user"
             name="fullName"
             autoComplete="name"
             placeholder="Nguyễn Văn A"
@@ -98,7 +82,7 @@ export default function RegisterPage() {
           />
           <TextField
             label="Email"
-            icon={iconMail}
+            icon="mail"
             type="email"
             name="email"
             autoComplete="email"
@@ -106,11 +90,21 @@ export default function RegisterPage() {
             value={form.email}
             onChange={update('email')}
             error={errors.email}
+            errorNode={
+              emailTaken ? (
+                <>
+                  Email này đã được sử dụng.{' '}
+                  <Link to="/login" state={{ email: form.email.trim() }}>
+                    Đăng nhập?
+                  </Link>
+                </>
+              ) : undefined
+            }
           />
           <div className={styles.row}>
             <TextField
               label="Mật khẩu"
-              icon={iconLock}
+              icon="unlock"
               type="password"
               name="password"
               autoComplete="new-password"
@@ -121,7 +115,7 @@ export default function RegisterPage() {
             />
             <TextField
               label="Xác nhận mật khẩu"
-              icon={iconLock}
+              icon="unlock"
               type="password"
               name="confirmPassword"
               autoComplete="new-password"
@@ -132,11 +126,10 @@ export default function RegisterPage() {
             />
           </div>
           <Checkbox checked={form.agreed} onChange={update('agreed')} error={errors.agreed}>
-            Tôi đồng ý với <a href="#">điều khoản sử dụng</a> và{' '}
-            <a href="#">chính sách bảo mật</a>.
+            Tôi đồng ý với <a href="#">điều khoản sử dụng</a> và <a href="#">chính sách bảo mật</a>.
           </Checkbox>
 
-          <SubmitButton icon={iconUserPlus} loading={submitting}>
+          <SubmitButton icon="userPlus" loading={submitting}>
             Đăng ký
           </SubmitButton>
           <Divider uppercase>Hoặc đăng ký với</Divider>

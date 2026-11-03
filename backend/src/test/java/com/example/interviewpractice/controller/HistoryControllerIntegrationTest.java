@@ -79,12 +79,18 @@ class HistoryControllerIntegrationTest {
         scoreResult(newMarketing);
     }
 
+    // Bỏ qua phần tử null để dọn được cả khi setUp hỏng giữa chừng
     @AfterEach
     void cleanUp() {
-        scoreResults.findBySessionId(newMarketing.getId()).ifPresent(scoreResults::delete);
-        sessions.deleteAll(List.of(oldIt, newMarketing, processing, otherUsers));
-        questions.deleteAll(List.of(itQuestion, marketingQuestion));
-        users.deleteAll(List.of(owner, other));
+        if (newMarketing != null) scoreResults.findBySessionId(newMarketing.getId()).ifPresent(scoreResults::delete);
+        sessions.deleteAll(nonNull(oldIt, newMarketing, processing, otherUsers));
+        questions.deleteAll(nonNull(itQuestion, marketingQuestion));
+        users.deleteAll(nonNull(owner, other));
+    }
+
+    @SafeVarargs
+    private static <T> List<T> nonNull(T... items) {
+        return java.util.Arrays.stream(items).filter(java.util.Objects::nonNull).toList();
     }
 
     @Test
@@ -189,7 +195,8 @@ class HistoryControllerIntegrationTest {
 
     private Question question(User creator, String industry) {
         Question q = new Question();
-        q.setContent("Câu hỏi thử cho lịch sử");
+        // Bảng questions có ràng buộc duy nhất (position, content)
+        q.setContent("Câu hỏi thử cho lịch sử " + UUID.randomUUID());
         q.setIndustry(industry);
         q.setPosition("Chung");
         q.setLevel(Question.Level.EASY);

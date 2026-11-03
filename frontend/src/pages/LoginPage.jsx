@@ -1,29 +1,10 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
-import iconLock from '../assets/figma/icon-lock.svg'
-import iconLogin from '../assets/figma/icon-login.svg'
-import iconMail from '../assets/figma/icon-mail.svg'
 import { useAuth } from '../auth/AuthContext'
 import { toFieldErrors, validateLogin } from '../auth/validation'
-import {
-  AuthCard,
-  Checkbox,
-  Divider,
-  FormAlert,
-  GoogleButton,
-  SubmitButton,
-  TextField,
-} from '../components/AuthForm'
+import { AuthCard, Checkbox, Divider, FormAlert, GoogleButton, SubmitButton, TextField } from '../components/AuthForm'
 import styles from '../components/AuthForm.module.css'
 import AuthLayout from '../layouts/AuthLayout'
-
-function loginErrorMessage(error) {
-  if (error.status === 401) return 'Email hoặc mật khẩu không đúng'
-  if (error.code === 'ACCOUNT_LOCKED')
-    return 'Tài khoản tạm khoá do đăng nhập sai quá 5 lần. Vui lòng thử lại sau 15 phút.'
-  if (error.status === 400) return null
-  return error.message
-}
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -31,44 +12,47 @@ export default function LoginPage() {
   const location = useLocation()
 
   const [form, setForm] = useState({
-    email: location.state?.registeredEmail || '',
+    email: location.state?.registeredEmail || location.state?.email || '',
     password: '',
     remember: false,
   })
   const [errors, setErrors] = useState({})
-  const [formError, setFormError] = useState(null)
+  // null | 'invalid' (sai email/mật khẩu) | 'locked' (khoá 15 phút) | { message }
+  const [failure, setFailure] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
   const update = (field) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setForm((f) => ({ ...f, [field]: value }))
     setErrors((errs) => ({ ...errs, [field]: undefined }))
+    // Đổi email thì cho thử lại tài khoản khác
+    if (field === 'email' && failure === 'locked') setFailure(null)
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setFormError(null)
     const clientErrors = validateLogin(form)
     setErrors(clientErrors)
     if (Object.keys(clientErrors).length) return
 
     setSubmitting(true)
+    setFailure(null)
     try {
       await login({ email: form.email.trim(), password: form.password, remember: form.remember })
-      navigate(location.state?.from?.pathname || '/questions', { replace: true })
+      navigate(location.state?.from?.pathname || '/dashboard', { replace: true })
     } catch (err) {
-      setErrors(toFieldErrors(err))
-      setFormError(loginErrorMessage(err))
+      if (err.code === 'ACCOUNT_LOCKED' || err.status === 423) setFailure('locked')
+      else if (err.status === 401) setFailure('invalid')
+      else if (err.status === 400) setErrors(toFieldErrors(err))
+      else setFailure({ message: err.message })
       setSubmitting(false)
     }
   }
 
+  const registered = location.state?.registeredEmail && !failure
+
   return (
-    <AuthLayout
-      heroTitle="Chinh phục buổi phỏng vấn tiếp theo cùng AI"
-      heroSubtitle="Nhận phản hồi cá nhân hóa, xây dựng sự tự tin và tiến gần hơn đến công việc mơ ước qua các buổi phỏng vấn thử thông minh."
-      heroFooter="© 2026 TalentSTAR AI"
-    >
+    <AuthLayout>
       <AuthCard
         title="Đăng nhập"
         subtitle="Nhập thông tin đăng nhập để truy cập tài khoản của bạn"
@@ -79,17 +63,31 @@ export default function LoginPage() {
           </>
         }
       >
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <FormAlert tone="success">
-            {location.state?.registeredEmail && !formError
-              ? 'Đăng ký thành công. Vui lòng đăng nhập để tiếp tục.'
-              : null}
-          </FormAlert>
-          <FormAlert>{formError}</FormAlert>
+        <form onSubmit={handleSubmit} noValidate>
+          {registered && (
+            <FormAlert tone="success" title="Đăng ký thành công.">
+              Vui lòng đăng nhập để tiếp tục.
+            </FormAlert>
+          )}
+          {failure === 'invalid' && (
+            <FormAlert title="Email hoặc mật khẩu không chính xác.">
+              Vui lòng kiểm tra lại. Nếu quên mật khẩu, bấm “Quên mật khẩu?”.
+            </FormAlert>
+          )}
+          {failure === 'locked' && (
+            <FormAlert tone="warn" title="Tài khoản đang tạm khoá 15 phút">
+              Bạn đã nhập sai mật khẩu 5 lần liên tiếp. Thử lại sau 15 phút, hoặc đặt lại mật khẩu để mở khoá ngay.
+              <br />
+              <Link to="/forgot-password" state={{ email: form.email }}>
+                Đặt lại mật khẩu →
+              </Link>
+            </FormAlert>
+          )}
+          {failure?.message && <FormAlert title="Không đăng nhập được">{failure.message}</FormAlert>}
 
           <TextField
             label="Email"
-            icon={iconMail}
+            icon="mail"
             type="email"
             name="email"
             autoComplete="email"
@@ -100,7 +98,7 @@ export default function LoginPage() {
           />
           <TextField
             label="Mật khẩu"
-            icon={iconLock}
+            icon="unlock"
             type="password"
             name="password"
             autoComplete="current-password"
@@ -108,8 +106,9 @@ export default function LoginPage() {
             value={form.password}
             onChange={update('password')}
             error={errors.password}
+            invalid={failure === 'invalid'}
             labelAction={
-              <Link to="/forgot-password" className={styles.link}>
+              <Link to="/forgot-password" state={{ email: form.email }} className={styles.link}>
                 Quên mật khẩu?
               </Link>
             }
@@ -118,7 +117,7 @@ export default function LoginPage() {
             Ghi nhớ đăng nhập
           </Checkbox>
 
-          <SubmitButton icon={iconLogin} loading={submitting}>
+          <SubmitButton icon="login" loading={submitting} disabled={failure === 'locked'}>
             Đăng nhập
           </SubmitButton>
           <Divider>Hoặc đăng nhập với</Divider>

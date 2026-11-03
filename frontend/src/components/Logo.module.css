@@ -1,0 +1,45 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-strong);
+}
+
+.mark {
+  display: inline-grid;
+  place-items: center;
+  background: var(--primary);
+  color: #fff;
+}
+
+.mark .bars {
+  fill: var(--primary);
+}
+
+.markInverted {
+  background: #fff;
+  color: var(--primary);
+}
+
+.markInverted .bars {
+  fill: #fff;
+}
+
+.word {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.ai {
+  color: var(--primary);
+}
+
+.inverted {
+  color: #fff;
+}
+
+.inverted .ai {
+  color: #fff;
+}

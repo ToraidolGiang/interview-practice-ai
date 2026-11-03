@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const BAR_COUNT = 64
+// Số cột sóng âm của bản thu khi nghe lại
+export const PEAK_COUNT = 60
 const PREFERRED_TYPES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4']
 
 function pickMimeType() {
@@ -17,6 +19,7 @@ export function isRecordingSupported() {
  * status: idle | requesting | recording | paused | stopped
  * elapsed: số giây đã ghi (không tính lúc tạm dừng); tự dừng khi chạm maxSeconds.
  * levels: biên độ BAR_COUNT cột gần nhất (0-1) để vẽ sóng âm; db: mức âm lượng hiện tại.
+ * recording.peaks: PEAK_COUNT cột biên độ của cả bản thu; deviceLabel: tên micro đang dùng (nếu trình duyệt cho biết).
  */
 export function useAudioRecorder({ maxSeconds }) {
   const [status, setStatus] = useState('idle')
@@ -25,6 +28,7 @@ export function useAudioRecorder({ maxSeconds }) {
   const [db, setDb] = useState(null)
   const [recording, setRecording] = useState(null) // { blob, url, duration }
   const [error, setError] = useState(null)
+  const [deviceLabel, setDeviceLabel] = useState(null)
 
   const recorderRef = useRef(null)
   const streamRef = useRef(null)
@@ -35,6 +39,7 @@ export function useAudioRecorder({ maxSeconds }) {
   const accumulatedRef = useRef(0)
   const segmentStartRef = useRef(0)
   const lastBarAtRef = useRef(0)
+  const historyRef = useRef([])
 
   const currentElapsed = () =>
     accumulatedRef.current + (segmentStartRef.current ? (performance.now() - segmentStartRef.current) / 1000 : 0)
@@ -74,7 +79,9 @@ export function useAudioRecorder({ maxSeconds }) {
           // Thêm một cột mới khoảng 12 lần/giây để sóng âm chạy đều
           if (now - lastBarAtRef.current > 80) {
             lastBarAtRef.current = now
-            setLevels((prev) => [...prev.slice(1), Math.min(1, rms * 4)])
+            const level = Math.min(1, rms * 4)
+            historyRef.current.push(level)
+            setLevels((prev) => [...prev.slice(1), level])
             setDb(rms > 0 ? Math.round(20 * Math.log10(rms)) : -100)
           }
         }
@@ -104,6 +111,7 @@ export function useAudioRecorder({ maxSeconds }) {
     }
 
     streamRef.current = stream
+    setDeviceLabel(stream.getAudioTracks()[0]?.label || null)
     const mimeType = pickMimeType()
     const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
     recorderRef.current = recorder
@@ -111,7 +119,12 @@ export function useAudioRecorder({ maxSeconds }) {
     recorder.ondataavailable = (e) => e.data.size && chunksRef.current.push(e.data)
     recorder.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
-      setRecording({ blob, url: URL.createObjectURL(blob), duration: accumulatedRef.current })
+      setRecording({
+        blob,
+        url: URL.createObjectURL(blob),
+        duration: accumulatedRef.current,
+        peaks: downsample(historyRef.current, PEAK_COUNT),
+      })
       setElapsed(accumulatedRef.current)
       setStatus('stopped')
       releaseStream()
@@ -125,6 +138,7 @@ export function useAudioRecorder({ maxSeconds }) {
     audioCtx.createMediaStreamSource(stream).connect(analyser)
 
     accumulatedRef.current = 0
+    historyRef.current = []
     segmentStartRef.current = performance.now()
     setElapsed(0)
     setLevels(new Array(BAR_COUNT).fill(0))
@@ -183,5 +197,18 @@ export function useAudioRecorder({ maxSeconds }) {
     [releaseStream],
   )
 
-  return { status, elapsed, levels, db, recording, error, start, pause, resume, stop, reset }
+  return { status, elapsed, levels, db, recording, error, deviceLabel, start, pause, resume, stop, reset }
+}
+
+// Gộp lịch sử biên độ thành `count` cột (lấy đỉnh mỗi đoạn), chuẩn hoá về 0-1
+function downsample(values, count) {
+  if (!values.length) return new Array(count).fill(0.15)
+  const result = []
+  for (let i = 0; i < count; i++) {
+    const from = Math.floor((i * values.length) / count)
+    const to = Math.max(from + 1, Math.floor(((i + 1) * values.length) / count))
+    result.push(Math.max(...values.slice(from, to)))
+  }
+  const max = Math.max(...result) || 1
+  return result.map((v) => Math.max(0.12, v / max))
 }

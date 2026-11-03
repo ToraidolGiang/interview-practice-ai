@@ -11,6 +11,6 @@ export function RequireAuth() {
 // Trang đăng nhập/đăng ký: đã đăng nhập thì chuyển vào app
 export function GuestOnly() {
   const { isAuthenticated } = useAuth()
-  if (isAuthenticated) return <Navigate to="/questions" replace />
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />
   return <Outlet />
 }

@@ -1,0 +1,60 @@
+.player {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 14px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.play {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 10px rgb(53 37 205 / 25%);
+}
+
+.play:hover {
+  background: var(--primary-hover);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.wave span {
+  flex: 0 0 3px;
+  min-height: 4px;
+  border-radius: 2px;
+  background: #b9b5f3;
+}
+
+.wave .played {
+  background: var(--primary);
+}
+
+.times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}

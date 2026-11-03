@@ -27,3 +27,8 @@ export function getScoreResult(id) {
 export function getFeedbackAudio(id) {
   return request(`/practice-sessions/${encodeURIComponent(id)}/feedback/audio`)
 }
+
+// Chấm lại với transcript đã sửa (UC5 Alt 6a): trả 202, phiên chuyển PROCESSING rồi polling như /evaluate
+export function rescoreSession(id, transcript) {
+  return request(`/practice-sessions/${encodeURIComponent(id)}/rescore`, { method: 'POST', body: { transcript } })
+}

@@ -1,69 +1,49 @@
-import flagVn from '../assets/figma/flag-vn.svg'
-import iconChevronDown from '../assets/figma/icon-chevron-down.svg'
-import iconMoon from '../assets/figma/icon-moon.svg'
-import iconTrend from '../assets/figma/icon-trend.svg'
-import iconUsers from '../assets/figma/icon-users.svg'
-import logo from '../assets/figma/logo.jpg'
+import heroArt from '../assets/illustrations/auth-hero.png'
+import Icon from '../components/Icon'
+import Logo from '../components/Logo'
 import styles from './AuthLayout.module.css'
 
-// Bố cục chia đôi của màn hình Đăng nhập / Đăng ký (Figma 8:991, 8:1106)
-export default function AuthLayout({ heroTitle, heroSubtitle, heroFooter, bottomNote, children }) {
+const DEFAULT_TITLE = 'Chinh phục buổi phỏng vấn tiếp theo cùng AI'
+const DEFAULT_SUBTITLE =
+  'Nhận phản hồi cá nhân hóa, xây dựng sự tự tin và tiến gần hơn đến công việc mơ ước qua các buổi phỏng vấn thử thông minh.'
+
+// Bố cục chia đôi của nhóm màn Đăng nhập / Đăng ký / Quên mật khẩu (Figma "Split Screen")
+export default function AuthLayout({
+  heroTitle = DEFAULT_TITLE,
+  heroSubtitle = DEFAULT_SUBTITLE,
+  heroFooter = '© 2026 InterviewAI',
+  bottomNote,
+  children,
+}) {
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
-        <span className={`${styles.diamond} ${styles.diamondTopLeft}`} aria-hidden />
-        <span className={`${styles.diamond} ${styles.diamondRight}`} aria-hidden />
-        <span className={`${styles.diamond} ${styles.diamondLeft}`} aria-hidden />
-        <span className={`${styles.diamond} ${styles.diamondBottomRight}`} aria-hidden />
-
-        <div className={styles.heroCenter}>
-          <div className={styles.brand}>
-            <span className={styles.brandLogo}>
-              <img src={logo} alt="" />
-            </span>
-            <span className={styles.brandName}>
-              TalentSTAR <span className={styles.brandAi}>AI</span>
-            </span>
-          </div>
-          <h1 className={styles.heroTitle}>{heroTitle}</h1>
-          <p className={styles.heroSubtitle}>{heroSubtitle}</p>
-          <div className={styles.badges}>
-            <span className={styles.badge}>
-              <img src={iconUsers} alt="" width="16" height="16" />
-              <strong>10K+</strong> người dùng
-            </span>
-            <span className={styles.badge}>
-              <img src={iconTrend} alt="" width="16" height="16" />
-              <strong>95%</strong> thành công
-            </span>
-          </div>
-        </div>
-
+        <Logo inverted size={40} />
+        <span className={styles.dots} aria-hidden />
+        <h1 className={styles.heroTitle}>{heroTitle}</h1>
+        <p className={styles.heroSubtitle}>{heroSubtitle}</p>
+        <img className={styles.art} src={heroArt} alt="" width="640" height="540" />
         <p className={styles.heroFooter}>{heroFooter}</p>
       </section>
 
       <section className={styles.panel}>
         <div className={styles.topActions}>
-          {/* Chọn ngôn ngữ và chế độ tối làm ở #149 (i18n), hiện chỉ hiển thị theo thiết kế */}
-          <button type="button" className={styles.langButton} disabled title="Sắp hỗ trợ">
-            <img src={flagVn} alt="" width="16" height="12" />
-            Tiếng Việt
-            <img src={iconChevronDown} alt="" width="14" height="14" />
+          {/* Đổi ngôn ngữ và chế độ tối chưa có trong phạm vi; hiển thị theo thiết kế */}
+          <button type="button" className={styles.langButton} title="Tiếng Việt">
+            <Icon name="globe" size={14} strokeWidth={1.8} className={styles.globe} />
+            VI
+            <span className={styles.caret} aria-hidden>
+              ▾
+            </span>
           </button>
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label="Chuyển chế độ tối"
-            disabled
-            title="Sắp hỗ trợ"
-          >
-            <img src={iconMoon} alt="" width="16" height="16" />
+          <button type="button" className={styles.iconButton} aria-label="Chế độ tối" title="Sắp hỗ trợ">
+            <Icon name="moon" size={16} strokeWidth={1.8} />
           </button>
         </div>
 
         <div className={styles.panelCenter}>{children}</div>
 
-        <p className={styles.bottomNote}>{bottomNote}</p>
+        {bottomNote && <p className={styles.bottomNote}>{bottomNote}</p>}
       </section>
     </div>
   )

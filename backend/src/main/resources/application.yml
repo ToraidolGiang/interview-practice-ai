@@ -11,6 +11,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
 
 jwt:
   secret: ${JWT_SECRET}
@@ -19,9 +23,31 @@ jwt:
 ai:
   gemini:
     api-key: ${GEMINI_API_KEY}
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+    stt-model: ${GEMINI_STT_MODEL:gemini-2.5-flash}
+    llm-model: ${GEMINI_LLM_MODEL:gemini-2.5-flash}
   fpt:
     api-key: ${FPT_AI_API_KEY}
+  stt:
+    timeout: 15s
+  llm:
+    timeout: 15s
+    temperature: 0.2
 
 aws:
   access-key-id: ${AWS_ACCESS_KEY_ID}
   secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+  region: ${AWS_REGION:ap-southeast-1}
+  s3:
+    bucket: ${AWS_S3_BUCKET:interview-practice-audio}
+
+app:
+  audio:
+    max-bytes: 10485760
+    min-seconds: 10
+    max-seconds: 180
+  scoring:
+    executor:
+      core: 2
+      max: 4
+      queue: 20

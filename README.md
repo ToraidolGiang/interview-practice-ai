@@ -45,6 +45,24 @@ cp ../.env.example ../.env   # điền giá trị thật, không commit file nà
 ./mvnw spring-boot:run
 ```
 
+Biến môi trường (xem `.env.example`; không commit `.env`):
+
+| Biến | Bắt buộc | Ghi chú |
+|---|---|---|
+| `DATABASE_URL`, `JWT_SECRET` | có | |
+| `GEMINI_API_KEY` | có | STT + chấm điểm LLM |
+| `GEMINI_BASE_URL`, `GEMINI_STT_MODEL`, `GEMINI_LLM_MODEL` | không | Có mặc định; tên model mặc định chưa xác minh với API thật |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | có | Lưu audio lên S3 |
+| `AWS_REGION`, `AWS_S3_BUCKET` | không | Có mặc định |
+
+**Windows: múi giờ JVM.** Máy đặt múi giờ `Asia/Saigon` làm PostgreSQL 16 từ chối kết nối (không nhận tên múi giờ này). Đặt trước khi chạy backend/test:
+
+```powershell
+$env:JAVA_TOOL_OPTIONS = "-Duser.timezone=Asia/Ho_Chi_Minh"   # hoặc UTC
+```
+
+Cần đúng **JDK 21** (`java -version`); JDK khác làm build lỗi.
+
 ### Frontend
 
 ```bash

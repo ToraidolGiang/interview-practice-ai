@@ -328,8 +328,26 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Không phải chủ sở hữu phiên luyện tập (code FORBIDDEN)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Không tìm thấy phiên luyện tập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Phiên đang PROCESSING (code SESSION_PROCESSING) hoặc đã SCORED (code SESSION_ALREADY_SCORED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Lưu file lên S3 thất bại hoặc hàng đợi chấm điểm đầy (code SERVICE_UNAVAILABLE); trạng thái phiên không đổi
           content:
             application/json:
               schema:
@@ -361,6 +379,12 @@ paths:
                 status: PROCESSING
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Không phải chủ sở hữu phiên luyện tập (code FORBIDDEN)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Không tìm thấy phiên luyện tập
           content:
@@ -368,7 +392,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Session chưa có audio (status != UPLOADED/FAILED) hoặc đang PROCESSING (code SESSION_PROCESSING)
+          description: Session chưa có audio hoặc đang PROCESSING (code SESSION_PROCESSING), hoặc đã SCORED (code SESSION_ALREADY_SCORED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Hàng đợi chấm điểm đầy (code SERVICE_UNAVAILABLE); phiên được hoàn tác về UPLOADED
           content:
             application/json:
               schema:
@@ -924,7 +954,8 @@ components:
           type: string
           description: >
             Mã lỗi nghiệp vụ, ví dụ UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION_ERROR, EMAIL_EXISTS,
-            ACCOUNT_LOCKED, INVALID_TOKEN, SESSION_NOT_READY, SESSION_PROCESSING, DUPLICATE_QUESTION
+            ACCOUNT_LOCKED, INVALID_TOKEN, SESSION_NOT_READY, SESSION_PROCESSING, SESSION_ALREADY_SCORED, DUPLICATE_QUESTION,
+            SERVICE_UNAVAILABLE (503: S3 lỗi hoặc hàng đợi chấm đầy), INTERNAL_ERROR
           example: VALIDATION_ERROR
         message:
           type: string
@@ -1076,8 +1107,9 @@ components:
           $ref: '#/components/schemas/PracticeSessionStatus'
         audioUrl:
           type: string
-          format: uri
           nullable: true
+          description: >
+            Thực chất là khóa đối tượng S3 (bucket riêng tư, chỉ server đọc), KHÔNG phải URL tải được.
         duration:
           type: integer
           description: Thời lượng ghi âm (giây)
@@ -1103,7 +1135,7 @@ components:
         errorCode:
           type: string
           nullable: true
-          description: Mã lỗi khi status = FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART)
+          description: Mã lỗi khi status = FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART, INTERNAL_ERROR)
     ScoreResult:
       type: object
       properties:

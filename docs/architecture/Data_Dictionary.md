@@ -72,11 +72,11 @@ Một lượt luyện tập: câu hỏi, audio, trạng thái xử lý.
 | `user_id` | uuid | không |  | FK → users(id) ON DELETE RESTRICT | Người luyện tập |
 | `question_id` | uuid | không |  | FK → questions(id) ON DELETE RESTRICT | Câu hỏi được chọn |
 | `status` | varchar(20) | không | `'CREATED'` | CHECK status IN ('CREATED','UPLOADED','PROCESSING','SCORED','FAILED') | Trạng thái phiên |
-| `audio_key` | varchar(255) | có |  |  | Khóa đối tượng S3 của file ghi âm (API trả URL ký sẵn) |
+| `audio_key` | varchar(255) | có |  |  | Khóa đối tượng S3 của file ghi âm (hiện API trả nguyên khóa ở trường `audioUrl`, chưa ký URL) |
 | `duration_sec` | integer | có |  | CHECK duration_sec >= 0 | Thời lượng ghi âm (giây) |
 | `total_score` | numeric(5,2) | có |  | CHECK total_score BETWEEN 0 AND 100 | Điểm tổng (sao chép từ score_results để lọc/sắp xếp lịch sử) |
 | `feedback` | text | có |  |  | Nhận xét tóm tắt hiển thị ở danh sách lịch sử |
-| `error_code` | varchar(40) | có |  |  | Mã lỗi khi FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, SERVER_RESTART) |
+| `error_code` | varchar(40) | có |  |  | Mã lỗi khi FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART, INTERNAL_ERROR) |
 | `started_at` | timestamptz | không | `now()` |  | Thời điểm tạo phiên |
 | `submitted_at` | timestamptz | có |  |  | Thời điểm nộp audio |
 | `processing_started_at` | timestamptz | có |  |  | Thời điểm worker bắt đầu chấm (phát hiện job quá hạn) |

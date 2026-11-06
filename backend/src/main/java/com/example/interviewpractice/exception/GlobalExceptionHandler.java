@@ -1,20 +1,27 @@
 package com.example.interviewpractice.exception;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.example.interviewpractice.dto.ErrorResponse;
@@ -64,6 +71,42 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of("VALIDATION_ERROR", "Nội dung yêu cầu không đúng định dạng JSON"));
+    }
+
+    // Query/path sai kiểu (level=FOO, id không phải UUID): 400 VALIDATION_ERROR gắn vào đúng tham số
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException e, HttpHeaders headers,
+            HttpStatusCode status, WebRequest request) {
+        String field = e instanceof MethodArgumentTypeMismatchException m ? m.getName() : e.getPropertyName();
+        Class<?> type = e.getRequiredType();
+        String message = type != null && type.isEnum()
+                ? "Giá trị không hợp lệ, chấp nhận: " + Arrays.toString(type.getEnumConstants())
+                : "Giá trị không hợp lệ";
+        return validationError(List.of(new ErrorResponse.FieldError(field, message)));
+    }
+
+    // @Min/@Max/@Size trên tham số query (size=101, page=-1...)
+    @Override
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException e,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        List<ErrorResponse.FieldError> fieldErrors = e.getParameterValidationResults().stream()
+                .flatMap(result -> result.getResolvableErrors().stream()
+                        .map(error -> new ErrorResponse.FieldError(fieldName(result, error),
+                                error.getDefaultMessage())))
+                .toList();
+        return validationError(fieldErrors);
+    }
+
+    private static String fieldName(ParameterValidationResult result, MessageSourceResolvable error) {
+        if (error instanceof FieldError fieldError) {
+            return fieldError.getField();
+        }
+        return result.getMethodParameter().getParameterName();
+    }
+
+    private static ResponseEntity<Object> validationError(List<ErrorResponse.FieldError> fieldErrors) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("VALIDATION_ERROR", "Dữ liệu không hợp lệ", Instant.now(), fieldErrors));
     }
 
     // Mọi lỗi chuẩn còn lại của Spring (404, 405, 415...) đi qua đây, giữ nguyên header như Allow của 405

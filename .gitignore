@@ -38,3 +38,6 @@ data/interim/review.csv
 
 # Mock spec sinh tu docs/api/openapi.yaml
 frontend/mock/.generated/
+
+# Python
+__pycache__/

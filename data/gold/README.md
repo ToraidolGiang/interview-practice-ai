@@ -10,6 +10,7 @@ Dùng để đo độ chính xác của bộ chấm theo `docs/business/Rubric_C
 |---|---|
 | `gold_v1.jsonl` | 144 câu trả lời kèm câu hỏi, đáp án tham chiếu và tập, không có nhãn |
 | `labels/claude_draft.jsonl` | Nhãn nháp của Claude, kèm mức dự kiến và lý do |
+| `labels/claude_blind.jsonl` | Điểm AI: một phiên Claude khác chấm mù, chỉ thấy rubric và câu trả lời. Không phải điểm người |
 | `rater.html` | Trang chấm mù chạy offline, tự lưu tiến độ, xuất CSV. Đây là cách chấm chính |
 | `HUONG_DAN_CHAM.md` | Hướng dẫn cho người chấm |
 | `rater_sheet.csv` | Phiếu chấm mù dạng bảng, dùng khi không chấm bằng `rater.html` |
@@ -42,7 +43,17 @@ Chạy test: `python -m unittest discover -s scripts/gold`
 
 > Bộ dữ liệu gồm 144 câu trả lời tổng hợp do Claude sinh theo 5 mức chất lượng, trên 24 câu hỏi thuộc 4 loại, không phải câu trả lời của ứng viên thật. Điểm tham chiếu do N người chấm độc lập theo rubric, không xem nhãn nháp. Đồng thuận giữa người chấm đạt QWK = ... . Trên tập giữ lại 48 câu không dùng khi chỉnh prompt, bộ chấm đạt QWK trung bình = ... so với người chấm, Spearman = ..., MAE = ... . Bộ chấm giả chỉ dựa vào độ dài đạt QWK = ... . Do người chấm đồng thời là thành viên nhóm phát triển và dữ liệu chỉ có văn bản, kết quả chưa khái quát cho ứng viên thật và chưa bao gồm sai số STT.
 
-Bỏ câu về thành viên nhóm nếu người chấm là người ngoài nhóm. Không dùng `labels/claude_draft.jsonl` làm tham chiếu cho bất kỳ số liệu nào trong báo cáo.
+Bỏ câu về thành viên nhóm nếu người chấm là người ngoài nhóm. Không dùng `labels/claude_draft.jsonl` hay `labels/claude_blind.jsonl` làm tham chiếu cho số liệu AI so với người trong báo cáo.
+
+## Kết quả chấm mù bằng AI
+
+Hai phiên Claude khớp nhau ở mức QWK 0.93-0.98 trên cả 144 câu, Spearman điểm tổng 0.955. Con số này chỉ cho thấy các mức chất lượng tách biệt rõ với chính Claude. Nó không đo độ chính xác, vì cùng một họ mô hình, và câu trả lời được viết theo mức định sẵn nên dễ chấm hơn câu thật.
+
+Khi chấm, phiên mù ghi nhận các chỗ rubric khó áp dụng, nên làm rõ trước khi người chấm:
+- `off_topic`: câu cùng lĩnh vực nhưng không trả lời câu hỏi có tính là lạc đề không.
+- DEPTH mức 5 đòi số liệu và bài học, không tự nhiên với câu TECHNICAL và SITUATIONAL.
+- Khung STRUCTURE của INTRO (hiện tại, quá khứ, định hướng) không hợp với câu như điểm mạnh yếu.
+- CORRECTNESS chưa có mức cho câu thừa nhận không biết, và ranh giới giữa mức 3 và 4 với câu đúng nhưng thiếu.
 
 ## Giới hạn
 

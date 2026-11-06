@@ -23,6 +23,7 @@ SOURCE_DIR = ROOT / "data" / "gold" / "source"
 QUESTIONS = ROOT / "data" / "interim" / "questions_vi.jsonl"
 SEED_SQL = ROOT / "backend" / "src" / "main" / "resources" / "db" / "migration" / "V2__seed_questions.sql"
 OUT_DIR = ROOT / "data" / "gold"
+RATER_TEMPLATE = Path(__file__).with_name("rater_template.html")
 
 # Phải trùng scripts/dataset/build_seed_sql.py để id khớp bảng questions
 QUESTION_NAMESPACE = uuid.UUID("6f1c2d4e-8a5b-4c3d-9e7f-0a1b2c3d4e5f")
@@ -157,11 +158,21 @@ def write_rater_sheet(path, gold):
             ])
 
 
+def write_rater_page(path, gold):
+    """Trang chấm offline: chỉ nhúng phần người chấm được xem, không có nhãn, tập hay số từ."""
+    visible = ["id", "question_type", "question", "reference_answer", "transcript"]
+    items = [{key: row[key] for key in visible} for row in gold]
+    data = json.dumps(items, ensure_ascii=False).replace("</", "<\\/")
+    template = RATER_TEMPLATE.read_text(encoding="utf-8")
+    path.write_text(template.replace("/*GOLD_DATA*/[]", data), encoding="utf-8", newline="\n")
+
+
 def main():
     gold, labels = build()
     write_jsonl(OUT_DIR / "gold_v1.jsonl", gold)
     write_jsonl(OUT_DIR / "labels" / "claude_draft.jsonl", labels)
     write_rater_sheet(OUT_DIR / "rater_sheet.csv", gold)
+    write_rater_page(OUT_DIR / "rater.html", gold)
     print(f"{len(gold)} câu trả lời, tập: {dict(Counter(g['split'] for g in gold))}")
     print(f"Loại: {dict(Counter(g['question_type'] for g in gold))}")
 

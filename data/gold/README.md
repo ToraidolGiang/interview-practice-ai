@@ -10,7 +10,9 @@ Dùng để đo độ chính xác của bộ chấm theo `docs/business/Rubric_C
 |---|---|
 | `gold_v1.jsonl` | 144 câu trả lời kèm câu hỏi, đáp án tham chiếu và tập, không có nhãn |
 | `labels/claude_draft.jsonl` | Nhãn nháp của Claude, kèm mức dự kiến và lý do |
-| `rater_sheet.csv` | Phiếu chấm mù cho người, đã xáo thứ tự, không có nhãn nháp |
+| `rater.html` | Trang chấm mù chạy offline, tự lưu tiến độ, xuất CSV. Đây là cách chấm chính |
+| `HUONG_DAN_CHAM.md` | Hướng dẫn cho người chấm |
+| `rater_sheet.csv` | Phiếu chấm mù dạng bảng, dùng khi không chấm bằng `rater.html` |
 | `source/*.jsonl` | Bản gốc để sửa. `contrast.jsonl` là các câu đối chứng ngắn mà tốt, dài mà yếu |
 
 Sửa `source/` rồi chạy lại `python scripts/gold/build_gold.py`, không sửa tay các file sinh ra.
@@ -24,14 +26,23 @@ Sửa `source/` rồi chạy lại `python scripts/gold/build_gold.py`, không s
 
 ## Quy trình
 
-1. **Chấm:** 2-3 người chấm độc lập trên bản sao của `rater_sheet.csv`, theo đúng rubric, không trao đổi và không xem `labels/`. Cột `off_topic` đánh `x` nếu lạc đề. Lưu dạng "CSV UTF-8".
+1. **Chấm:** 2-3 người chấm độc lập theo `HUONG_DAN_CHAM.md`.
 2. **Nhập điểm:** `python scripts/gold/import_ratings.py phieu.csv --rater nguoi_cham_1`
-3. **Đo đồng thuận giữa người chấm:** `python scripts/gold/metrics.py --ref data/gold/labels/nguoi_cham_1.jsonl --pred data/gold/labels/nguoi_cham_2.jsonl`
+3. **Đo đồng thuận giữa người chấm:** `python scripts/gold/metrics.py --split all --ref data/gold/labels/nguoi_cham_1.jsonl --pred data/gold/labels/nguoi_cham_2.jsonl`. Nếu QWK giữa người dưới 0.6 thì rubric còn mơ hồ: làm rõ mô tả mức điểm, tăng `rubric-v`, chấm lại, chưa chỉnh AI.
 4. **Chạy pipeline** trên `transcript` của từng câu, lưu kết quả cùng định dạng file nhãn: `{"id": "GOLD-001", "scores": {"RELEVANCE": 4, "STRUCTURE": 3, "DEPTH": 3}, "off_topic": false}`
-5. **Đo bộ chấm:** `python scripts/gold/metrics.py --ref <nhãn người> --pred lan1.jsonl --pred lan2.jsonl`. Truyền nhiều `--pred` để đo độ lặp lại, rubric yêu cầu 5 lần.
-6. **Chốt:** chỉ dùng `--split holdout` một lần sau khi đã ngừng chỉnh prompt. Nếu chỉnh tiếp sau khi xem holdout thì holdout không còn giá trị.
+5. **Đo bộ chấm:** `python scripts/gold/metrics.py --ref <nhãn người> --pred lan1.jsonl --pred lan2.jsonl`. Chạy riêng với **từng** người chấm rồi lấy trung bình, không gộp điểm người chấm thành một nhãn. Truyền nhiều `--pred` để đo độ lặp lại, rubric yêu cầu 5 lần.
+6. **Đọc kết quả:** bộ chấm đạt khi QWK với người từ 0.6 trở lên, vượt "Mốc độ dài", và không thấp hơn nhiều so với QWK giữa người với người. Mức đồng thuận giữa người là trần thực tế của AI.
+7. **Chốt:** chỉ dùng `--split holdout` một lần sau khi đã ngừng chỉnh prompt. Nếu chỉnh tiếp sau khi xem holdout thì holdout không còn giá trị.
 
 Chạy test: `python -m unittest discover -s scripts/gold`
+
+## Cách ghi trong báo cáo
+
+Điền số thật sau khi đo, giữ nguyên các phần công bố:
+
+> Bộ dữ liệu gồm 144 câu trả lời tổng hợp do Claude sinh theo 5 mức chất lượng, trên 24 câu hỏi thuộc 4 loại, không phải câu trả lời của ứng viên thật. Điểm tham chiếu do N người chấm độc lập theo rubric, không xem nhãn nháp. Đồng thuận giữa người chấm đạt QWK = ... . Trên tập giữ lại 48 câu không dùng khi chỉnh prompt, bộ chấm đạt QWK trung bình = ... so với người chấm, Spearman = ..., MAE = ... . Bộ chấm giả chỉ dựa vào độ dài đạt QWK = ... . Do người chấm đồng thời là thành viên nhóm phát triển và dữ liệu chỉ có văn bản, kết quả chưa khái quát cho ứng viên thật và chưa bao gồm sai số STT.
+
+Bỏ câu về thành viên nhóm nếu người chấm là người ngoài nhóm. Không dùng `labels/claude_draft.jsonl` làm tham chiếu cho bất kỳ số liệu nào trong báo cáo.
 
 ## Giới hạn
 

@@ -1,12 +1,12 @@
 # Hướng dẫn cho người chấm
 
-Bạn chấm 144 câu trả lời phỏng vấn theo rubric, ước tính khoảng 2-3 giờ, có thể chia nhiều buổi. Điểm của bạn là mốc để đo xem AI chấm có đúng không, nên hãy chấm theo đánh giá của chính bạn.
+Bạn chấm 100 câu trả lời phỏng vấn theo rubric, ước tính khoảng 1,5-2 giờ, có thể chia nhiều buổi. Điểm của bạn là mốc để đo xem AI chấm có đúng không, nên hãy chấm theo đánh giá của chính bạn.
 
 ## Trước khi chấm
 
 Đọc mục 3 của `docs/business/Rubric_Cham_Diem.md` (`rubric-v1.1`).
 
-**Không mở các file trong `data/gold/labels/` và `data/gold/source/`.** Các file đó có nhãn nháp, xem rồi thì điểm của bạn không còn độc lập.
+**Không mở các file trong `data/gold/labels/` và `data/gold/source/`, cũng không xem tab Files changed của PR.** Các nơi đó có nhãn nháp, xem rồi thì điểm của bạn không còn độc lập.
 
 ## Cách chấm
 

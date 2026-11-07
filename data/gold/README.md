@@ -8,7 +8,7 @@ Dùng để đo độ chính xác của bộ chấm theo `docs/business/Rubric_C
 
 | File | Nội dung |
 |---|---|
-| `gold_v1.jsonl` | 144 câu trả lời kèm câu hỏi, đáp án tham chiếu và tập, không có nhãn |
+| `gold_v1.jsonl` | 144 câu trả lời kèm câu hỏi, đáp án tham chiếu, tập và `rating_set`, không có nhãn |
 | `labels/claude_draft.jsonl` | Nhãn nháp của Claude, kèm mức dự kiến và lý do |
 | `labels/claude_blind.jsonl` | Điểm AI: một phiên Claude khác chấm mù, chỉ thấy rubric và câu trả lời. Không phải điểm người |
 | `rater.html` | Trang chấm mù chạy offline, tự lưu tiến độ, xuất CSV. Đây là cách chấm chính |
@@ -22,6 +22,7 @@ Sửa `source/` rồi chạy lại `python scripts/gold/build_gold.py`, không s
 
 - 24 câu hỏi có trong seed V2, mỗi loại 6 câu; 6 câu trả lời mỗi câu hỏi (5 mức chất lượng và 1 câu đối chứng).
 - Tách tập theo câu hỏi: 16 câu hỏi calibration (96 câu trả lời), 8 câu hỏi holdout (48 câu trả lời).
+- Người chấm chấm 100 câu (`rating_set`): đủ 48 câu holdout và 52 câu calibration, mỗi loại 13 câu, trải đều các mức. Các số liệu so với người chỉ tính trên 100 câu này.
 - Có các ca khó: lạc đề, dài mà rỗng, ngắn mà tốt, trình bày tốt nhưng sai chuyên môn.
 - Câu trả lời viết theo văn nói, từ đệm có ở cả câu tốt lẫn câu yếu.
 
@@ -41,7 +42,7 @@ Chạy test: `python -m unittest discover -s scripts/gold`
 
 Điền số thật sau khi đo, giữ nguyên các phần công bố:
 
-> Bộ dữ liệu gồm 144 câu trả lời tổng hợp do Claude sinh theo 5 mức chất lượng, trên 24 câu hỏi thuộc 4 loại, không phải câu trả lời của ứng viên thật. Điểm tham chiếu do N người chấm độc lập theo rubric, không xem nhãn nháp. Đồng thuận giữa người chấm đạt QWK = ... . Trên tập giữ lại 48 câu không dùng khi chỉnh prompt, bộ chấm đạt QWK trung bình = ... so với người chấm, Spearman = ..., MAE = ... . Bộ chấm giả chỉ dựa vào độ dài đạt QWK = ... . Do người chấm đồng thời là thành viên nhóm phát triển và dữ liệu chỉ có văn bản, kết quả chưa khái quát cho ứng viên thật và chưa bao gồm sai số STT.
+> Bộ dữ liệu gồm 144 câu trả lời tổng hợp do Claude sinh theo 5 mức chất lượng, trên 24 câu hỏi thuộc 4 loại, không phải câu trả lời của ứng viên thật. Điểm tham chiếu do N người chấm độc lập trên 100 câu theo rubric, không xem nhãn nháp. Đồng thuận giữa người chấm đạt QWK = ... . Trên tập giữ lại 48 câu không dùng khi chỉnh prompt, bộ chấm đạt QWK trung bình = ... so với người chấm, Spearman = ..., MAE = ... . Bộ chấm giả chỉ dựa vào độ dài đạt QWK = ... . Do người chấm đồng thời là thành viên nhóm phát triển và dữ liệu chỉ có văn bản, kết quả chưa khái quát cho ứng viên thật và chưa bao gồm sai số STT.
 
 Bỏ câu về thành viên nhóm nếu người chấm là người ngoài nhóm. Không dùng `labels/claude_draft.jsonl` hay `labels/claude_blind.jsonl` làm tham chiếu cho số liệu AI so với người trong báo cáo.
 

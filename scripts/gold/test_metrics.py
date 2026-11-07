@@ -3,7 +3,8 @@
 import unittest
 
 from import_ratings import parse_row
-from metrics import content_score, length_baseline_qwk, mean_absolute_error, quadratic_weighted_kappa, spearman
+from metrics import (content_score, length_baseline_qwk, mean_absolute_error, quadratic_weighted_kappa,
+                     select_items, spearman)
 
 
 class QuadraticWeightedKappaTest(unittest.TestCase):
@@ -72,6 +73,30 @@ class LengthBaselineTest(unittest.TestCase):
     def test_score_opposite_to_length_gives_minus_one(self):
         items, ref = self.dataset([(10, 5), (20, 4), (30, 3), (40, 2), (50, 1)])
         self.assertAlmostEqual(length_baseline_qwk(items, ref, "DEPTH"), -1.0)
+
+
+class SelectItemsTest(unittest.TestCase):
+    GOLD = [
+        {"id": "A", "split": "calibration", "rating_set": True},
+        {"id": "B", "split": "calibration", "rating_set": False},
+        {"id": "C", "split": "holdout", "rating_set": True},
+    ]
+
+    def test_unrated_item_is_skipped_when_reference_lacks_it(self):
+        chosen = select_items(self.GOLD, {"A": {}}, "calibration")
+        self.assertEqual([item["id"] for item in chosen], ["A"])
+
+    def test_item_is_kept_when_reference_has_it(self):
+        chosen = select_items(self.GOLD, {"A": {}, "B": {}}, "calibration")
+        self.assertEqual([item["id"] for item in chosen], ["A", "B"])
+
+    def test_missing_rated_item_stays_so_validation_reports_it(self):
+        chosen = select_items(self.GOLD, {}, "calibration")
+        self.assertEqual([item["id"] for item in chosen], ["A"])
+
+    def test_split_filter_applies(self):
+        chosen = select_items(self.GOLD, {"A": {}, "C": {}}, "holdout")
+        self.assertEqual([item["id"] for item in chosen], ["C"])
 
 
 class ParseRowTest(unittest.TestCase):

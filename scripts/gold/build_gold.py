@@ -30,6 +30,7 @@ QUESTION_NAMESPACE = uuid.UUID("6f1c2d4e-8a5b-4c3d-9e7f-0a1b2c3d4e5f")
 SPLIT_SALT = "gold-v1"
 HOLDOUT_PER_TYPE = 2
 MIN_WORDS = 15  # dưới mức này pipeline trả ANSWER_TOO_SHORT, không gọi LLM
+CALIBRATION_RATED_PER_TYPE = 13  # cộng 48 câu holdout thành 100 câu cho người chấm
 
 CRITERIA = {
     "BEHAVIORAL": ["RELEVANCE", "STRUCTURE", "DEPTH"],
@@ -74,6 +75,29 @@ def holdout_questions(by_type):
     return chosen
 
 
+def pick_rated_calibration(prepared, holdout):
+    """Chọn câu calibration cho người chấm, xoay vòng theo mức chất lượng để giữ đủ điểm thấp và cao."""
+    groups = {}
+    for entry in prepared:
+        item, question = entry[0], entry[1]
+        if question["id"] not in holdout:
+            groups.setdefault(question["question_type"], {}).setdefault(item["t"], []).append(item["origin"])
+
+    rng = random.Random(f"{SPLIT_SALT}:rated")
+    chosen = set()
+    for question_type in sorted(groups):
+        tiers = groups[question_type]
+        for tier in sorted(tiers):
+            rng.shuffle(tiers[tier])
+        picked = 0
+        while picked < CALIBRATION_RATED_PER_TYPE:
+            for tier in sorted(tiers):
+                if tiers[tier] and picked < CALIBRATION_RATED_PER_TYPE:
+                    chosen.add(tiers[tier].pop())
+                    picked += 1
+    return chosen
+
+
 def build():
     rows = load_questions()
     seed_sql = SEED_SQL.read_text(encoding="utf-8")
@@ -110,6 +134,7 @@ def build():
         sys.exit(1)
 
     holdout = holdout_questions(by_type)
+    rated_calibration = pick_rated_calibration(prepared, holdout)
     # Xáo trước khi đánh số: id theo thứ tự file sẽ để lộ mức chất lượng cho người chấm mù
     random.Random(SPLIT_SALT).shuffle(prepared)
     gold, labels = [], []
@@ -118,6 +143,7 @@ def build():
         gold.append({
             "id": answer_id,
             "split": "holdout" if question["id"] in holdout else "calibration",
+            "rating_set": question["id"] in holdout or item["origin"] in rated_calibration,
             "question_id": question_uuid,
             "question_type": question["question_type"],
             "position": question["position"],
@@ -171,10 +197,12 @@ def main():
     gold, labels = build()
     write_jsonl(OUT_DIR / "gold_v1.jsonl", gold)
     write_jsonl(OUT_DIR / "labels" / "claude_draft.jsonl", labels)
-    write_rater_sheet(OUT_DIR / "rater_sheet.csv", gold)
-    write_rater_page(OUT_DIR / "rater.html", gold)
+    rated = [row for row in gold if row["rating_set"]]
+    write_rater_sheet(OUT_DIR / "rater_sheet.csv", rated)
+    write_rater_page(OUT_DIR / "rater.html", rated)
     print(f"{len(gold)} câu trả lời, tập: {dict(Counter(g['split'] for g in gold))}")
     print(f"Loại: {dict(Counter(g['question_type'] for g in gold))}")
+    print(f"Người chấm: {len(rated)} câu, {dict(Counter((g['split'], g['question_type']) for g in rated))}")
 
 
 if __name__ == "__main__":

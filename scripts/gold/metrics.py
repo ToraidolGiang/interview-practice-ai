@@ -97,6 +97,17 @@ def load_gold():
         return [json.loads(line) for line in f]
 
 
+def select_items(gold, ref, split):
+    """Câu dùng để đo. Câu ngoài rating_set chỉ được bỏ qua khi nhãn tham chiếu không có.
+
+    Câu trong rating_set mà thiếu nhãn vẫn được giữ lại để validate báo lỗi, không bị bỏ sót âm thầm.
+    """
+    return [
+        item for item in gold
+        if (split == "all" or item["split"] == split) and (item["rating_set"] or item["id"] in ref)
+    ]
+
+
 def validate(items, labels, name):
     problems = []
     for item in items:
@@ -164,8 +175,8 @@ def main():
     parser.add_argument("--split", choices=["calibration", "holdout", "all"], default="calibration")
     args = parser.parse_args()
 
-    items = [g for g in load_gold() if args.split == "all" or g["split"] == args.split]
     ref = load_labels(args.ref)
+    items = select_items(load_gold(), ref, args.split)
     preds = [load_labels(path) for path in args.pred]
     problems = validate(items, ref, "ref")
     for path, pred in zip(args.pred, preds):

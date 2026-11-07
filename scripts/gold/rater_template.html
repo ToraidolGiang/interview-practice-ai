@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phiếu chấm mù #159</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1c2230; --muted:#5f6878; --line:#d9dee7; --accent:#2457d6; --on:#fff; --warn:#a33a00; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14171d; --card:#1e232c; --text:#e8ebf1; --muted:#a3acbb; --line:#363e4b; --accent:#7ea2ff; --on:#10131a; --warn:#ffb27a; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 system-ui, "Segoe UI", sans-serif; }
+  main { max-width:860px; margin:0 auto; padding:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:12px; }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; }
+  .muted { color:var(--muted); font-size:14px; }
+  h1 { font-size:20px; margin:0 0 8px; } h2 { font-size:15px; margin:0 0 6px; }
+  .transcript { font-size:17px; white-space:pre-wrap; }
+  .reference { white-space:pre-wrap; font-size:14px; color:var(--muted); }
+  button, input[type=text] { font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px 12px; }
+  button { cursor:pointer; } button:disabled { opacity:.5; cursor:default; }
+  button.primary, .score.on { background:var(--accent); border-color:var(--accent); color:var(--on); }
+  .criterion { padding:10px 0; border-top:1px solid var(--line); }
+  .criterion.active h2::after { content:" ← phím 1-5"; color:var(--accent); font-weight:400; font-size:13px; }
+  .scores { display:flex; gap:6px; margin:6px 0; }
+  .score { width:44px; height:40px; padding:0; }
+  ul.anchors { margin:0; padding-left:18px; font-size:14px; color:var(--muted); }
+  .warn { color:var(--warn); }
+  label.flag { display:flex; gap:8px; align-items:center; padding-top:10px; border-top:1px solid var(--line); }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <section id="start" class="card">
+    <h1>Phiếu chấm mù câu trả lời phỏng vấn</h1>
+    <p>Chấm độc lập theo rubric, không trao đổi với người chấm khác trong lúc chấm. Tiến độ tự lưu trong trình duyệt này.</p>
+    <p><input id="rater" type="text" placeholder="Tên người chấm, không dấu" aria-label="Tên người chấm"> <button id="begin" class="primary">Bắt đầu</button></p>
+  </section>
+
+  <section id="work" hidden>
+    <div class="card bar">
+      <div><strong id="position"></strong> <span class="muted" id="progress"></span></div>
+      <div>
+        <button id="prev">Câu trước</button>
+        <button id="next" class="primary">Câu sau</button>
+        <button id="nextEmpty">Câu chưa chấm</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="muted" id="type"></div>
+      <h2 id="question"></h2>
+      <details id="referenceBox"><summary class="muted">Đáp án tham chiếu</summary><p class="reference" id="reference"></p></details>
+    </div>
+    <div class="card"><h2>Lời thí sinh</h2><p class="transcript" id="transcript"></p></div>
+    <div class="card">
+      <p class="muted">Chấm nội dung. Bỏ qua từ đệm và cách nói, phần đó tính riêng. Độ dài không phải là tiêu chí. Một câu có thể tính cho nhiều yếu tố, nhưng một con số chỉ tính cho một yếu tố. Chỉ tính điều thí sinh nói ra.</p>
+      <div id="criteria"></div>
+      <label class="flag"><input id="offTopic" type="checkbox"> Lạc đề (off_topic), đánh dấu khi và chỉ khi RELEVANCE = 1</label>
+    </div>
+    <div class="card bar">
+      <span class="muted" id="status"></span>
+      <div>
+        <label class="muted">Nạp lại phiếu <input id="restore" type="file" accept=".csv"></label>
+        <button id="export" class="primary">Tải phiếu CSV</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const ITEMS = /*GOLD_DATA*/[];
+
+const ANCHORS = {
+  RELEVANCE: { label: "RELEVANCE: Đúng trọng tâm (không xét đúng sai chuyên môn)", all: {
+    1: "Không có ý nào trả lời trực tiếp câu hỏi, kể cả khi cùng lĩnh vực. Bắt buộc đánh dấu lạc đề.",
+    2: "Chạm đến câu hỏi nhưng né tránh, từ chối, nói không biết, hoặc chỉ có một câu khẳng định không có nội dung.",
+    3: "Trả lời một phần: thiếu một vế của câu hỏi, hoặc phần lớn là lan man.",
+    4: "Trả lời đủ các vế, có đoạn lan man ngắn hoặc một vế còn sơ sài.",
+    5: "Trả lời trúng và đầy đủ các vế câu hỏi yêu cầu, không lạc đề.",
+    note: "Lan man ngắn: dưới một nửa số câu. Phần lớn: từ một nửa trở lên. Sơ sài: chỉ nhắc tới mà không nói nội dung; một mệnh đề có nội dung là đủ. Mô tả vấn đề dẫn thẳng tới biện pháp không tính là lan man." } },
+  STRUCTURE: { label: "STRUCTURE: Cấu trúc (lạc đề thì bằng 1)", byType: {
+    BEHAVIORAL: {
+      1: "Không xác định được bối cảnh hay hành động.",
+      2: "Có 1 thành phần S/T/A/R.",
+      3: "Có 2-3 thành phần S/T/A/R, hoặc đủ 4 nhưng từ hai phần trở lên còn mơ hồ.",
+      4: "Đủ 4 thành phần nhưng đúng một phần còn mơ hồ hoặc vai trò cá nhân chưa rõ.",
+      5: "Đủ Situation, Task, Action, Result, rõ vai trò cá nhân, trình tự hợp lý. Task suy ra rõ từ Situation vẫn tính là có." },
+    SITUATIONAL: {
+      1: "Không nêu hướng xử lý.",
+      2: "Có hướng xử lý nhưng mơ hồ, không có bước nào cụ thể.",
+      3: "Nêu hướng xử lý nhưng thiếu lý do hoặc thứ tự bước.",
+      4: "Có thứ tự và lý do, chưa cân nhắc rủi ro hoặc phương án khác.",
+      5: "Nêu cách tiếp cận có thứ tự, giải thích lý do, cân nhắc rủi ro hoặc phương án khác.",
+      note: "Vấn đề nêu ngay trước biện pháp tính là lý do. Làm thử có điều kiện dừng tính là cân nhắc rủi ro. Chỉ có một bước tính là thiếu thứ tự." },
+    TECHNICAL: {
+      1: "Rời rạc, không có mạch giải thích.",
+      2: "Có định nghĩa nhưng không có giải thích.",
+      3: "Có định nghĩa và giải thích, thiếu ví dụ hoặc so sánh.",
+      4: "Đủ khái niệm, cơ chế, ví dụ hoặc so sánh, nhưng phần ví dụ chỉ nêu lướt.",
+      5: "Mạch rõ: khái niệm, cơ chế, ví dụ, so sánh hoặc trường hợp áp dụng.",
+      note: "Câu không hỏi định nghĩa thì khái niệm là luận điểm trả lời trực tiếp. Ví dụ là tình huống hoặc đối tượng cụ thể, tính kể cả khi sai; chỉ nêu tên loại việc, tên công cụ, hoặc chính là điều câu hỏi yêu cầu thì không tính. Lướt: chỉ nhắc tên, không nói vì sao liên quan." },
+    INTRO: {
+      1: "Không có phần nào của khung, hoặc liệt kê rời rạc không liên kết.",
+      2: "Có 1 trong 3 phần.",
+      3: "Có 2 trong 3 phần của khung.",
+      4: "Đủ 3 phần nhưng phần cuối chỉ nối lướt qua.",
+      5: "Đủ 3 phần, mạch lạc, phần cuối nối được với vị trí ứng tuyển hoặc định hướng nghề.",
+      note: "Giới thiệu bản thân: hiện tại, quá khứ, định hướng. Câu khác: ý chính, bằng chứng, liên hệ vị trí hoặc định hướng nghề. Hiểu về vị trí: mô tả công việc, trải nghiệm của thí sinh, vì sao phù hợp. Câu định hướng: bằng chứng là việc đã làm, kế hoạch chỉ tính là liên hệ. Kế hoạch cải thiện tính là định hướng nghề. Ý sáo rỗng (đúng với mọi ứng viên) không tính. Lướt: chỉ nhắc tên, không nói vì sao liên quan." } } },
+  DEPTH: { label: "DEPTH: đếm yếu tố nói cụ thể, điểm = số yếu tố + 1 (lạc đề thì bằng 1)", byType: {
+    BEHAVIORAL: {
+      a: "Chi tiết cụ thể của sự việc", b: "Số liệu hoặc kết quả đo được",
+      c: "Việc chính thí sinh đã làm", d: "Bài học hoặc thay đổi sau đó, khác với việc xử lý chính" },
+    SITUATIONAL: {
+      a: "Biện pháp cụ thể, không chỉ nguyên tắc", b: "Lý do của biện pháp",
+      c: "Ví dụ, công cụ hoặc con số minh họa cho biện pháp", d: "Cách đo kết quả hoặc xử lý khi biện pháp không hiệu quả; câu hỏi liệt kê thì xác nhận lại với người hỏi cũng tính" },
+    TECHNICAL: {
+      a: "Giải thích cơ chế hoặc vì sao: có quan hệ nhân quả nói rõ, kể cả sai; định nghĩa lại không tính", b: "Ví dụ hoặc so sánh cụ thể",
+      c: "Giới hạn, đánh đổi hoặc khi nào không dùng: nêu rõ mặt hại, chi phí hoặc tình huống không nên dùng", d: "Kinh nghiệm thực tế, số liệu hoặc cách kiểm chứng ngoài điều câu hỏi đã yêu cầu" },
+    INTRO: {
+      a: "Thông tin cụ thể về vai trò, công nghệ hoặc thời gian của chính thí sinh", b: "Thành tích có số liệu",
+      c: "Đóng góp cá nhân", d: "Lý do hoặc kế hoạch cụ thể, gắn với câu hỏi" } } },
+  CORRECTNESS: { label: "CORRECTNESS: tỉ lệ ý tham chiếu nêu đúng. Mỗi gạch đầu dòng: đủ = 1 ý, một phần = 0,5 ý", all: {
+    1: "Dưới 20%, kể cả nói không biết; hoặc sai ở khái niệm trung tâm.",
+    2: "20% đến dưới 50%.",
+    3: "50% đến dưới 70%.",
+    4: "70% đến dưới 90%.",
+    5: "Từ 90% trở lên, không có phát biểu sai.",
+    note: "Mỗi phát biểu sai không thuộc khái niệm trung tâm trừ 1 mức. Ý đúng ngoài tham chiếu không cộng, không trừ." } },
+};
+const COLUMNS = ["RELEVANCE", "STRUCTURE", "DEPTH", "CORRECTNESS"];
+const $ = (id) => document.getElementById(id);
+
+let raterName = "";
+let ratings = {};
+let index = 0;
+
+const codesFor = (item) => COLUMNS.filter((c) => c !== "CORRECTNESS" || item.question_type === "TECHNICAL");
+const entry = (id) => (ratings[id] ??= { scores: {}, off_topic: false });
+const isDone = (item) => codesFor(item).every((c) => ratings[item.id]?.scores[c]);
+const storageKey = () => `gold-rating:${raterName}`;
+
+function save() {
+  try { localStorage.setItem(storageKey(), JSON.stringify({ ratings, index })); }
+  catch { $("status").textContent = "Không lưu được trong trình duyệt, hãy tải phiếu CSV thường xuyên."; }
+}
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey()) || "null");
+    if (saved) { ratings = saved.ratings || {}; index = saved.index || 0; }
+  } catch { ratings = {}; }
+}
+
+function activeCode(item) {
+  return codesFor(item).find((c) => !ratings[item.id]?.scores[c]) ?? null;
+}
+
+function render() {
+  const item = ITEMS[index];
+  const done = ITEMS.filter(isDone).length;
+  $("position").textContent = `${item.id} (${index + 1}/${ITEMS.length})`;
+  $("progress").textContent = `Đã chấm xong ${done}/${ITEMS.length}`;
+  $("type").textContent = item.question_type;
+  $("question").textContent = item.question;
+  $("transcript").textContent = item.transcript;
+  $("referenceBox").hidden = !item.reference_answer;
+  $("referenceBox").open = true;
+  $("reference").textContent = item.reference_answer || "";
+  $("offTopic").checked = !!ratings[item.id]?.off_topic;
+  $("prev").disabled = index === 0;
+  $("next").disabled = index === ITEMS.length - 1;
+
+  const active = activeCode(item);
+  const box = $("criteria");
+  box.replaceChildren();
+  for (const code of codesFor(item)) {
+    const spec = ANCHORS[code];
+    const anchors = spec.all || spec.byType[item.question_type];
+    const section = document.createElement("div");
+    section.className = "criterion" + (code === active ? " active" : "");
+    const title = document.createElement("h2");
+    title.textContent = spec.label;
+    const row = document.createElement("div");
+    row.className = "scores";
+    for (let score = 1; score <= 5; score++) {
+      const button = document.createElement("button");
+      button.textContent = score;
+      button.className = "score" + (ratings[item.id]?.scores[code] === score ? " on" : "");
+      button.setAttribute("aria-label", `${code} ${score} điểm`);
+      button.onclick = () => setScore(code, score);
+      row.append(button);
+    }
+    const list = document.createElement("ul");
+    list.className = "anchors";
+    for (const [level, text] of Object.entries(anchors)) {
+      const line = document.createElement("li");
+      line.textContent = /^[1-5]$/.test(level) ? `${level}: ${text}` : text;
+      list.append(line);
+    }
+    section.append(title, row, list);
+    box.append(section);
+  }
+  const missing = ITEMS.length - done;
+  $("status").textContent = missing ? `Còn ${missing} câu chưa chấm đủ.` : "Đã chấm đủ, hãy tải phiếu CSV.";
+}
+
+function setScore(code, score) {
+  entry(ITEMS[index].id).scores[code] = score;
+  save();
+  render();
+}
+
+function go(next) {
+  index = Math.min(ITEMS.length - 1, Math.max(0, next));
+  save();
+  render();
+  window.scrollTo?.(0, 0);
+}
+
+function nextEmpty() {
+  const order = [...ITEMS.keys()].map((k) => (k + index + 1) % ITEMS.length);
+  const found = order.find((k) => !isDone(ITEMS[k]));
+  if (found !== undefined) go(found);
+}
+
+function buildCsv() {
+  const header = ["id", "question_type", ...COLUMNS, "off_topic"];
+  const lines = ITEMS.map((item) => {
+    const rating = ratings[item.id] || { scores: {} };
+    return [item.id, item.question_type, ...COLUMNS.map((c) => rating.scores[c] ?? ""), rating.off_topic ? "x" : ""].join(",");
+  });
+  return [header.join(","), ...lines].join("\r\n") + "\r\n";
+}
+
+function restoreCsv(text) {
+  const [header, ...rows] = text.replace(/^﻿/, "").trim().split(/\r?\n/);
+  const names = header.split(",");
+  const known = new Set(ITEMS.map((item) => item.id));
+  for (const line of rows) {
+    const cells = Object.fromEntries(line.split(",").map((value, i) => [names[i], value]));
+    if (!known.has(cells.id)) continue;
+    const rating = entry(cells.id);
+    for (const code of COLUMNS) if (/^[1-5]$/.test(cells[code] || "")) rating.scores[code] = Number(cells[code]);
+    rating.off_topic = cells.off_topic === "x";
+  }
+  save();
+  render();
+}
+
+function exportCsv() {
+  const blob = new Blob(["﻿" + buildCsv()], { type: "text/csv;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `phieu_cham_${raterName}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+$("begin").onclick = () => {
+  raterName = $("rater").value.trim().toLowerCase().replace(/[^a-z0-9_]+/g, "_");
+  if (!raterName) { $("rater").focus(); return; }
+  load();
+  $("start").hidden = true;
+  $("work").hidden = false;
+  render();
+};
+$("prev").onclick = () => go(index - 1);
+$("next").onclick = () => go(index + 1);
+$("nextEmpty").onclick = nextEmpty;
+$("export").onclick = exportCsv;
+$("offTopic").onchange = (event) => { entry(ITEMS[index].id).off_topic = event.target.checked; save(); };
+$("restore").onchange = async (event) => { const file = event.target.files[0]; if (file) restoreCsv(await file.text()); };
+document.addEventListener("keydown", (event) => {
+  if ($("work").hidden || event.target.tagName === "INPUT" || event.ctrlKey || event.metaKey || event.altKey) return;
+  const item = ITEMS[index];
+  if (/^[1-5]$/.test(event.key)) {
+    const code = activeCode(item);
+    if (code) setScore(code, Number(event.key));
+  } else if (event.key === "ArrowRight") go(index + 1);
+  else if (event.key === "ArrowLeft") go(index - 1);
+});
+</script>
+</body>
+</html>

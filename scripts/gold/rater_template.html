@@ -53,9 +53,9 @@
     </div>
     <div class="card"><h2>Lời thí sinh</h2><p class="transcript" id="transcript"></p></div>
     <div class="card">
-      <p class="muted">Chấm nội dung. Bỏ qua từ đệm và cách nói, phần đó tính riêng. Độ dài không phải là tiêu chí. Mức 2 và 4 là mức trung gian.</p>
+      <p class="muted">Chấm nội dung. Bỏ qua từ đệm và cách nói, phần đó tính riêng. Độ dài không phải là tiêu chí. Một câu có thể tính cho nhiều yếu tố, nhưng một con số chỉ tính cho một yếu tố. Chỉ tính điều thí sinh nói ra.</p>
       <div id="criteria"></div>
-      <label class="flag"><input id="offTopic" type="checkbox"> Lạc đề hoàn toàn (off_topic)</label>
+      <label class="flag"><input id="offTopic" type="checkbox"> Lạc đề (off_topic), đánh dấu khi và chỉ khi RELEVANCE = 1</label>
     </div>
     <div class="card bar">
       <span class="muted" id="status"></span>
@@ -71,35 +71,61 @@
 const ITEMS = /*GOLD_DATA*/[];
 
 const ANCHORS = {
-  RELEVANCE: { label: "RELEVANCE: Đúng trọng tâm", all: {
-    1: "Lạc đề hoặc không trả lời câu hỏi.",
-    3: "Trả lời một phần câu hỏi, có đoạn lan man.",
-    5: "Trả lời trúng và đầy đủ các ý câu hỏi yêu cầu, không lạc đề." } },
-  STRUCTURE: { label: "STRUCTURE: Cấu trúc", byType: {
+  RELEVANCE: { label: "RELEVANCE: Đúng trọng tâm (không xét đúng sai chuyên môn)", all: {
+    1: "Không có ý nào trả lời trực tiếp câu hỏi, kể cả khi cùng lĩnh vực. Bắt buộc đánh dấu lạc đề.",
+    2: "Chạm đến câu hỏi nhưng né tránh, từ chối, nói không biết, hoặc chỉ có một câu khẳng định không có nội dung.",
+    3: "Trả lời một phần: thiếu một vế của câu hỏi, hoặc phần lớn là lan man.",
+    4: "Trả lời đủ các vế, có đoạn lan man ngắn hoặc một vế còn sơ sài.",
+    5: "Trả lời trúng và đầy đủ các vế câu hỏi yêu cầu, không lạc đề.",
+    note: "Lan man ngắn: dưới một nửa số câu. Phần lớn: từ một nửa trở lên. Sơ sài: chỉ nhắc tới mà không nói nội dung; một mệnh đề có nội dung là đủ. Mô tả vấn đề dẫn thẳng tới biện pháp không tính là lan man." } },
+  STRUCTURE: { label: "STRUCTURE: Cấu trúc (lạc đề thì bằng 1)", byType: {
     BEHAVIORAL: {
       1: "Không xác định được bối cảnh hay hành động.",
-      3: "Có 2-3 thành phần S/T/A/R, thiếu hoặc mơ hồ phần còn lại (thường là Result).",
-      5: "Đủ Situation, Task, Action, Result, rõ vai trò cá nhân, trình tự hợp lý." },
+      2: "Có 1 thành phần S/T/A/R.",
+      3: "Có 2-3 thành phần S/T/A/R, hoặc đủ 4 nhưng từ hai phần trở lên còn mơ hồ.",
+      4: "Đủ 4 thành phần nhưng đúng một phần còn mơ hồ hoặc vai trò cá nhân chưa rõ.",
+      5: "Đủ Situation, Task, Action, Result, rõ vai trò cá nhân, trình tự hợp lý. Task suy ra rõ từ Situation vẫn tính là có." },
     SITUATIONAL: {
       1: "Không nêu hướng xử lý.",
+      2: "Có hướng xử lý nhưng mơ hồ, không có bước nào cụ thể.",
       3: "Nêu hướng xử lý nhưng thiếu lý do hoặc thứ tự bước.",
-      5: "Nêu cách tiếp cận có thứ tự, giải thích lý do, cân nhắc rủi ro hoặc phương án khác." },
+      4: "Có thứ tự và lý do, chưa cân nhắc rủi ro hoặc phương án khác.",
+      5: "Nêu cách tiếp cận có thứ tự, giải thích lý do, cân nhắc rủi ro hoặc phương án khác.",
+      note: "Vấn đề nêu ngay trước biện pháp tính là lý do. Làm thử có điều kiện dừng tính là cân nhắc rủi ro. Chỉ có một bước tính là thiếu thứ tự." },
     TECHNICAL: {
       1: "Rời rạc, không có mạch giải thích.",
+      2: "Có định nghĩa nhưng không có giải thích.",
       3: "Có định nghĩa và giải thích, thiếu ví dụ hoặc so sánh.",
-      5: "Mạch rõ: khái niệm, cơ chế, ví dụ hoặc trường hợp áp dụng." },
+      4: "Đủ khái niệm, cơ chế, ví dụ hoặc so sánh, nhưng phần ví dụ chỉ nêu lướt.",
+      5: "Mạch rõ: khái niệm, cơ chế, ví dụ, so sánh hoặc trường hợp áp dụng.",
+      note: "Câu không hỏi định nghĩa thì khái niệm là luận điểm trả lời trực tiếp. Ví dụ là tình huống hoặc đối tượng cụ thể, tính kể cả khi sai; chỉ nêu tên loại việc, tên công cụ, hoặc chính là điều câu hỏi yêu cầu thì không tính. Lướt: chỉ nhắc tên, không nói vì sao liên quan." },
     INTRO: {
-      1: "Liệt kê rời rạc, không liên kết.",
-      3: "Có 2 trong 3 phần (hiện tại, quá khứ, định hướng), thiếu liên hệ với vị trí ứng tuyển.",
-      5: "Mạch lạc, nối kinh nghiệm với vị trí ứng tuyển và định hướng." } } },
-  DEPTH: { label: "DEPTH: Mức cụ thể", all: {
-    1: "Chung chung, toàn câu nói sáo rỗng, không có chi tiết cụ thể.",
-    3: "Có ví dụ hoặc lập luận cụ thể nhưng thiếu số liệu, kết quả hoặc vai trò cá nhân.",
-    5: "Chi tiết cụ thể, có số liệu hoặc kết quả đo được, nêu rõ đóng góp cá nhân và bài học." } },
-  CORRECTNESS: { label: "CORRECTNESS: Đúng chuyên môn", all: {
-    1: "Sai cơ bản hoặc mâu thuẫn với đáp án tham chiếu.",
-    3: "Đúng ý chính nhưng thiếu hoặc sai một số ý quan trọng.",
-    5: "Đúng và đủ các ý chính trong đáp án tham chiếu, không có sai sót đáng kể." } },
+      1: "Không có phần nào của khung, hoặc liệt kê rời rạc không liên kết.",
+      2: "Có 1 trong 3 phần.",
+      3: "Có 2 trong 3 phần của khung.",
+      4: "Đủ 3 phần nhưng phần cuối chỉ nối lướt qua.",
+      5: "Đủ 3 phần, mạch lạc, phần cuối nối được với vị trí ứng tuyển hoặc định hướng nghề.",
+      note: "Giới thiệu bản thân: hiện tại, quá khứ, định hướng. Câu khác: ý chính, bằng chứng, liên hệ vị trí hoặc định hướng nghề. Hiểu về vị trí: mô tả công việc, trải nghiệm của thí sinh, vì sao phù hợp. Câu định hướng: bằng chứng là việc đã làm, kế hoạch chỉ tính là liên hệ. Kế hoạch cải thiện tính là định hướng nghề. Ý sáo rỗng (đúng với mọi ứng viên) không tính. Lướt: chỉ nhắc tên, không nói vì sao liên quan." } } },
+  DEPTH: { label: "DEPTH: đếm yếu tố nói cụ thể, điểm = số yếu tố + 1 (lạc đề thì bằng 1)", byType: {
+    BEHAVIORAL: {
+      a: "Chi tiết cụ thể của sự việc", b: "Số liệu hoặc kết quả đo được",
+      c: "Việc chính thí sinh đã làm", d: "Bài học hoặc thay đổi sau đó, khác với việc xử lý chính" },
+    SITUATIONAL: {
+      a: "Biện pháp cụ thể, không chỉ nguyên tắc", b: "Lý do của biện pháp",
+      c: "Ví dụ, công cụ hoặc con số minh họa cho biện pháp", d: "Cách đo kết quả hoặc xử lý khi biện pháp không hiệu quả; câu hỏi liệt kê thì xác nhận lại với người hỏi cũng tính" },
+    TECHNICAL: {
+      a: "Giải thích cơ chế hoặc vì sao: có quan hệ nhân quả nói rõ, kể cả sai; định nghĩa lại không tính", b: "Ví dụ hoặc so sánh cụ thể",
+      c: "Giới hạn, đánh đổi hoặc khi nào không dùng: nêu rõ mặt hại, chi phí hoặc tình huống không nên dùng", d: "Kinh nghiệm thực tế, số liệu hoặc cách kiểm chứng ngoài điều câu hỏi đã yêu cầu" },
+    INTRO: {
+      a: "Thông tin cụ thể về vai trò, công nghệ hoặc thời gian của chính thí sinh", b: "Thành tích có số liệu",
+      c: "Đóng góp cá nhân", d: "Lý do hoặc kế hoạch cụ thể, gắn với câu hỏi" } } },
+  CORRECTNESS: { label: "CORRECTNESS: tỉ lệ ý tham chiếu nêu đúng. Mỗi gạch đầu dòng: đủ = 1 ý, một phần = 0,5 ý", all: {
+    1: "Dưới 20%, kể cả nói không biết; hoặc sai ở khái niệm trung tâm.",
+    2: "20% đến dưới 50%.",
+    3: "50% đến dưới 70%.",
+    4: "70% đến dưới 90%.",
+    5: "Từ 90% trở lên, không có phát biểu sai.",
+    note: "Mỗi phát biểu sai không thuộc khái niệm trung tâm trừ 1 mức. Ý đúng ngoài tham chiếu không cộng, không trừ." } },
 };
 const COLUMNS = ["RELEVANCE", "STRUCTURE", "DEPTH", "CORRECTNESS"];
 const $ = (id) => document.getElementById(id);
@@ -166,9 +192,9 @@ function render() {
     }
     const list = document.createElement("ul");
     list.className = "anchors";
-    for (const level of [1, 3, 5]) {
+    for (const [level, text] of Object.entries(anchors)) {
       const line = document.createElement("li");
-      line.textContent = `${level}: ${anchors[level]}`;
+      line.textContent = /^[1-5]$/.test(level) ? `${level}: ${text}` : text;
       list.append(line);
     }
     section.append(title, row, list);

@@ -49,11 +49,9 @@ Bỏ câu về thành viên nhóm nếu người chấm là người ngoài nhó
 
 Hai phiên Claude khớp nhau ở mức QWK 0.93-0.98 trên cả 144 câu, Spearman điểm tổng 0.955. Con số này chỉ cho thấy các mức chất lượng tách biệt rõ với chính Claude. Nó không đo độ chính xác, vì cùng một họ mô hình, và câu trả lời được viết theo mức định sẵn nên dễ chấm hơn câu thật.
 
-Khi chấm, phiên mù ghi nhận các chỗ rubric khó áp dụng, nên làm rõ trước khi người chấm:
-- `off_topic`: câu cùng lĩnh vực nhưng không trả lời câu hỏi có tính là lạc đề không.
-- DEPTH mức 5 đòi số liệu và bài học, không tự nhiên với câu TECHNICAL và SITUATIONAL.
-- Khung STRUCTURE của INTRO (hiện tại, quá khứ, định hướng) không hợp với câu như điểm mạnh yếu.
-- CORRECTNESS chưa có mức cho câu thừa nhận không biết, và ranh giới giữa mức 3 và 4 với câu đúng nhưng thiếu.
+Hai bộ nhãn `claude_*` được chấm theo `rubric-v1.0`, trước khi rubric đổi sang v1.1.
+
+Khi thử áp dụng v1.1 bằng các phiên mù, rubric giải quyết được phần lớn câu từng khó, nhưng trên 15 câu chưa từng thử chỉ 3 câu được quyết định hoàn toàn bằng câu chữ, phần còn lại cần phán đoán, thường lệch 1 điểm. Vì vậy không thể coi rubric là hết mơ hồ; thước đo đúng là đồng thuận giữa người chấm ở bước 3.
 
 ## Giới hạn
 

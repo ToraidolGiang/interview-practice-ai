@@ -4,7 +4,7 @@ Bạn chấm 144 câu trả lời phỏng vấn theo rubric, ước tính khoả
 
 ## Trước khi chấm
 
-Đọc mục 3 của `docs/business/Rubric_Cham_Diem.md`.
+Đọc mục 3 của `docs/business/Rubric_Cham_Diem.md` (`rubric-v1.1`).
 
 **Không mở các file trong `data/gold/labels/` và `data/gold/source/`.** Các file đó có nhãn nháp, xem rồi thì điểm của bạn không còn độc lập.
 
@@ -21,6 +21,8 @@ Bạn chấm 144 câu trả lời phỏng vấn theo rubric, ước tính khoả
 - **Bám mô tả mức điểm**, không chấm theo cảm giác chung. Mỗi tiêu chí chấm riêng: một câu có thể cấu trúc tốt nhưng sai chuyên môn.
 - **Độ dài không phải là tiêu chí.** Câu ngắn vẫn có thể đạt điểm cao, câu dài vẫn có thể đạt điểm thấp.
 - **Bỏ qua từ đệm và cách nói** như "ừm", "ờ". Phần đó được tính riêng bằng code.
-- **CORRECTNESS** đối chiếu với đáp án tham chiếu. Câu hỏi không nêu vị trí thì không trừ điểm vì thí sinh tự chọn một vị trí để nói.
-- **Lạc đề (off_topic)** chỉ đánh dấu khi câu trả lời hoàn toàn không liên quan đến câu hỏi, không dùng cho câu chỉ lan man.
+- **DEPTH** đếm số yếu tố nói cụ thể, trang chấm hiện đúng 4 yếu tố của từng loại câu hỏi. Điểm bằng số yếu tố cộng 1.
+- **CORRECTNESS** tính tỉ lệ ý đúng so với đáp án tham chiếu, mỗi gạch đầu dòng là một ý.
+- **Thí sinh tự chọn vị trí:** câu hỏi không nêu vị trí thì không trừ điểm vì thí sinh tự nói về một vị trí.
+- **Lạc đề (off_topic)** đánh dấu khi và chỉ khi RELEVANCE = 1, tức là không có ý nào trả lời trực tiếp câu hỏi, kể cả khi cùng lĩnh vực. Câu né tránh hoặc nói không biết là RELEVANCE 2, không phải lạc đề.
 - Phân vân giữa hai mức thì chọn mức bạn tin hơn, không cần giải thích.

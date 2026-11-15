@@ -38,6 +38,9 @@ def parse_row(row):
 
 
 def main():
+    # Console Windows mặc định cp1252, không in được tiếng Việt
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("sheet", help="File CSV đã chấm")
     parser.add_argument("--rater", required=True, help="Tên người chấm, dùng làm tên file nhãn")

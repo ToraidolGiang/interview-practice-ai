@@ -169,6 +169,9 @@ def report(items, ref, preds):
 
 
 def main():
+    # Console Windows mặc định cp1252, không in được tiếng Việt
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--ref", required=True, help="File nhãn tham chiếu")
     parser.add_argument("--pred", required=True, action="append", help="File dự đoán, lặp lại để đo độ lặp lại")

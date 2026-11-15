@@ -194,6 +194,9 @@ def write_rater_page(path, gold):
 
 
 def main():
+    # Console Windows mặc định cp1252, không in được tiếng Việt
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8")
     gold, labels = build()
     write_jsonl(OUT_DIR / "gold_v1.jsonl", gold)
     write_jsonl(OUT_DIR / "labels" / "claude_draft.jsonl", labels)

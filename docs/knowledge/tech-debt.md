@@ -11,12 +11,12 @@ Nguồn: `specs/AI-PIPELINE/review.md`, `design.md`, `test-report.md`.
 | F2 | `PracticeSessionRepository` import `dto/ScoringInput` (phụ thuộc ngược) | Dùng interface projection |
 
 ## Chưa xác minh / rủi ro
-- Tài liệu Gemini (tra 2026-11-15) đã liệt kê `audio/webm`, `audio/m4a`; `gemini-3.5-transcribe` nhận webm. Vẫn **cần smoke test thật** với audio từ trình duyệt (xem `specs/20261115-research-stt-tts-hoi-thoai/research.md`).
-- Schema Gemini (`responseSchema` / `generateContent`) chưa xác minh với API thật.
-- Mặc định đã đổi (2026-11-15) vì `gemini-2.5-flash` khai tử từ 2026-12-01: STT `gemini-3.5-transcribe` (VERBATIM, `vi-VN`), LLM `gemini-3.8-flash`. Chưa gọi thử API thật; `responseSchema` của chấm điểm chưa kiểm trên model mới. Dự phòng: đặt `GEMINI_STT_MODEL` là model đa năng thì client quay về prompt phiên âm nguyên văn.
+- **Smoke test thật 2026-11-17 (STT):** `gemini-3.5-transcribe` nhận `audio/webm` (opus), giữ từ đệm "Um", "Uh" ở VERBATIM. Phản hồi để transcript ở `parts[].audioTranscription.text`, không phải `parts[].text`; client đã sửa (trước đó mọi phiên sẽ ra `STT_ERROR`). Mới thử mẫu tiếng Anh tổng hợp, **chưa thử giọng tiếng Việt thật từ trình duyệt**.
+- **Smoke test thật 2026-11-17 (LLM):** `gemini-3.8-flash` trả 503 "high demand" (cả request tối giản không schema) và timeout, `gemini-2.5-flash` thì 200. `responseSchema` của chấm điểm **vẫn chưa kiểm được**. Cần chạy lại; nếu 3.8 tiếp tục quá tải, cân nhắc model dự phòng và timeout/retry (backend hiện timeout 15s, thử lại 1 lần). `gemini-2.5-flash` khai tử từ 2026-12-01 nên chỉ dùng tạm.
+- Mặc định đã đổi (2026-11-15) vì `gemini-2.5-flash` khai tử từ 2026-12-01: STT `gemini-3.5-transcribe` (VERBATIM, `vi-VN`), LLM `gemini-3.8-flash`. Dự phòng: đặt `GEMINI_STT_MODEL` là model đa năng thì client quay về prompt phiên âm nguyên văn.
 - Chưa dùng `wordTimestamp` của `gemini-3.5-transcribe` để tính thời gian nói thật cho WPM (hiện vẫn dùng `durationSeconds` client khai).
 - AC-30 (<=12s, 14 mẫu 10-131s) chưa đo; quy trình ở `specs/AI-PIPELINE/test-report.md` dòng 59.
 - `durationSeconds` do client khai (WPM có thể bị làm giả); chỉ đúng 1 instance (ADR-001).
 - Q10 (chờ xác nhận): `weight` trả về là trọng số gốc hay đã chia lại khi Delivery null (hiện lưu gốc).
 
-Cập nhật lần cuối: 2026-11-15
+Cập nhật lần cuối: 2026-11-17

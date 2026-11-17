@@ -98,7 +98,8 @@ class GeminiSttClientTest {
                 .andExpect(jsonPath("$.generationConfig.audioTranscriptionConfig.mode").value("VERBATIM"))
                 .andExpect(jsonPath("$.generationConfig.audioTranscriptionConfig.languageCodes[0]").value("vi-VN"))
                 .andRespond(withSuccess("""
-                        {"candidates":[{"content":{"parts":[{"text":" Ừm, tôi ờ "},{"text":"muốn nói về Java. "}]}}],
+                        {"candidates":[{"content":{"parts":[{"audioTranscription":{"text":" Ừm, tôi ờ "}},
+                         {"audioTranscription":{"text":"muốn nói về Java. "}}]}}],
                          "usageMetadata":{"totalTokenCount":64}}""", MediaType.APPLICATION_JSON));
 
         String transcript = transcribeClient.transcribe(sessionId, audio, "audio/webm");

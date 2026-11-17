@@ -84,7 +84,12 @@ public class GeminiSttClient implements SttClient {
             StringBuilder transcript = new StringBuilder();
             boolean hasText = false;
             for (JsonNode part : root.path("candidates").path(0).path("content").path("parts")) {
-                JsonNode text = part.path("text");
+                // gemini-3.5-transcribe trả part.audioTranscription.text (đã xác minh API thật 2026-11-17);
+                // model đa năng trả part.text
+                JsonNode text = part.path("audioTranscription").path("text");
+                if (!text.isString()) {
+                    text = part.path("text");
+                }
                 if (text.isString()) {
                     transcript.append(text.asString());
                     hasText = true;

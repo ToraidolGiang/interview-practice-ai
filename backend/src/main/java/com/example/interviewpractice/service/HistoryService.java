@@ -56,6 +56,10 @@ public class HistoryService {
                 .map(s -> PracticeSessionDto.from(s, null)));
     }
 
+    /**
+     * Khác danh sách (chỉ SCORED), chi tiết trả phiên ở mọi trạng thái để màn kết quả xem được cả phiên đang xử lý
+     * hoặc lỗi (status, errorCode); khi đó scoreResult là null.
+     */
     public HistoryDetailDto detail(UUID userId, UUID sessionId) {
         PracticeSession session = history.findById(sessionId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND",

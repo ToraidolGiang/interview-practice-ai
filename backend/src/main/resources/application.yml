@@ -24,8 +24,8 @@ ai:
   gemini:
     api-key: ${GEMINI_API_KEY}
     base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
-    stt-model: ${GEMINI_STT_MODEL:gemini-2.5-flash}
-    llm-model: ${GEMINI_LLM_MODEL:gemini-2.5-flash}
+    stt-model: ${GEMINI_STT_MODEL:gemini-3.5-transcribe}
+    llm-model: ${GEMINI_LLM_MODEL:gemini-3.8-flash}
   fpt:
     api-key: ${FPT_AI_API_KEY}
   stt:

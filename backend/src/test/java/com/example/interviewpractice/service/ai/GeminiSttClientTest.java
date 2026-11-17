@@ -80,6 +80,34 @@ class GeminiSttClientTest {
     }
 
     @Test
+    void transcriptionModelUsesVerbatimConfigWithoutPromptAndJoinsTextParts() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("http://gemini.test");
+        MockRestServiceServer transcribeServer = MockRestServiceServer.bindTo(builder).build();
+        AiProperties ai = new AiProperties(
+                new AiProperties.Gemini("secret-key", "http://gemini.test", "gemini-3.5-transcribe", "llm-model"),
+                new AiProperties.Fpt("x"), new AiProperties.Stt(Duration.ofSeconds(15)),
+                new AiProperties.Llm(Duration.ofSeconds(15), 0.2));
+        GeminiSttClient transcribeClient = new GeminiSttClient(builder.build(), new JsonMapper(), ai, recorder);
+        byte[] audio = {4, 5};
+        transcribeServer.expect(once(),
+                requestTo("http://gemini.test/v1beta/models/gemini-3.5-transcribe:generateContent"))
+                .andExpect(jsonPath("$.contents[0].parts.length()").value(1))
+                .andExpect(jsonPath("$.contents[0].parts[0].inline_data.mime_type").value("audio/webm"))
+                .andExpect(jsonPath("$.contents[0].parts[0].inline_data.data")
+                        .value(Base64.getEncoder().encodeToString(audio)))
+                .andExpect(jsonPath("$.generationConfig.audioTranscriptionConfig.mode").value("VERBATIM"))
+                .andExpect(jsonPath("$.generationConfig.audioTranscriptionConfig.languageCodes[0]").value("vi-VN"))
+                .andRespond(withSuccess("""
+                        {"candidates":[{"content":{"parts":[{"text":" Ừm, tôi ờ "},{"text":"muốn nói về Java. "}]}}],
+                         "usageMetadata":{"totalTokenCount":64}}""", MediaType.APPLICATION_JSON));
+
+        String transcript = transcribeClient.transcribe(sessionId, audio, "audio/webm");
+
+        assertEquals("Ừm, tôi ờ muốn nói về Java.", transcript);
+        transcribeServer.verify();
+    }
+
+    @Test
     void firstTimeoutThenSuccessMakesExactlyTwoRequests() {
         server.expect(requestTo(URL)).andRespond(request -> {
             throw new SocketTimeoutException("read timed out");

@@ -11,11 +11,12 @@ Nguồn: `specs/AI-PIPELINE/review.md`, `design.md`, `test-report.md`.
 | F2 | `PracticeSessionRepository` import `dto/ScoringInput` (phụ thuộc ngược) | Dùng interface projection |
 
 ## Chưa xác minh / rủi ro
-- Gemini có thể không nhận `audio/webm`, `audio/mp4` qua `inline_data` (tài liệu liệt kê wav/mp3/aiff/aac/ogg/flac). Test mock xanh nhưng runtime có thể ra `STT_ERROR`. **Cần smoke test thật** (hoặc đổi định dạng ở client).
+- Tài liệu Gemini (tra 2026-11-15) đã liệt kê `audio/webm`, `audio/m4a`; `gemini-3.5-transcribe` nhận webm. Vẫn **cần smoke test thật** với audio từ trình duyệt (xem `specs/20261115-research-stt-tts-hoi-thoai/research.md`).
 - Schema Gemini (`responseSchema` / `generateContent`) chưa xác minh với API thật.
-- Tên model mặc định `gemini-2.5-flash` chưa xác minh (đổi qua `GEMINI_STT_MODEL`/`GEMINI_LLM_MODEL`); README ghi "Gemini 3.7 Flash" -> lệch, cần thống nhất.
+- Mặc định đã đổi (2026-11-15) vì `gemini-2.5-flash` khai tử từ 2026-12-01: STT `gemini-3.5-transcribe` (VERBATIM, `vi-VN`), LLM `gemini-3.8-flash`. Chưa gọi thử API thật; `responseSchema` của chấm điểm chưa kiểm trên model mới. Dự phòng: đặt `GEMINI_STT_MODEL` là model đa năng thì client quay về prompt phiên âm nguyên văn.
+- Chưa dùng `wordTimestamp` của `gemini-3.5-transcribe` để tính thời gian nói thật cho WPM (hiện vẫn dùng `durationSeconds` client khai).
 - AC-30 (<=12s, 14 mẫu 10-131s) chưa đo; quy trình ở `specs/AI-PIPELINE/test-report.md` dòng 59.
 - `durationSeconds` do client khai (WPM có thể bị làm giả); chỉ đúng 1 instance (ADR-001).
 - Q10 (chờ xác nhận): `weight` trả về là trọng số gốc hay đã chia lại khi Delivery null (hiện lưu gốc).
 
-Cập nhật lần cuối: 2026-11-04
+Cập nhật lần cuối: 2026-11-15

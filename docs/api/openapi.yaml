@@ -148,7 +148,12 @@ paths:
     get:
       tags: [Questions]
       summary: Danh sách câu hỏi theo bộ lọc (UC3)
-      description: Chỉ trả về câu hỏi có status=ACTIVE (B1), có phân trang. Dùng /questions/random để lấy ngẫu nhiên một câu.
+      description: >
+        Chỉ trả về câu hỏi có status=ACTIVE (B1), có phân trang, sắp xếp mới nhất trước. Dùng /questions/random
+        để lấy ngẫu nhiên một câu.
+        Khi có cả `industry` và `position`, kết quả gồm câu hỏi của `position` đó và câu hỏi vị trí `Chung`
+        của cùng `industry`. Chỉ có `position` (không có `industry`) thì khớp đúng `position`, không thêm `Chung`.
+        Nếu `position` là `Chung` thì chỉ trả nhóm `Chung`. `industry` và `position` so khớp chính xác.
       parameters:
         - name: industry
           in: query
@@ -168,9 +173,12 @@ paths:
             $ref: '#/components/schemas/QuestionType'
         - name: keyword
           in: query
-          description: Từ khoá tìm trong nội dung câu hỏi
+          description: >
+            Từ khoá tìm trong nội dung câu hỏi, không phân biệt hoa thường; `%` và `_` được coi là ký tự thường.
+            Tối đa 200 ký tự, khoảng trắng đầu cuối bị bỏ.
           schema:
             type: string
+            maxLength: 200
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/Size'
       responses:
@@ -180,12 +188,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuestionPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
   /questions/random:
     get:
       tags: [Questions]
       summary: Lấy ngẫu nhiên một câu hỏi theo bộ lọc (UC3, Alt 5a)
+      description: Cùng quy tắc `Chung` như GET /questions.
       parameters:
         - name: industry
           in: query
@@ -206,6 +217,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Question'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -218,6 +231,7 @@ paths:
     get:
       tags: [Questions]
       summary: Chi tiết một câu hỏi
+      description: Câu hỏi có status=HIDDEN được coi như không tồn tại (404), kể cả với ADMIN; ADMIN xem qua /admin/questions.
       parameters:
         - $ref: '#/components/parameters/QuestionId'
       responses:
@@ -227,6 +241,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Question'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -560,6 +576,7 @@ paths:
     get:
       tags: [Admin - Questions]
       summary: Danh sách toàn bộ câu hỏi (bao gồm HIDDEN) — chỉ ADMIN
+      description: Phần tử trả về là AdminQuestion (có referenceAnswer). Sắp xếp mới nhất trước.
       security:
         - bearerAuth: [ADMIN]
       responses:
@@ -568,7 +585,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QuestionPage'
+                $ref: '#/components/schemas/AdminQuestionPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -584,13 +603,19 @@ paths:
             $ref: '#/components/schemas/QuestionStatus'
         - name: keyword
           in: query
+          description: Cùng quy tắc với GET /questions
           schema:
             type: string
+            maxLength: 200
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/Size'
     post:
       tags: [Admin - Questions]
       summary: Thêm câu hỏi mới — chỉ ADMIN (UC8)
+      description: >
+        `industry` và `position` phải thuộc danh mục taxonomy-v1.0 (docs/business/Danh_Muc_Nganh_Vi_Tri.md),
+        sai thì 400 gắn vào đúng trường. `content`, `industry`, `position` được bỏ khoảng trắng đầu cuối trước khi lưu.
+        Ghi AuditLog (action CREATE).
       security:
         - bearerAuth: [ADMIN]
       requestBody:
@@ -605,7 +630,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Question'
+                $ref: '#/components/schemas/AdminQuestion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -614,9 +641,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
         '409':
-          description: Nội dung trùng 100% với câu hỏi khác cùng vị trí (B2)
+          description: Nội dung trùng 100% với câu hỏi khác cùng vị trí (B2), code DUPLICATE_QUESTION
           content:
             application/json:
               schema:
@@ -625,6 +651,7 @@ paths:
     put:
       tags: [Admin - Questions]
       summary: Sửa câu hỏi — chỉ ADMIN
+      description: Cùng quy tắc kiểm tra như POST. Ghi AuditLog (action UPDATE). Không đổi người tạo.
       security:
         - bearerAuth: [ADMIN]
       parameters:
@@ -641,7 +668,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Question'
+                $ref: '#/components/schemas/AdminQuestion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -656,12 +685,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Nội dung trùng 100% với câu hỏi khác cùng vị trí (B2), code DUPLICATE_QUESTION
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags: [Admin - Questions]
       summary: Xoá câu hỏi — chỉ ADMIN
       description: >
         Nếu câu hỏi đã từng được dùng trong ít nhất một PracticeSession → xoá mềm (status=HIDDEN).
-        Nếu chưa từng dùng → xoá cứng khỏi DB. Mọi thao tác đều ghi AuditLog (NF2).
+        Nếu chưa từng dùng → xoá cứng khỏi DB. Mọi thao tác đều ghi AuditLog (NF2, action DELETE kể cả xoá mềm).
       security:
         - bearerAuth: [ADMIN]
       parameters:
@@ -669,6 +704,8 @@ paths:
       responses:
         '204':
           description: Xoá (cứng hoặc mềm) thành công
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1038,6 +1075,17 @@ components:
           type: string
           format: date-time
 
+    AdminQuestion:
+      description: Question kèm referenceAnswer; chỉ trả cho ADMIN ở các endpoint /admin/questions.
+      allOf:
+        - $ref: '#/components/schemas/Question'
+        - type: object
+          properties:
+            referenceAnswer:
+              type: string
+              nullable: true
+              description: Các ý chính cần có khi chấm câu TECHNICAL; null với câu không phải TECHNICAL
+
     QuestionUpsertRequest:
       type: object
       required: [content, industry, position, level, questionType]
@@ -1187,6 +1235,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Question'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+    AdminQuestionPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminQuestion'
         page:
           type: integer
         size:

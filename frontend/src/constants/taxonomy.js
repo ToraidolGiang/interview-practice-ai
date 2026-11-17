@@ -1,12 +1,10 @@
 // Danh mục ngành/vị trí theo docs/business/Danh_Muc_Nganh_Vi_Tri.md (taxonomy-v1.0).
-// Giá trị gửi lên API phải đúng nguyên văn; label (thẻ câu hỏi) và chipLabel (bộ lọc) chỉ để hiển thị theo Figma.
+// Giá trị gửi lên API phải đúng nguyên văn và cũng là nhãn hiển thị trên chip/thẻ câu hỏi (Figma).
 export const TAXONOMY_VERSION = 'taxonomy-v1.0'
 
 export const INDUSTRIES = [
   {
     value: 'IT',
-    label: 'Công nghệ thông tin (IT)',
-    chipLabel: 'Công nghệ thông tin (IT)',
     positions: [
       'Chung',
       'Backend Developer',
@@ -22,52 +20,39 @@ export const INDUSTRIES = [
   },
   {
     value: 'Marketing',
-    label: 'Marketing / PR',
-    chipLabel: 'Marketing & PR',
     positions: ['Chung', 'Digital Marketing', 'Content Marketing', 'Chuyên viên SEO'],
   },
   {
     value: 'Kinh doanh / Bán hàng',
-    label: 'Kinh doanh / Bán hàng',
-    chipLabel: 'Kinh doanh & Bán hàng',
     positions: ['Chung', 'Nhân viên kinh doanh', 'Nhân viên bán hàng'],
   },
   {
     value: 'Kế toán / Tài chính',
-    label: 'Tài chính / Kế toán',
-    chipLabel: 'Tài chính & Kế toán',
     positions: ['Chung', 'Kế toán viên', 'Chuyên viên phân tích tài chính'],
   },
   {
     value: 'Nhân sự',
-    label: 'Nhân sự (HR)',
-    chipLabel: 'Quản trị nhân sự (HR)',
     positions: ['Chung', 'Chuyên viên tuyển dụng', 'Chuyên viên C&B'],
   },
   {
     value: 'Chăm sóc khách hàng',
-    label: 'CSKH / Dịch vụ',
-    chipLabel: 'Chăm sóc khách hàng',
     positions: ['Chung', 'Nhân viên CSKH'],
   },
 ]
 
 export const LEVELS = [
-  { value: 'EASY', label: 'Dễ', badge: 'DỄ' },
-  { value: 'MEDIUM', label: 'TB', badge: 'TRUNG BÌNH' },
-  { value: 'HARD', label: 'Khó', badge: 'KHÓ' },
+  { value: 'EASY', label: 'Dễ', pill: 'pill-green' },
+  { value: 'MEDIUM', label: 'Trung bình', pill: 'pill-indigo' },
+  { value: 'HARD', label: 'Khó', pill: 'pill-red' },
 ]
 
+// label: nhãn ngắn trên thẻ/bộ lọc (Figma); full: tên đầy đủ kèm tiếng Anh
 export const QUESTION_TYPES = [
-  { value: 'BEHAVIORAL', label: 'Hành vi (Behavioral)' },
-  { value: 'SITUATIONAL', label: 'Tình huống (Situational)' },
-  { value: 'TECHNICAL', label: 'Chuyên môn (Technical)' },
-  { value: 'INTRO', label: 'Giới thiệu bản thân (Intro)' },
+  { value: 'BEHAVIORAL', label: 'Hành vi', full: 'Hành vi (Behavioral)' },
+  { value: 'SITUATIONAL', label: 'Tình huống', full: 'Tình huống (Situational)' },
+  { value: 'TECHNICAL', label: 'Kỹ thuật', full: 'Kỹ thuật (Technical)' },
+  { value: 'INTRO', label: 'Giới thiệu', full: 'Giới thiệu bản thân (Intro)' },
 ]
-
-export function industryLabel(value) {
-  return INDUSTRIES.find((i) => i.value === value)?.label ?? value
-}
 
 export function levelOf(value) {
   return LEVELS.find((l) => l.value === value)
@@ -75,4 +60,9 @@ export function levelOf(value) {
 
 export function questionTypeLabel(value) {
   return QUESTION_TYPES.find((t) => t.value === value)?.label ?? value
+}
+
+// "IT · Backend Developer": ngành giữ nguyên giá trị taxonomy như trong Figma
+export function questionContext(question) {
+  return [question?.industry, question?.position].filter(Boolean).join(' · ')
 }

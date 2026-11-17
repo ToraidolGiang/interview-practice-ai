@@ -1,176 +1,83 @@
 .page {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   min-height: 100vh;
-  font-family: var(--font-heading);
-  background: var(--color-page-bg);
 }
 
-/* ---- Nửa trái: hero ---- */
+/* ----- Nửa trái: gradient xanh, tiêu đề, hình minh hoạ ----- */
 .hero {
   position: relative;
-  flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 64px;
+  min-height: 100vh;
+  padding: 56px 56px 24px;
   overflow: hidden;
-  background: var(--hero-gradient);
   color: #fff;
+  background:
+    radial-gradient(70% 45% at 30% 72%, rgb(99 102 241 / 45%), transparent 70%),
+    linear-gradient(160deg, #3793e1 0%, #2d6fda 22%, #2a4cd2 48%, #3a36cf 75%, #3525cd 100%);
 }
 
-.diamond {
+.dots {
   position: absolute;
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transform: rotate(45deg);
-  pointer-events: none;
-}
-
-.diamondTopLeft {
-  top: 64px;
-  left: 96px;
-  opacity: 0.6;
-}
-
-.diamondRight {
-  top: 34%;
-  right: 112px;
-  width: 28px;
-  height: 28px;
-  border-color: rgba(255, 255, 255, 0.08);
-  opacity: 0.4;
-}
-
-.diamondLeft {
-  top: 64%;
-  left: 80px;
-  width: 28px;
-  height: 28px;
-  border-color: rgba(255, 255, 255, 0.08);
-  opacity: 0.3;
-}
-
-.diamondBottomRight {
-  right: 160px;
-  bottom: 96px;
-  opacity: 0.4;
-}
-
-.heroCenter {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-width: 576px;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
-.brandLogo {
-  display: flex;
-  width: 48px;
-  height: 48px;
-  padding: 7px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(2px);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.brandLogo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.brandName {
-  font-size: 36px;
-  font-weight: 800;
-  line-height: 40px;
-  letter-spacing: -0.9px;
-}
-
-.brandAi {
-  margin-left: 2px;
-  font-weight: 700;
-  color: #c7d2fe;
+  top: 56px;
+  right: 46px;
+  width: 128px;
+  height: 84px;
+  background-image: radial-gradient(circle, rgb(255 255 255 / 45%) 1.6px, transparent 2px);
+  background-size: 30px 26px;
 }
 
 .heroTitle {
-  max-width: 520px;
-  margin-bottom: 16px;
-  font-size: 34px;
+  max-width: 540px;
+  margin-top: 56px;
+  font-family: var(--font-heading);
+  font-size: 41px;
+  line-height: 51px;
   font-weight: 700;
-  line-height: 36px;
+  letter-spacing: -0.025em;
 }
 
 .heroSubtitle {
-  max-width: 512px;
-  margin-bottom: 36px;
-  font-size: 16px;
-  line-height: 24px;
-  color: rgba(224, 231, 255, 0.8);
+  max-width: 520px;
+  margin-top: 22px;
+  font-size: 17px;
+  line-height: 27px;
+  color: rgb(255 255 255 / 86%);
 }
 
-.badges {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 17px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-}
-
-.badge strong {
-  font-weight: 700;
+.art {
+  align-self: center;
+  width: min(640px, calc(100% + 112px));
+  height: auto;
+  margin: auto -56px 0;
+  /* Ảnh cắt từ thiết kế: làm mờ mép để hoà vào nền gradient */
+  mask-image: linear-gradient(180deg, transparent 0, #000 70px, #000 calc(100% - 40px), transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+  mask-composite: intersect;
 }
 
 .heroFooter {
-  padding-top: 24px;
-  font-size: 12px;
-  line-height: 16px;
-  text-align: center;
-  color: rgba(199, 210, 254, 0.6);
+  margin-top: 24px;
+  font-size: 12.5px;
+  color: rgb(255 255 255 / 75%);
 }
 
-/* ---- Nửa phải: form ---- */
+/* ----- Nửa phải: biểu mẫu ----- */
 .panel {
-  flex: 1 1 0;
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 40px 56px;
-  background: var(--color-page-bg);
+  min-height: 100vh;
+  padding: 56px 56px 40px;
+  background: #fbfbfb;
 }
 
 .topActions {
+  position: absolute;
+  top: 56px;
+  right: 56px;
   display: flex;
-  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -178,53 +85,65 @@
 .iconButton {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--color-border);
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-  color: var(--color-text-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-strong);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
 }
 
 .langButton {
-  gap: 8px;
-  padding: 7px 13px;
-  font-family: var(--font-heading);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
+  padding: 0 10px;
 }
 
 .iconButton {
-  padding: 9px;
+  width: 34px;
+  color: var(--text-body);
 }
 
-.langButton:disabled,
-.iconButton:disabled {
-  cursor: default;
+.globe {
+  color: #0ea5e9;
+}
+
+.caret {
+  font-size: 8px;
+  color: var(--text-muted);
 }
 
 .panelCenter {
-  flex: 1;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  padding: 48px 0;
+  padding: 72px 0 24px;
 }
 
 .bottomNote {
-  min-height: 16px;
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 12px;
   text-align: center;
-  color: var(--color-placeholder);
+  color: var(--text-subtle);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
   .hero {
     display: none;
   }
 
   .panel {
     padding: 24px 16px;
+  }
+
+  .topActions {
+    top: 16px;
+    right: 16px;
   }
 }

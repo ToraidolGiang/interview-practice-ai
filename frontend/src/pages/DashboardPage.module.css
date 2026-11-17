@@ -1,0 +1,286 @@
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 4px;
+}
+
+.newSession {
+  min-height: 38px;
+  padding: 8px 18px;
+  font-size: 14.5px;
+}
+
+.topRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 24px;
+  margin-top: 22px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 227px;
+  padding: 28px 28px 28px;
+  border-radius: 16px;
+  background: linear-gradient(110deg, #3525cd 0%, #4336d9 55%, #4f46e5 100%);
+  color: #fff;
+}
+
+.heroTag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 16%);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.heroTitle {
+  margin-top: 14px;
+  font-family: var(--font-heading);
+  font-size: 21px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.heroMeta {
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: rgb(255 255 255 / 82%);
+}
+
+.heroError {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #fecdd3;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.heroButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 37px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.heroButton:hover:not(:disabled) {
+  background: #f1f0ff;
+}
+
+.heroLink {
+  font-size: 14px;
+  color: #fff;
+}
+
+.heroLink:hover {
+  text-decoration: underline;
+}
+
+.goal {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.goalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.goalHead strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.goal :global(.meter) {
+  height: 7px;
+}
+
+.days {
+  display: flex;
+  justify-content: space-between;
+}
+
+.days li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.days li > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.dayDone {
+  background: var(--primary);
+  color: #fff;
+}
+
+.dayTodo {
+  background: var(--primary-soft);
+}
+
+.goalNote {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cardHead :global(.link) {
+  margin-top: 4px;
+  font-size: 13.5px;
+}
+
+.cardTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.cardSub {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ----- KPI ----- */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  min-height: 136px;
+  padding: 22px 24px;
+}
+
+.kpiLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--text-body);
+}
+
+.kpiValue {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 12px;
+  font-family: var(--font-heading);
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.kpiValue small {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.kpi > p:last-child,
+.kpi > a:last-child {
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+
+.good {
+  color: var(--green);
+}
+
+.warn {
+  color: var(--amber);
+}
+
+.orange {
+  color: #c2410c;
+}
+
+.plan {
+  border-color: var(--amber-border);
+  background: var(--amber-bg);
+}
+
+.plan .kpiLabel {
+  color: var(--amber);
+}
+
+.plan :global(.link) {
+  font-weight: 600;
+}
+
+.bottomRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: start;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+@media (max-width: 1180px) {
+  .kpis {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1000px) {
+  .topRow,
+  .bottomRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .welcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+}

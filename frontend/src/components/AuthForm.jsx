@@ -1,25 +1,27 @@
 import { useId, useState } from 'react'
-import googleLogo from '../assets/figma/google.svg'
-import iconEyeOff from '../assets/figma/icon-eye-off.svg'
+import Icon, { GoogleLogo } from './Icon'
 import styles from './AuthForm.module.css'
 
 export function AuthCard({ title, subtitle, children, footer, wide }) {
   return (
     <div className={`${styles.container} ${wide ? styles.wide : ''}`}>
       <div className={styles.header}>
-        <h2 className={`${styles.title} ${wide ? styles.titleLarge : ''}`}>{title}</h2>
-        <p className={styles.subtitle}>{subtitle}</p>
+        <h2 className={styles.title}>{title}</h2>
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       </div>
       <div className={styles.card}>{children}</div>
-      <p className={styles.footer}>{footer}</p>
+      {footer && <p className={styles.footer}>{footer}</p>}
     </div>
   )
 }
 
-export function TextField({ label, icon, error, labelAction, type = 'text', ...inputProps }) {
+// invalid: chỉ tô viền đỏ (lỗi đã hiện ở hộp thông báo phía trên)
+export function TextField({ label, icon, error, errorNode, invalid: markInvalid, labelAction, type = 'text', ...inputProps }) {
   const id = useId()
   const [revealed, setRevealed] = useState(false)
   const isPassword = type === 'password'
+  const hasMessage = !!(error || errorNode)
+  const invalid = hasMessage || !!markInvalid
 
   return (
     <div className={styles.field}>
@@ -30,34 +32,30 @@ export function TextField({ label, icon, error, labelAction, type = 'text', ...i
         {labelAction}
       </div>
       <div className={styles.inputWrap}>
-        <img className={styles.leadingIcon} src={icon} alt="" width="16" height="16" />
+        {icon && <Icon name={icon} size={16} strokeWidth={1.7} className={styles.leadingIcon} />}
         <input
           id={id}
           type={isPassword && revealed ? 'text' : type}
-          className={[
-            styles.input,
-            isPassword ? styles.inputWithToggle : '',
-            error ? styles.inputError : '',
-          ].join(' ')}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
+          className={`${styles.input} ${invalid ? styles.inputError : ''}`}
+          aria-invalid={invalid}
+          aria-describedby={hasMessage ? `${id}-error` : undefined}
           {...inputProps}
         />
         {isPassword && (
           <button
             type="button"
-            className={`${styles.toggle} ${revealed ? styles.toggleActive : ''}`}
+            className={styles.toggle}
             onClick={() => setRevealed((v) => !v)}
             aria-label={revealed ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
             aria-pressed={revealed}
           >
-            <img src={iconEyeOff} alt="" width="16" height="16" />
+            <Icon name={revealed ? 'eye' : 'eyeOff'} size={16} strokeWidth={1.7} />
           </button>
         )}
       </div>
-      {error && (
+      {hasMessage && (
         <p id={`${id}-error`} className={styles.fieldError}>
-          {error}
+          {errorNode ?? error}
         </p>
       )}
     </div>
@@ -76,21 +74,36 @@ export function Checkbox({ children, error, ...inputProps }) {
   )
 }
 
-export function SubmitButton({ icon, loading, children }) {
+export function SubmitButton({ icon, loading, disabled, children, type = 'submit', onClick }) {
   return (
-    <button type="submit" className={styles.submit} disabled={loading}>
-      <img src={icon} alt="" width="16" height="16" />
+    <button type={type} className={styles.submit} disabled={loading || disabled} onClick={onClick}>
+      {icon && <Icon name={icon} size={16} strokeWidth={1.8} />}
       {loading ? 'Đang xử lý...' : children}
     </button>
   )
 }
 
-export function FormAlert({ children, tone = 'error' }) {
-  if (!children) return null
+/** Hộp thông báo trong thẻ: tone = error | warn | success */
+export function FormAlert({ tone = 'error', title, children }) {
+  if (!title && !children) return null
   return (
-    <p role={tone === 'error' ? 'alert' : 'status'} className={styles[tone]}>
-      {children}
-    </p>
+    <div role={tone === 'error' ? 'alert' : 'status'} className={`${styles.alert} ${styles[tone]}`}>
+      {title && <strong>{title}</strong>}
+      {children && <div>{children}</div>}
+    </div>
+  )
+}
+
+/** Khối kết quả có icon tròn ở giữa (Đã gửi email, Mật khẩu đã cập nhật) */
+export function SuccessPanel({ icon, title, children }) {
+  return (
+    <div className={styles.successPanel} role="status">
+      <span className={styles.successIcon}>
+        <Icon name={icon} size={20} strokeWidth={1.8} />
+      </span>
+      <strong>{title}</strong>
+      <p>{children}</p>
+    </div>
   )
 }
 
@@ -102,13 +115,12 @@ export function Divider({ children, uppercase }) {
   )
 }
 
-// Contract API (openapi.yaml v0.2.0) chưa có endpoint OAuth Google nên nút để disabled
+// Contract API chưa có endpoint OAuth Google
 export function GoogleButton({ children }) {
   return (
-    <button type="button" className={styles.google} disabled title="Chưa hỗ trợ">
-      <img src={googleLogo} alt="" width="16" height="16" />
+    <button type="button" className={styles.google} title="Chưa hỗ trợ đăng nhập Google" aria-disabled>
+      <GoogleLogo size={18} />
       {children}
     </button>
   )
 }
-

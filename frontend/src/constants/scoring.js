@@ -6,7 +6,7 @@ export const RUBRIC_VERSION = 'rubric-v1.0'
 export const CRITERIA = {
   RELEVANCE: {
     key: 'R',
-    label: 'Đúng trọng tâm',
+    label: 'Độ liên quan',
     desc: 'Trả lời trúng và đủ các ý câu hỏi yêu cầu',
     anchor5: 'Trả lời trúng và đầy đủ các ý câu hỏi yêu cầu, không lạc đề.',
   },
@@ -18,7 +18,7 @@ export const CRITERIA = {
   },
   DEPTH: {
     key: 'D',
-    label: 'Chiều sâu',
+    label: 'Độ cụ thể',
     desc: 'Ví dụ, số liệu, vai trò cá nhân, lập luận',
     anchor5: 'Chi tiết cụ thể, có số liệu hoặc kết quả đo được, nêu rõ đóng góp cá nhân và bài học.',
   },
@@ -30,7 +30,8 @@ export const CRITERIA = {
   },
   DELIVERY: {
     key: 'V',
-    label: 'Giọng nói (Delivery)',
+    label: 'Trình bày',
+    longLabel: 'Trình bày (tốc độ, từ đệm)',
     desc: 'Tốc độ nói và từ đệm, tính tự động không dùng AI',
     anchor5: 'Tốc độ 100-170 từ/phút và không quá 2 từ đệm trên 100 từ.',
   },
@@ -92,7 +93,8 @@ export function formatPoints(value) {
 
 // Dải WPM tối ưu (5 điểm) trong rubric mục 5
 export const WPM_IDEAL = [100, 170]
-export const WPM_SCALE_MAX = 240
+// Thang hiển thị tốc độ nói trên màn kết quả (Chậm ... Nhanh)
+export const WPM_SCALE = [40, 240]
 
 export const FAILED_MESSAGES = {
   ANSWER_TOO_SHORT: 'Câu trả lời quá ngắn (dưới 15 từ) nên không thể chấm. Hãy ghi âm lại câu trả lời đầy đủ hơn.',
@@ -102,20 +104,40 @@ export const FAILED_MESSAGES = {
   SERVER_RESTART: 'Máy chủ khởi động lại trong lúc chấm. Bạn có thể gửi chấm lại.',
 }
 
+// Mức điểm hiển thị ở Lịch sử / Tổng quan (Figma: Xuất sắc, Rất tốt, Cần cải thiện)
 export function scoreBand(total) {
-  if (total >= 85) return { label: 'Xuất sắc', tone: 'excellent' }
-  if (total >= 70) return { label: 'Tốt', tone: 'good' }
-  if (total >= 50) return { label: 'Đạt', tone: 'fair' }
-  return { label: 'Cần cải thiện', tone: 'weak' }
+  if (total >= 90) return { label: 'Xuất sắc', tone: 'green' }
+  if (total >= 80) return { label: 'Rất tốt', tone: 'green' }
+  if (total >= 60) return { label: 'Cần cải thiện', tone: 'amber' }
+  return { label: 'Chưa đạt', tone: 'red' }
 }
 
+// Điểm phụ của Delivery theo Rubric_Cham_Diem.md mục 5 (giá trị khởi đầu, khớp DeliveryCalculator)
+export function wpmScore(wpm) {
+  if (wpm >= 100 && wpm <= 170) return 5
+  if ((wpm >= 80 && wpm <= 99) || (wpm >= 171 && wpm <= 190)) return 4
+  if ((wpm >= 60 && wpm <= 79) || (wpm >= 191 && wpm <= 210)) return 3
+  if ((wpm >= 40 && wpm <= 59) || (wpm >= 211 && wpm <= 240)) return 2
+  return 1
+}
+
+export function fillerScore(rate) {
+  if (rate <= 2) return 5
+  if (rate <= 4) return 4
+  if (rate <= 6) return 3
+  if (rate <= 9) return 2
+  return 1
+}
+
+const SCORE_WORDS = { 5: 'Lý tưởng', 4: 'Khá', 3: 'Trung bình', 2: 'Yếu', 1: 'Kém' }
+
 export function wpmVerdict(wpm) {
-  if (wpm >= WPM_IDEAL[0] && wpm <= WPM_IDEAL[1]) return { label: 'Lý tưởng', tone: 'good' }
-  return wpm < WPM_IDEAL[0] ? { label: 'Hơi chậm', tone: 'warn' } : { label: 'Hơi nhanh', tone: 'warn' }
+  const score = wpmScore(wpm)
+  const label = score === 5 ? 'Lý tưởng' : wpm < WPM_IDEAL[0] ? 'Hơi chậm' : 'Hơi nhanh'
+  return { score, label, tone: score >= 4 ? 'green' : 'amber' }
 }
 
 export function fillerVerdict(rate) {
-  if (rate <= 2) return { label: 'Rất tốt', tone: 'good' }
-  if (rate <= 6) return { label: 'Khá', tone: 'warn' }
-  return { label: 'Nhiều từ đệm', tone: 'bad' }
+  const score = fillerScore(rate)
+  return { score, label: score === 5 ? 'Rất tốt' : SCORE_WORDS[score], tone: score >= 4 ? 'green' : 'amber' }
 }

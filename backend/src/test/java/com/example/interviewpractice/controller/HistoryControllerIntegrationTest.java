@@ -145,6 +145,16 @@ class HistoryControllerIntegrationTest {
     }
 
     @Test
+    void rejectsPageWhoseOffsetWouldOverflowInsteadOfFailingWith500() throws Exception {
+        mvc.perform(as(owner, get("/history").param("page", "30000000").param("size", "100")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.fieldErrors[*].field").value(contains("page")));
+        mvc.perform(as(owner, get("/history").param("page", "1000000").param("size", "100")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void detailIncludesScoreResult() throws Exception {
         mvc.perform(as(owner, get("/history/{id}", newMarketing.getId())))
                 .andExpect(status().isOk())

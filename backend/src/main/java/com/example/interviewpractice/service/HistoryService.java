@@ -36,6 +36,8 @@ public class HistoryService {
     // Ngày trong bộ lọc from/to là ngày theo giờ Việt Nam, người dùng chọn trên lịch
     static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     static final int MAX_PAGE_SIZE = 100;
+    // page * size phải vừa int (Spring Data đặt offset kiểu int), vượt quá thì trả 400 thay vì 500
+    static final int MAX_PAGE = 1_000_000;
     private static final BigDecimal MAX_SCORE = BigDecimal.valueOf(100);
 
     private final HistoryRepository history;
@@ -96,7 +98,9 @@ public class HistoryService {
 
     private static void validate(HistoryFilter f, int page, int size) {
         List<ErrorResponse.FieldError> errors = new ArrayList<>();
-        if (page < 0) errors.add(new ErrorResponse.FieldError("page", "Số trang phải từ 0 trở lên"));
+        if (page < 0 || page > MAX_PAGE) {
+            errors.add(new ErrorResponse.FieldError("page", "Số trang phải từ 0 đến " + MAX_PAGE));
+        }
         if (size < 1 || size > MAX_PAGE_SIZE) {
             errors.add(new ErrorResponse.FieldError("size", "Số phần tử mỗi trang phải từ 1 đến " + MAX_PAGE_SIZE));
         }

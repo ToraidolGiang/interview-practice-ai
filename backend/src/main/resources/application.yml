@@ -12,9 +12,23 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  # SMTP chỉ bật khi đặt SPRING_MAIL_HOST (cùng SPRING_MAIL_PORT, SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD);
+  # không đặt thì MailService chỉ ghi link đặt lại mật khẩu ra log (dùng khi dev)
+  mail:
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
 jwt:
   secret: ${JWT_SECRET}
   expiration-hours: 24
+
+# Quên mật khẩu (#157)
+password-reset:
+  frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
+  mail-from: ${MAIL_FROM:no-reply@interview-practice.local}
+  token-ttl: 30m
+  resend-cooldown: 60s
 
 ai:
   gemini:

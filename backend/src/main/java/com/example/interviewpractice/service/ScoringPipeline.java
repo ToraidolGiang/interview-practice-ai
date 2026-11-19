@@ -81,7 +81,24 @@ public class ScoringPipeline {
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy phiên để chấm"));
         byte[] audio = storage.get(input.getAudioKey());
         String transcript = stt.transcribe(sessionId, audio, mimeTypeOf(input.getAudioKey()));
+        scoreTranscript(sessionId, input, transcript);
+    }
 
+    /**
+     * Chạy nền việc chấm lại (UC5 6a) với transcript người dùng đã sửa: bỏ qua STT, tính lại Delivery rồi gọi LLM
+     * một lần. Cùng cam kết như {@link #run}: không ném ra ngoài, mọi lỗi chốt phiên FAILED.
+     */
+    public void rescore(UUID sessionId, String transcript) {
+        try {
+            ScoringInputView input = sessions.findScoringInput(sessionId)
+                    .orElseThrow(() -> new IllegalStateException("Không tìm thấy phiên để chấm lại"));
+            scoreTranscript(sessionId, input, transcript);
+        } catch (Throwable e) {
+            fail(sessionId, errorCodeOf(e), e);
+        }
+    }
+
+    private void scoreTranscript(UUID sessionId, ScoringInputView input, String transcript) {
         if (wordCount(transcript) < MIN_WORDS) {
             fail(sessionId, ANSWER_TOO_SHORT, null);
             return;

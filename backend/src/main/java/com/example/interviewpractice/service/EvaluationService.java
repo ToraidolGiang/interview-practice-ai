@@ -60,6 +60,41 @@ public class EvaluationService {
      */
     public PracticeSessionResponse submit(UUID sessionId, AuthUser user) {
         access.requireOwned(sessionId, user);
+        enforceLimits(user);
+        if (sessions.markProcessing(sessionId, clock.instant()) == 0) {
+            throw conflictFor(sessionId);
+        }
+        return enqueue(sessionId, user, () -> pipeline.run(sessionId), () -> sessions.revertToUploaded(sessionId));
+    }
+
+    /**
+     * Chấm lại với transcript người dùng đã sửa (UC5 6a), không gọi lại STT. Kiểm tra quyền sở hữu rồi độ dài
+     * transcript trước khi đụng tới trạng thái phiên.
+     *
+     * @throws ApiException 400 ANSWER_TOO_SHORT khi transcript dưới 15 từ; 403/404 theo quyền sở hữu;
+     *                      409 SESSION_PROCESSING (đang chấm), 409 SESSION_NOT_READY (chưa từng được chấm);
+     *                      429 như {@link #submit}; 503 khi hàng đợi đầy (phiên hoàn tác về SCORED, kết quả cũ còn nguyên)
+     */
+    public PracticeSessionResponse rescore(UUID sessionId, AuthUser user, String transcript) {
+        access.requireOwned(sessionId, user);
+        String text = transcript == null ? "" : transcript.strip();
+        if (ScoringPipeline.wordCount(text) < ScoringPipeline.MIN_WORDS) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, ScoringPipeline.ANSWER_TOO_SHORT,
+                    "Transcript phải có ít nhất " + ScoringPipeline.MIN_WORDS + " từ");
+        }
+        enforceLimits(user);
+        if (sessions.markRescoring(sessionId, clock.instant()) == 0) {
+            PracticeSession.Status status = sessions.findById(sessionId).map(PracticeSession::getStatus).orElse(null);
+            if (status == PracticeSession.Status.PROCESSING) {
+                throw new ApiException(HttpStatus.CONFLICT, "SESSION_PROCESSING", "Phiên đang được xử lý");
+            }
+            throw new ApiException(HttpStatus.CONFLICT, "SESSION_NOT_READY", "Phiên chưa từng được chấm điểm");
+        }
+        return enqueue(sessionId, user, () -> pipeline.rescore(sessionId, text),
+                () -> sessions.revertToScored(sessionId, clock.instant()));
+    }
+
+    private void enforceLimits(AuthUser user) {
         // Giới hạn mềm (F4): kiểm tra rồi mới giành quyền nên có thể vượt 1-2 phiên khi request đồng thời,
         // đủ để một user không lấp đầy hàng đợi chung; không cần khóa vì mục tiêu là chặn lạm dụng, không phải đếm chính xác
         if (sessions.countProcessingByUser(user.id()) >= maxProcessingPerUser) {
@@ -72,16 +107,17 @@ public class EvaluationService {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "DAILY_LIMIT_EXCEEDED",
                     "Bạn đã dùng hết " + maxEvaluationsPerDay + " lượt chấm hôm nay, vui lòng quay lại vào ngày mai");
         }
-        if (sessions.markProcessing(sessionId, clock.instant()) == 0) {
-            throw conflictFor(sessionId);
-        }
+    }
+
+    /** Đưa việc vào executor sau khi đã giành quyền chấm; hàng đợi đầy thì chạy {@code revert} rồi trả 503. */
+    private PracticeSessionResponse enqueue(UUID sessionId, AuthUser user, Runnable job, Runnable revert) {
         // Chụp phản hồi ngay sau khi chiếm quyền chấm, trước khi worker kịp đổi trạng thái
         PracticeSessionResponse response = PracticeSessionResponse.from(access.requireOwned(sessionId, user));
         try {
-            executor.execute(() -> pipeline.run(sessionId));
+            executor.execute(job);
         } catch (TaskRejectedException e) {
-            // Hàng đợi đầy: trả phiên về UPLOADED để người dùng gọi lại được, không để treo PROCESSING
-            sessions.revertToUploaded(sessionId);
+            // Hàng đợi đầy: hoàn tác để người dùng gọi lại được, không để treo PROCESSING
+            revert.run();
             log.warn("Hàng đợi chấm đầy, đã hoàn tác sessionId={}", sessionId);
             throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE",
                     "Hệ thống chấm điểm đang bận, vui lòng thử lại sau");

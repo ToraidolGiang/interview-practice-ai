@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.interviewpractice.dto.CreateSessionRequest;
 import com.example.interviewpractice.dto.PracticeSessionResponse;
+import com.example.interviewpractice.dto.RescoreRequest;
 import com.example.interviewpractice.dto.ScoreResultResponse;
 import com.example.interviewpractice.security.AuthUser;
 import com.example.interviewpractice.service.EvaluationService;
@@ -73,5 +74,13 @@ public class PracticeSessionController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public PracticeSessionResponse evaluate(@PathVariable UUID id, @AuthenticationPrincipal AuthUser user) {
         return evaluationService.submit(id, user);
+    }
+
+    /** Chấm lại với transcript đã sửa (không gọi lại STT): trả 202 và polling như /evaluate. */
+    @PostMapping("/{id}/rescore")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PracticeSessionResponse rescore(@PathVariable UUID id, @Valid @RequestBody RescoreRequest request,
+            @AuthenticationPrincipal AuthUser user) {
+        return evaluationService.rescore(id, user, request.transcript());
     }
 }

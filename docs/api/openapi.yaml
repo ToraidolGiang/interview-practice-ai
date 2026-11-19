@@ -448,7 +448,8 @@ paths:
       summary: Chấm lại với transcript đã sửa (UC5, Alt 6a, bất đồng bộ)
       description: >
         Dùng khi STT nhận sai. Không gọi lại STT: hệ thống tính lại Delivery từ transcript đã sửa, gọi LLM 1 lần rồi ghi đè kết quả cũ.
-        Trả 202 và polling như /evaluate.
+        Trả 202 và polling như /evaluate. Chỉ phiên đã có kết quả (SCORED, hoặc FAILED sau một lần chấm lại lỗi) mới chấm lại được;
+        nếu chấm lại lỗi, phiên chuyển FAILED và kết quả cũ vẫn còn để thử lại. Tính vào cùng giới hạn 429 như /evaluate.
       parameters:
         - $ref: '#/components/parameters/SessionId'
       requestBody:
@@ -486,6 +487,18 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Session đang PROCESSING hoặc chưa từng được chấm (code SESSION_PROCESSING / SESSION_NOT_READY)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Quá nhiều phiên đang chấm (TOO_MANY_PROCESSING) hoặc hết hạn mức chấm trong ngày (DAILY_LIMIT_EXCEEDED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Hàng đợi chấm đầy; phiên hoàn tác về SCORED với kết quả cũ
           content:
             application/json:
               schema:

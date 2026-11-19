@@ -58,6 +58,29 @@ public interface PracticeSessionRepository extends JpaRepository<PracticeSession
             + "error_code = NULL, completed_at = NULL WHERE id = :id AND status IN ('UPLOADED', 'FAILED')", nativeQuery = true)
     int markProcessing(@Param("id") UUID id, @Param("now") Instant now);
 
+    /**
+     * Giành quyền chấm lại (UC5 6a): chỉ phiên SCORED/FAILED đã có kết quả chấm trước đó mới sang PROCESSING; một
+     * UPDATE có điều kiện nên hai request đồng thời chỉ một cái thắng. Trả 0 nếu phiên ở trạng thái khác hoặc chưa
+     * từng được chấm.
+     */
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "UPDATE practice_sessions SET status = 'PROCESSING', processing_started_at = :now, "
+            + "error_code = NULL, completed_at = NULL WHERE id = :id AND status IN ('SCORED', 'FAILED') "
+            + "AND EXISTS (SELECT 1 FROM score_results r WHERE r.session_id = practice_sessions.id)",
+            nativeQuery = true)
+    int markRescoring(@Param("id") UUID id, @Param("now") Instant now);
+
+    /** Hoàn tác về SCORED (kết quả cũ còn nguyên) khi không đưa được việc chấm lại vào hàng đợi. */
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "UPDATE practice_sessions SET status = 'SCORED', processing_started_at = NULL, "
+            + "completed_at = :now, total_score = (SELECT r.total_score FROM score_results r "
+            + "WHERE r.session_id = practice_sessions.id) WHERE id = :id AND status = 'PROCESSING' "
+            + "AND EXISTS (SELECT 1 FROM score_results r WHERE r.session_id = practice_sessions.id)",
+            nativeQuery = true)
+    int revertToScored(@Param("id") UUID id, @Param("now") Instant now);
+
     /** Hoàn tác về UPLOADED khi không đưa được việc chấm vào hàng đợi; trả 0 nếu phiên không còn PROCESSING. */
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)

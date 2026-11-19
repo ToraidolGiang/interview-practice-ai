@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.interviewpractice.entity.ApiUsage;
 import com.example.interviewpractice.entity.ApiUsage.Provider;
@@ -28,7 +27,8 @@ public class ApiUsageRecorder {
     }
 
     /** Ghi một dòng api_usages; usageUnit có thể null khi nhà cung cấp không trả số liệu. */
-    @Transactional
+    // Cố ý không dùng @Transactional: save() tự commit ngay trong try, nên lỗi ghi bị bắt tại đây
+    // và không biến thành UnexpectedRollbackException lúc commit, đè lên kết quả Gemini vừa nhận.
     public void record(UUID sessionId, Provider provider, long latencyMs, BigDecimal usageUnit) {
         try {
             ApiUsage usage = new ApiUsage();

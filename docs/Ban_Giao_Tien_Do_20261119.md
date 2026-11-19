@@ -43,3 +43,16 @@ Tiếp nối `Ban_Giao_Tien_Do_20261117.md`. Nhánh: `feature/AI-PIPELINE-nen-ta
 
 ## 6. Môi trường
 Như bàn giao 17/11. Docker Desktop không tự chạy: mở app rồi `docker start interview-pg-test`.
+
+## 7. Cập nhật buổi chiều 19/11 (chưa push)
+Trên nhánh `feature/AI-PIPELINE-nen-tang-phien-luyen-tap`, test backend 337/337:
+- F4 phần còn lại: hạn mức 20 lượt chấm/user/ngày (429 `DAILY_LIMIT_EXCEEDED`), cấu hình `app.scoring.max-evaluations-per-day`, `day-zone`. Chấm lại cùng một phiên chỉ tính một lượt.
+- F5: `AudioStorage.delete` best-effort, xóa file cũ khi nộp lại và file mới khi thua race. Còn thiếu S3 lifecycle trên AWS.
+- F2: `ScoringInput` thành interface projection `ScoringInputView`.
+- #155: `POST /practice-sessions/{id}/rescore` (không gọi lại STT, ghi đè kết quả cũ). Lỗi chấm lại thì FAILED, kết quả cũ còn để thử lại.
+- #163: `/admin/analytics/overview`, `/users/{userId}`, `/export` (chỉ csv; xlsx trả 400, cần Apache POI nếu muốn hỗ trợ).
+- #131: nhánh `feature/DLPVXVTHA-131-dockerfile` (từ `main`), Dockerfile đa tầng, đã build và chạy thử với Postgres local.
+
+Còn lại: #121 TTS (cần `FPT_AI_API_KEY` thật để kiểm), #132 deploy Render, #133 CD, và các việc của Giang ở mục 3 (chấm 100 câu, smoke test, đo AC-30, Jira, chốt #18).
+Môi trường Windows: nếu Postgres báo `invalid value for parameter "TimeZone": "Asia/Saigon"` thì chạy test với `JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Ho_Chi_Minh`.
+

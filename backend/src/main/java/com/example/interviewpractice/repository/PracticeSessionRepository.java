@@ -14,7 +14,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.interviewpractice.entity.PracticeSession;
-import com.example.interviewpractice.dto.ScoringInput;
 
 public interface PracticeSessionRepository extends JpaRepository<PracticeSession, UUID> {
 
@@ -101,8 +100,8 @@ public interface PracticeSessionRepository extends JpaRepository<PracticeSession
     long countEvaluatedSince(@Param("userId") UUID userId, @Param("since") Instant since);
 
     /** Dữ liệu worker cần để chấm; đọc bằng một truy vấn nên không giữ transaction/entity lazy khi gọi dịch vụ ngoài. */
-    @Query("SELECT new com.example.interviewpractice.dto.ScoringInput(s.id, s.audioKey, s.durationSec, "
-            + "q.questionType, q.content, q.referenceAnswer) FROM PracticeSession s JOIN s.question q "
-            + "WHERE s.id = :id")
-    Optional<ScoringInput> findScoringInput(@Param("id") UUID id);
+    @Query("SELECT s.id AS sessionId, s.audioKey AS audioKey, s.durationSec AS durationSec, "
+            + "q.questionType AS questionType, q.content AS questionContent, q.referenceAnswer AS referenceAnswer "
+            + "FROM PracticeSession s JOIN s.question q WHERE s.id = :id")
+    Optional<ScoringInputView> findScoringInput(@Param("id") UUID id);
 }

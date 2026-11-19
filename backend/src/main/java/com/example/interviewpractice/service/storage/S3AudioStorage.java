@@ -3,6 +3,8 @@ package com.example.interviewpractice.service.storage;
 import java.util.Map;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.interviewpractice.config.AwsProperties;
@@ -10,6 +12,7 @@ import com.example.interviewpractice.config.AwsProperties;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -24,6 +27,8 @@ public class S3AudioStorage implements AudioStorage {
             "audio/mpeg", "mp3",
             "audio/wav", "wav",
             "audio/mp4", "m4a");
+
+    private static final Logger log = LoggerFactory.getLogger(S3AudioStorage.class);
 
     private final S3Client s3;
     private final String bucket;
@@ -52,6 +57,15 @@ public class S3AudioStorage implements AudioStorage {
             return s3.getObjectAsBytes(GetObjectRequest.builder().bucket(bucket).key(key).build()).asByteArray();
         } catch (SdkException e) {
             throw new AudioStorageException("Không đọc được audio từ S3", e);
+        }
+    }
+
+    @Override
+    public void delete(String key) {
+        try {
+            s3.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+        } catch (SdkException e) {
+            log.warn("Không xóa được audio mồ côi key={}", key, e);
         }
     }
 }

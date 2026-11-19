@@ -110,10 +110,17 @@ public class PracticeSessionService {
                     "Không lưu được audio, vui lòng thử lại sau");
         }
 
+        String oldKey = session.getAudioKey();
         if (sessions.markUploaded(sessionId, key, durationSeconds, clock.instant()) == 0) {
+            // Không ghi nhận được audio mới nên file vừa lưu thành mồ côi
+            storage.delete(key);
             // Trạng thái đổi sang PROCESSING/SCORED giữa lúc kiểm tra và lúc cập nhật
             rejectIfNotUploadable(sessions.findById(sessionId).map(PracticeSession::getStatus).orElse(null));
             throw new ApiException(HttpStatus.CONFLICT, "SESSION_PROCESSING", "Phiên đang được xử lý");
+        }
+        if (oldKey != null && !oldKey.equals(key)) {
+            // Nộp lại audio: file của lần nộp trước không còn được tham chiếu
+            storage.delete(oldKey);
         }
         return PracticeSessionResponse.from(access.requireOwned(sessionId, user));
     }

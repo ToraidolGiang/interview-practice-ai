@@ -157,4 +157,40 @@ class PracticeSessionUploadIntegrationTest extends AbstractSessionApiTest {
                 .andExpect(jsonPath("$.code").value("SERVICE_UNAVAILABLE"));
         assertEquals("CREATED", statusOf(session.getId()));
     }
+
+    @Test
+    void reUploadDeletesPreviousAudioFile() throws Exception {
+        PracticeSession session = newSession(owner, PracticeSession.Status.UPLOADED);
+        jdbc.update("update practice_sessions set audio_key = 'audio/old.webm' where id = ?", session.getId());
+        when(storage.put(any(), any(), any(), anyString())).thenReturn(KEY);
+
+        upload(session.getId(), webm(), "30").andExpect(status().isOk());
+
+        verify(storage).delete("audio/old.webm");
+        verify(storage, never()).delete(KEY);
+    }
+
+    @Test
+    void firstUploadDeletesNothing() throws Exception {
+        PracticeSession session = newSession(owner, PracticeSession.Status.CREATED);
+        when(storage.put(any(), any(), any(), anyString())).thenReturn(KEY);
+
+        upload(session.getId(), webm(), "30").andExpect(status().isOk());
+
+        verify(storage, never()).delete(anyString());
+    }
+
+    @Test
+    void lostRaceDeletesTheNewlyStoredFile() throws Exception {
+        PracticeSession session = newSession(owner, PracticeSession.Status.UPLOADED);
+        // Phiên chuyển PROCESSING ngay khi file vừa lên S3 (sau lúc kiểm tra trạng thái)
+        when(storage.put(any(), any(), any(), anyString())).thenAnswer(inv -> {
+            jdbc.update("update practice_sessions set status = 'PROCESSING' where id = ?", session.getId());
+            return KEY;
+        });
+
+        upload(session.getId(), webm(), "30").andExpect(status().isConflict());
+
+        verify(storage).delete(KEY);
+    }
 }

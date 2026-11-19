@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.example.interviewpractice.dto.ScoringInput;
 import com.example.interviewpractice.repository.PracticeSessionRepository;
+import com.example.interviewpractice.repository.ScoringInputView;
 import com.example.interviewpractice.service.ai.LlmException;
 import com.example.interviewpractice.service.ai.LlmRequest;
 import com.example.interviewpractice.service.ai.LlmResult;
@@ -77,28 +77,28 @@ public class ScoringPipeline {
     }
 
     private void score(UUID sessionId) {
-        ScoringInput input = sessions.findScoringInput(sessionId)
+        ScoringInputView input = sessions.findScoringInput(sessionId)
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy phiên để chấm"));
-        byte[] audio = storage.get(input.audioKey());
-        String transcript = stt.transcribe(sessionId, audio, mimeTypeOf(input.audioKey()));
+        byte[] audio = storage.get(input.getAudioKey());
+        String transcript = stt.transcribe(sessionId, audio, mimeTypeOf(input.getAudioKey()));
 
         if (wordCount(transcript) < MIN_WORDS) {
             fail(sessionId, ANSWER_TOO_SHORT, null);
             return;
         }
 
-        LlmRequest request = promptBuilder.build(sessionId, input.questionType(), input.questionContent(),
-                input.referenceAnswer(), transcript);
+        LlmRequest request = promptBuilder.build(sessionId, input.getQuestionType(), input.getQuestionContent(),
+                input.getReferenceAnswer(), transcript);
         LlmResult llm = llmScorer.score(request, transcript);
         if (llm.injectionSuspected()) {
             // Audit log (Q7): chỉ sessionId, không log transcript hay trích dẫn; vẫn chấm theo nội dung (AC-32)
             log.warn("injection_suspected sessionId={}", sessionId);
         }
-        Double durationSec = input.durationSec() == null ? null : input.durationSec().doubleValue();
+        Double durationSec = input.getDurationSec() == null ? null : input.getDurationSec().doubleValue();
         Optional<DeliveryMetrics> metrics = delivery.calculate(transcript, durationSec);
-        ScoreOutcome outcome = calculator.calculate(input.questionType(), llm.criteria(), metrics, llm.offTopic());
+        ScoreOutcome outcome = calculator.calculate(input.getQuestionType(), llm.criteria(), metrics, llm.offTopic());
 
-        writer.save(new ScoredAnswer(sessionId, transcript, input.questionType(), llm.criteria(), metrics, outcome,
+        writer.save(new ScoredAnswer(sessionId, transcript, input.getQuestionType(), llm.criteria(), metrics, outcome,
                 llm.offTopic(), llm.injectionSuspected(), llm.feedbackText(), llm.sampleAnswer()));
         log.info("Chấm xong sessionId={}", sessionId);
     }

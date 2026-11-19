@@ -9,4 +9,7 @@ public interface AudioStorage {
     String put(UUID userId, UUID sessionId, byte[] data, String contentType);
 
     byte[] get(String key);
+
+    /** Xóa audio theo khóa, best-effort: lỗi chỉ được ghi log, không ném (dùng để dọn file mồ côi). */
+    void delete(String key);
 }

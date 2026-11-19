@@ -20,6 +20,7 @@ import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -51,6 +52,18 @@ class S3AudioStorageTest {
                 .thenThrow(SdkClientException.create("lỗi mạng"));
         assertThrows(AudioStorageException.class,
                 () -> storage.put(UUID.randomUUID(), UUID.randomUUID(), new byte[] {1}, "audio/webm"));
+    }
+
+    @Test
+    void deleteRemovesObjectAndSwallowsSdkFailure() {
+        storage.delete("audio/a/b/c.webm");
+        ArgumentCaptor<DeleteObjectRequest> captor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
+        verify(s3).deleteObject(captor.capture());
+        assertEquals("bucket-x", captor.getValue().bucket());
+        assertEquals("audio/a/b/c.webm", captor.getValue().key());
+
+        when(s3.deleteObject(any(DeleteObjectRequest.class))).thenThrow(SdkClientException.create("lỗi mạng"));
+        storage.delete("audio/a/b/d.webm"); // best-effort: không ném
     }
 
     @Test

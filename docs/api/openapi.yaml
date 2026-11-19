@@ -806,6 +806,9 @@ paths:
     get:
       tags: [Admin - Analytics]
       summary: Xuất báo cáo hoạt động dạng Excel/CSV — chỉ ADMIN
+      description: >
+        Mỗi dòng là một người dùng (họ tên, email, số phiên, số phiên đã chấm, điểm trung bình, lần luyện tập gần nhất) trong
+        khoảng [from, to]. Hiện chỉ hỗ trợ format=csv (UTF-8 có BOM, chống formula injection); xlsx trả 400 VALIDATION_ERROR.
       security:
         - bearerAuth: [ADMIN]
       parameters:
@@ -837,6 +840,12 @@ paths:
               schema:
                 type: string
                 format: binary
+        '400':
+          description: format không hỗ trợ hoặc from sau to (code VALIDATION_ERROR)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':

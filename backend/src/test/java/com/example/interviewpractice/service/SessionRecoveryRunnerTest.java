@@ -54,4 +54,16 @@ class SessionRecoveryRunnerTest extends AbstractSessionApiTest {
         assertThat(statusOf(failed.getId())).isEqualTo("FAILED");
         assertThat(errorOf(failed.getId())).isNull();
     }
+
+    @Test
+    void sweepFailsOnlyProcessingSessionsOlderThanTimeout() {
+        PracticeSession stuck = processingSince(Instant.now().minus(1, ChronoUnit.HOURS));
+        PracticeSession running = processingSince(Instant.now().minus(10, ChronoUnit.SECONDS));
+
+        runner.sweepTimedOut();
+
+        assertThat(statusOf(stuck.getId())).isEqualTo("FAILED");
+        assertThat(errorOf(stuck.getId())).isEqualTo("PROCESSING_TIMEOUT");
+        assertThat(statusOf(running.getId())).isEqualTo("PROCESSING");
+    }
 }

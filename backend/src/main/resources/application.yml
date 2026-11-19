@@ -47,6 +47,11 @@ app:
     min-seconds: 10
     max-seconds: 180
   scoring:
+    # Phiên PROCESSING quá hạn này bị đánh FAILED PROCESSING_TIMEOUT; phải dài hơn thời gian chấm tối đa
+    processing-timeout-seconds: 300
+    sweep-interval-ms: 60000
+    # Số phiên đang chấm tối đa của một user (chống một user lấp đầy hàng đợi chung)
+    max-processing-per-user: 3
     executor:
       core: 2
       max: 4

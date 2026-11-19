@@ -11,7 +11,7 @@
 - **Một kết quả mới nhất mỗi phiên:** `score_results.session_id` là duy nhất. Chấm lại sau khi sửa transcript ghi đè kết quả cũ (bản cũ chỉ lưu trong `audit_logs` nếu cần).
 - **Truy vết chấm điểm:** mỗi kết quả lưu `rubric_version`, `prompt_version`, `model_version`, `filler_list_version`; đổi phiên bản không tính lại kết quả cũ.
 - **Lưu trữ audio:** chỉ lưu khóa S3 (`audio_key`, `tts_audio_key`), API trả URL ký sẵn có hạn. Audio ghi âm được dọn sau 6 tháng bằng S3 lifecycle, đồng thời đặt `audio_key = NULL`.
-- **Chấm bất đồng bộ:** `practice_sessions.status = 'PROCESSING'` kèm `processing_started_at`; khi khởi động lại, phiên PROCESSING quá hạn được đặt `FAILED` với `error_code = 'SERVER_RESTART'` (dùng `idx_sessions_processing`).
+- **Chấm bất đồng bộ:** `practice_sessions.status = 'PROCESSING'` kèm `processing_started_at`; khi khởi động lại, phiên PROCESSING quá hạn được đặt `FAILED` với `error_code = 'SERVER_RESTART'` (dùng `idx_sessions_processing`). Khi ứng dụng đang chạy, job quét mỗi 60 giây đặt `FAILED` + `PROCESSING_TIMEOUT` cho phiên PROCESSING quá 300 giây.
 
 ## Quyết định đã chốt
 

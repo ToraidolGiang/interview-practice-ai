@@ -397,6 +397,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Người dùng đang có quá nhiều phiên PROCESSING (mặc định 3), code TOO_MANY_PROCESSING; phiên giữ nguyên trạng thái
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '503':
           description: Hàng đợi chấm điểm đầy (code SERVICE_UNAVAILABLE); phiên được hoàn tác về UPLOADED
           content:
@@ -1135,7 +1141,7 @@ components:
         errorCode:
           type: string
           nullable: true
-          description: Mã lỗi khi status = FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART, INTERNAL_ERROR)
+          description: Mã lỗi khi status = FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART, PROCESSING_TIMEOUT, INTERNAL_ERROR)
     ScoreResult:
       type: object
       properties:

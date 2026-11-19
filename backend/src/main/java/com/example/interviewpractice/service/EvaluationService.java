@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.HttpStatus;
@@ -31,9 +32,12 @@ public class EvaluationService {
     private final ScoringPipeline pipeline;
     private final TaskExecutor executor;
     private final Clock clock;
+    private final int maxProcessingPerUser;
 
     public EvaluationService(PracticeSessionRepository sessions, SessionAccess access, ScoringPipeline pipeline,
-            @Qualifier("scoringExecutor") TaskExecutor executor, Clock clock) {
+            @Qualifier("scoringExecutor") TaskExecutor executor, Clock clock,
+            @Value("${app.scoring.max-processing-per-user}") int maxProcessingPerUser) {
+        this.maxProcessingPerUser = maxProcessingPerUser;
         this.sessions = sessions;
         this.access = access;
         this.pipeline = pipeline;
@@ -45,10 +49,16 @@ public class EvaluationService {
      * Đưa phiên vào hàng đợi chấm và trả phiên ở trạng thái PROCESSING.
      *
      * @throws ApiException 403/404 theo quyền sở hữu; 409 SESSION_PROCESSING (đang chấm hoặc chưa có audio),
-     *                      409 SESSION_ALREADY_SCORED; 503 khi hàng đợi chấm đầy (trạng thái đã hoàn tác UPLOADED)
+     *                      409 SESSION_ALREADY_SCORED; 429 TOO_MANY_PROCESSING khi user đang có quá nhiều phiên chấm; 503 khi hàng đợi chấm đầy (trạng thái đã hoàn tác UPLOADED)
      */
     public PracticeSessionResponse submit(UUID sessionId, AuthUser user) {
         access.requireOwned(sessionId, user);
+        // Giới hạn mềm (F4): kiểm tra rồi mới giành quyền nên có thể vượt 1-2 phiên khi request đồng thời,
+        // đủ để một user không lấp đầy hàng đợi chung; không cần khóa vì mục tiêu là chặn lạm dụng, không phải đếm chính xác
+        if (sessions.countProcessingByUser(user.id()) >= maxProcessingPerUser) {
+            throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "TOO_MANY_PROCESSING",
+                    "Bạn đang có quá nhiều phiên đang chấm, vui lòng đợi một phiên xong rồi thử lại");
+        }
         if (sessions.markProcessing(sessionId, clock.instant()) == 0) {
             throw conflictFor(sessionId);
         }

@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * TaskRejectedException để tầng gọi hoàn tác trạng thái và trả 503 thay vì nuốt việc.
  */
 @Configuration
+@EnableScheduling
 public class AsyncConfig {
 
     @Bean(name = "scoringExecutor")

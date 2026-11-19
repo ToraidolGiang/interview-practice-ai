@@ -77,6 +77,22 @@ public interface PracticeSessionRepository extends JpaRepository<PracticeSession
             nativeQuery = true)
     int failStaleProcessing(@Param("bootTime") Instant bootTime, @Param("now") Instant now);
 
+    /**
+     * Đánh FAILED (PROCESSING_TIMEOUT) các phiên PROCESSING quá hạn khi ứng dụng vẫn chạy (F3): lúc DB chập chờn
+     * markFailed/revertToUploaded có thể lỗi và phiên kẹt mãi. Chỉ đụng phiên bắt đầu chấm trước cutoff.
+     */
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "UPDATE practice_sessions SET status = 'FAILED', error_code = 'PROCESSING_TIMEOUT', "
+            + "completed_at = :now WHERE status = 'PROCESSING' AND processing_started_at < :cutoff",
+            nativeQuery = true)
+    int failTimedOutProcessing(@Param("cutoff") Instant cutoff, @Param("now") Instant now);
+
+    /** Số phiên đang chấm của một người dùng, để giới hạn tải theo user (F4). */
+    @Query("SELECT COUNT(s) FROM PracticeSession s WHERE s.user.id = :userId AND s.status = "
+            + "com.example.interviewpractice.entity.PracticeSession.Status.PROCESSING")
+    long countProcessingByUser(@Param("userId") UUID userId);
+
     /** Dữ liệu worker cần để chấm; đọc bằng một truy vấn nên không giữ transaction/entity lazy khi gọi dịch vụ ngoài. */
     @Query("SELECT new com.example.interviewpractice.dto.ScoringInput(s.id, s.audioKey, s.durationSec, "
             + "q.questionType, q.content, q.referenceAnswer) FROM PracticeSession s JOIN s.question q "

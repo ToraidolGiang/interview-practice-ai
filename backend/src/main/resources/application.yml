@@ -52,6 +52,9 @@ app:
     sweep-interval-ms: 60000
     # Số phiên đang chấm tối đa của một user (chống một user lấp đầy hàng đợi chung)
     max-processing-per-user: 3
+    # Số lượt chấm tối đa của một user mỗi ngày (bảo vệ chi phí Gemini); ngày tính theo múi giờ day-zone
+    max-evaluations-per-day: 20
+    day-zone: Asia/Ho_Chi_Minh
     executor:
       core: 2
       max: 4

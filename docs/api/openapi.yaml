@@ -398,7 +398,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '429':
-          description: Người dùng đang có quá nhiều phiên PROCESSING (mặc định 3), code TOO_MANY_PROCESSING; phiên giữ nguyên trạng thái
+          description: Người dùng đang có quá nhiều phiên PROCESSING (mặc định 3, code TOO_MANY_PROCESSING) hoặc đã hết hạn mức chấm trong ngày (mặc định 20 lượt, ngày tính theo giờ Asia/Ho_Chi_Minh, code DAILY_LIMIT_EXCEEDED); phiên giữ nguyên trạng thái
           content:
             application/json:
               schema:

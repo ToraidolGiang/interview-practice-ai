@@ -1,6 +1,7 @@
 package com.example.interviewpractice.service;
 
 import java.time.Clock;
+import java.time.ZoneId;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -33,11 +34,17 @@ public class EvaluationService {
     private final TaskExecutor executor;
     private final Clock clock;
     private final int maxProcessingPerUser;
+    private final int maxEvaluationsPerDay;
+    private final ZoneId dayZone;
 
     public EvaluationService(PracticeSessionRepository sessions, SessionAccess access, ScoringPipeline pipeline,
             @Qualifier("scoringExecutor") TaskExecutor executor, Clock clock,
-            @Value("${app.scoring.max-processing-per-user}") int maxProcessingPerUser) {
+            @Value("${app.scoring.max-processing-per-user}") int maxProcessingPerUser,
+            @Value("${app.scoring.max-evaluations-per-day}") int maxEvaluationsPerDay,
+            @Value("${app.scoring.day-zone}") String dayZone) {
         this.maxProcessingPerUser = maxProcessingPerUser;
+        this.maxEvaluationsPerDay = maxEvaluationsPerDay;
+        this.dayZone = ZoneId.of(dayZone);
         this.sessions = sessions;
         this.access = access;
         this.pipeline = pipeline;
@@ -58,6 +65,12 @@ public class EvaluationService {
         if (sessions.countProcessingByUser(user.id()) >= maxProcessingPerUser) {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "TOO_MANY_PROCESSING",
                     "Bạn đang có quá nhiều phiên đang chấm, vui lòng đợi một phiên xong rồi thử lại");
+        }
+        // Hạn mức theo ngày (F4): bảo vệ chi phí Gemini; đếm theo ngày lịch của múi giờ cấu hình
+        if (sessions.countEvaluatedSince(user.id(), clock.instant().atZone(dayZone).toLocalDate()
+                .atStartOfDay(dayZone).toInstant()) >= maxEvaluationsPerDay) {
+            throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "DAILY_LIMIT_EXCEEDED",
+                    "Bạn đã dùng hết " + maxEvaluationsPerDay + " lượt chấm hôm nay, vui lòng quay lại vào ngày mai");
         }
         if (sessions.markProcessing(sessionId, clock.instant()) == 0) {
             throw conflictFor(sessionId);

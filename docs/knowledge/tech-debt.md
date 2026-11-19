@@ -6,7 +6,7 @@ Nguồn: `specs/AI-PIPELINE/review.md`, `design.md`, `test-report.md`.
 | Mã | Vấn đề | Đề xuất |
 |---|---|---|
 | F3 | ~~`markFailed`/`revertToUploaded` lỗi (DB chập chờn) -> phiên kẹt PROCESSING, mọi evaluate/upload 409 `SESSION_PROCESSING` tới lần restart sau (`ScoringPipeline.fail`, `EvaluationService.java:61`)~~ **Đã xử lý 2026-11-19** | `SessionRecoveryRunner.sweepTimedOut` quét mỗi 60s, đánh FAILED `PROCESSING_TIMEOUT` phiên quá 300s |
-| F4 | ~~Không rate limit /evaluate, không giới hạn phiên theo user; 1 user lấp đầy queue (core 2/max 4/queue 20) -> user khác 503, tốn quota Gemini~~ **Đã xử lý một phần 2026-11-19** | `EvaluationService` trả 429 `TOO_MANY_PROCESSING` khi user có >=3 phiên PROCESSING. Còn thiếu: hạn mức theo ngày |
+| F4 | ~~Không rate limit /evaluate, không giới hạn phiên theo user; 1 user lấp đầy queue (core 2/max 4/queue 20) -> user khác 503, tốn quota Gemini~~ **Đã xử lý 2026-11-19** | `EvaluationService` trả 429 `TOO_MANY_PROCESSING` khi user có >=3 phiên PROCESSING và 429 `DAILY_LIMIT_EXCEEDED` khi đã chấm >=20 phiên trong ngày (cấu hình `app.scoring.max-evaluations-per-day`). Chấm lại cùng một phiên chỉ tính một lượt |
 | F5 | Upload lại hoặc 409 sau `put` để lại file S3 mồ côi chứa giọng nói (`PracticeSessionService.java:106-117`) | Xóa best-effort khóa cũ/mới, hoặc S3 lifecycle |
 | F2 | `PracticeSessionRepository` import `dto/ScoringInput` (phụ thuộc ngược) | Dùng interface projection |
 

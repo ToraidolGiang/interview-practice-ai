@@ -93,6 +93,13 @@ public interface PracticeSessionRepository extends JpaRepository<PracticeSession
             + "com.example.interviewpractice.entity.PracticeSession.Status.PROCESSING")
     long countProcessingByUser(@Param("userId") UUID userId);
 
+    /**
+     * Số phiên user đã được đưa vào chấm kể từ {@code since}, để giới hạn lượt chấm theo ngày (F4). Chấm lại cùng
+     * một phiên ghi đè processing_started_at nên chỉ tính một lượt; phiên bị hoàn tác (NULL) không tính.
+     */
+    @Query("SELECT COUNT(s) FROM PracticeSession s WHERE s.user.id = :userId AND s.processingStartedAt >= :since")
+    long countEvaluatedSince(@Param("userId") UUID userId, @Param("since") Instant since);
+
     /** Dữ liệu worker cần để chấm; đọc bằng một truy vấn nên không giữ transaction/entity lazy khi gọi dịch vụ ngoài. */
     @Query("SELECT new com.example.interviewpractice.dto.ScoringInput(s.id, s.audioKey, s.durationSec, "
             + "q.questionType, q.content, q.referenceAnswer) FROM PracticeSession s JOIN s.question q "

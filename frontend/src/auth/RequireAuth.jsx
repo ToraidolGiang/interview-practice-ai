@@ -8,6 +8,13 @@ export function RequireAuth() {
   return <Outlet />
 }
 
+// Bọc trong RequireAuth: không phải ADMIN thì về dashboard
+export function RequireAdmin() {
+  const { isAdmin } = useAuth()
+  if (!isAdmin) return <Navigate to="/dashboard" replace />
+  return <Outlet />
+}
+
 // Trang đăng nhập/đăng ký: đã đăng nhập thì chuyển vào app
 export function GuestOnly() {
   const { isAuthenticated } = useAuth()

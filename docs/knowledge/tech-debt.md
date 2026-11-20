@@ -19,4 +19,17 @@ Nguồn: `specs/AI-PIPELINE/review.md`, `design.md`, `test-report.md`.
 - `durationSeconds` do client khai (WPM có thể bị làm giả); chỉ đúng 1 instance (ADR-001).
 - Q10 (chờ xác nhận): `weight` trả về là trọng số gốc hay đã chia lại khi Delivery null (hiện lưu gốc).
 
-Cập nhật lần cuối: 2026-11-17
+## Frontend & đề xuất cho backend/openapi (task 20261120-frontend-noi-api-moi)
+Đề xuất cho Giang (frontend không tự sửa backend/openapi):
+- `/history` không có `playbackUrl` trong schema (`audioUrl` là khóa S3, không phát được); `HistoryPage` dùng `session.playbackUrl` nên nút nghe lại có thể luôn khóa (`openapi.yaml:603` mô tả có, schema không khai).
+- Chưa có API liệt kê user / `GET /admin/analytics/users` hoặc cột userId (không làm chi tiết user, Q4); chưa có API bật lại câu HIDDEN; chưa có audit log thao tác admin.
+- Không rõ đơn vị tiền của `estimatedCost` (UI chỉ ghi "ước tính").
+- Ghi vào openapi: `newPassword` giới hạn 72 byte UTF-8 (`ResetPasswordRequest.java:17`); `RescoreRequest.transcript` tối đa 10000 ký tự; rescore 503 hoàn tác về SCORED.
+
+Nợ frontend:
+- `HistoryPage` gọi `/questions/{id}` cho từng dòng (N+1) vì `PracticeSession` không có nội dung câu hỏi; lọc keyword chỉ trong trang hiện tại.
+- `QuestionsPage`: ô "Sắp xếp" chỉ có 1 lựa chọn giả; thiếu nút "Thử lại" khi lỗi tải; `page` vượt tổng hiện trạng thái rỗng thay vì về trang cuối.
+- Chưa có test tự động cho `downloadBlob`, `RequireAdmin`, `ConfirmDialog`; chưa kiểm tay: tải CSV thật, sửa/xoá câu hỏi, giao diện 1280px, `INTERNAL_ERROR`/mã lạ trên trình duyệt.
+- Các câu thông báo lỗi mới còn là giả định chờ PO (`specs/20261120-frontend-noi-api-moi/assumptions.md`).
+
+Cập nhật lần cuối: 2026-11-20

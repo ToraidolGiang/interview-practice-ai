@@ -10,6 +10,8 @@ import {
   anchor5,
   contribution,
   CRITERIA,
+  apiErrorMessage,
+  FAILED_MESSAGE_FALLBACK,
   FAILED_MESSAGES,
   fillerVerdict,
   WEIGHTS,
@@ -142,7 +144,9 @@ function FailedCard({ session, onRetried }) {
       await evaluateSession(session.id)
       await onRetried()
     } catch (err) {
-      setError(err.message)
+      setError(
+        err.code === 'SESSION_PROCESSING' ? 'Phiên đang được chấm, vui lòng đợi rồi thử lại.' : apiErrorMessage(err),
+      )
     } finally {
       setRetrying(false)
     }
@@ -151,7 +155,7 @@ function FailedCard({ session, onRetried }) {
   return (
     <section className={`card ${styles.failed}`}>
       <h2 className="section-title">Chấm điểm không thành công</h2>
-      <p>{FAILED_MESSAGES[code] ?? `Đã xảy ra lỗi khi chấm điểm${code ? ` (${code})` : ''}.`}</p>
+      <p>{FAILED_MESSAGES[code] ?? FAILED_MESSAGE_FALLBACK}</p>
       {error && (
         <p role="alert" className="alert">
           {error}
@@ -357,7 +361,7 @@ function FeedbackCard({ sessionId, result, rows, questionType }) {
       setStatus('ready')
     } catch (err) {
       setStatus('error')
-      setError(err.status === 502 ? 'Dịch vụ đọc nhận xét tạm thời gián đoạn, bạn vẫn đọc được nhận xét bên dưới.' : err.message)
+      setError(err.status === 502 ? 'Dịch vụ đọc nhận xét tạm thời gián đoạn, bạn vẫn đọc được nhận xét bên dưới.' : apiErrorMessage(err))
     }
   }
 
@@ -642,7 +646,7 @@ function TranscriptEditor({ sessionId, transcript, onCancel, onDone }) {
           ? 'Phiên đang được chấm, vui lòng đợi rồi thử lại.'
           : err.code === 'ANSWER_TOO_SHORT'
             ? `Transcript cần tối thiểu ${MIN_RESCORE_WORDS} từ.`
-            : err.message,
+            : apiErrorMessage(err),
       )
       setSaving(false)
     }

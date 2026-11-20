@@ -73,7 +73,7 @@ export function AppFooter() {
 }
 
 function AccountMenu() {
-  const { user, logout } = useAuth()
+  const { user, logout, isAdmin } = useAuth()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -120,6 +120,19 @@ function AccountMenu() {
             <Icon name="star" size={16} />
             Nâng cấp Pro
           </Link>
+          {isAdmin && (
+            <>
+              <div className={styles.menuDivider} />
+              <Link to="/admin/questions" role="menuitem" className={styles.menuItem}>
+                <Icon name="shieldCheck" size={16} />
+                Quản trị câu hỏi
+              </Link>
+              <Link to="/admin/analytics" role="menuitem" className={styles.menuItem}>
+                <Icon name="trendUp" size={16} />
+                Thống kê quản trị
+              </Link>
+            </>
+          )}
           <div className={styles.menuDivider} />
           <button type="button" role="menuitem" className={`${styles.menuItem} ${styles.menuDanger}`} onClick={logout}>
             <Icon name="logout" size={16} />

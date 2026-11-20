@@ -5,7 +5,7 @@ Tiếp nối `Ban_Giao_Tien_Do_20261117.md`. Nhánh: `feature/AI-PIPELINE-nen-ta
 ## 1. Đã làm hôm nay
 - Sửa góp ý MINOR của review #20: bỏ `@Transactional` ở `ApiUsageRecorder.record` (`0b4f0e6`).
 - F3: job quét `SessionRecoveryRunner.sweepTimedOut` (60s/lần), phiên PROCESSING quá 300s thành FAILED `PROCESSING_TIMEOUT` (`ff53ccc`).
-- F4: tối đa 3 phiên PROCESSING mỗi user, vượt thì 429 `TOO_MANY_PROCESSING` (`ff53ccc`). Chưa có hạn mức theo ngày.
+- F4: tối đa 3 phiên PROCESSING mỗi user, vượt thì 429 `TOO_MANY_PROCESSING` (`ff53ccc`). Hạn mức theo ngày xem mục dưới.
 - Cập nhật `openapi.yaml`, `Data_Dictionary.md`, `tech-debt.md`. Test backend 312/312 (JDK 21).
 - Tài liệu học (git-ignore, chỉ trên máy): `.claude/learning/AI-PIPELINE-do-ben-vung-F3-F4.md`.
 
@@ -46,7 +46,7 @@ Như bàn giao 17/11. Docker Desktop không tự chạy: mở app rồi `docker 
 
 ## 7. Cập nhật buổi chiều 19/11 (chưa push)
 Trên nhánh `feature/AI-PIPELINE-nen-tang-phien-luyen-tap`, test backend 337/337:
-- F4 phần còn lại: hạn mức 20 lượt chấm/user/ngày (429 `DAILY_LIMIT_EXCEEDED`), cấu hình `app.scoring.max-evaluations-per-day`, `day-zone`. Chấm lại cùng một phiên chỉ tính một lượt.
+- F4 hạn mức ngày: đã làm. 20 lượt chấm/user/ngày (429 `DAILY_LIMIT_EXCEEDED`), cấu hình `app.scoring.max-evaluations-per-day`, `day-zone`. Đếm từ bảng `evaluation_attempts` (V3): mỗi lượt evaluate/retry/rescore là một đơn vị, chấm lại cùng phiên vẫn tính; lượt bị hoàn tác do hàng đợi đầy (503) không tính.
 - F5: `AudioStorage.delete` best-effort, xóa file cũ khi nộp lại và file mới khi thua race. Còn thiếu S3 lifecycle trên AWS.
 - F2: `ScoringInput` thành interface projection `ScoringInputView`.
 - #155: `POST /practice-sessions/{id}/rescore` (không gọi lại STT, ghi đè kết quả cũ). Lỗi chấm lại thì FAILED, kết quả cũ còn để thử lại.

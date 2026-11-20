@@ -983,6 +983,7 @@ components:
           description: >
             Mã lỗi nghiệp vụ, ví dụ UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION_ERROR, EMAIL_EXISTS,
             ACCOUNT_LOCKED, INVALID_TOKEN, SESSION_NOT_READY, SESSION_PROCESSING, SESSION_ALREADY_SCORED, DUPLICATE_QUESTION,
+            TOO_MANY_PROCESSING (429: quá nhiều phiên đang chấm), DAILY_LIMIT_EXCEEDED (429: hết hạn mức chấm trong ngày),
             SERVICE_UNAVAILABLE (503: S3 lỗi hoặc hàng đợi chấm đầy), INTERNAL_ERROR
           example: VALIDATION_ERROR
         message:

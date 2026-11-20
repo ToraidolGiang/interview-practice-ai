@@ -76,7 +76,7 @@ Một lượt luyện tập: câu hỏi, audio, trạng thái xử lý.
 | `duration_sec` | integer | có |  | CHECK duration_sec >= 0 | Thời lượng ghi âm (giây) |
 | `total_score` | numeric(5,2) | có |  | CHECK total_score BETWEEN 0 AND 100 | Điểm tổng (sao chép từ score_results để lọc/sắp xếp lịch sử) |
 | `feedback` | text | có |  |  | Nhận xét tóm tắt hiển thị ở danh sách lịch sử |
-| `error_code` | varchar(40) | có |  |  | Mã lỗi khi FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART, INTERNAL_ERROR) |
+| `error_code` | varchar(40) | có |  |  | Mã lỗi khi FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART, PROCESSING_TIMEOUT, INTERNAL_ERROR) |
 | `started_at` | timestamptz | không | `now()` |  | Thời điểm tạo phiên |
 | `submitted_at` | timestamptz | có |  |  | Thời điểm nộp audio |
 | `processing_started_at` | timestamptz | có |  |  | Thời điểm worker bắt đầu chấm (phát hiện job quá hạn) |
@@ -156,6 +156,19 @@ Index và ràng buộc duy nhất:
 
 - Index `idx_api_usages_called`: `(called_at, provider)`
 - Index `idx_api_usages_session`: `(session_id)`
+
+## `evaluation_attempts`
+
+Mỗi lượt chấm thật (evaluate, retry, rescore) một dòng, dùng tính hạn mức chấm theo ngày (429 `DAILY_LIMIT_EXCEEDED`). Lượt bị hoàn tác vì hàng đợi đầy (503) bị xóa.
+
+| Cột | Kiểu | Null | Mặc định | Ràng buộc | Mô tả |
+|---|---|---|---|---|---|
+| `id` | uuid | không |  | PK | Khóa chính (sinh ở ứng dụng) |
+| `user_id` | uuid | không |  | FK → users(id) ON DELETE CASCADE | Người dùng |
+| `session_id` | uuid | có |  | FK → practice_sessions(id) ON DELETE SET NULL | Phiên được chấm |
+| `started_at` | timestamptz | không |  |  | Thời điểm bắt đầu lượt chấm |
+
+- Index `idx_evaluation_attempts_user_started`: `(user_id, started_at)`
 
 ## `audit_logs`
 

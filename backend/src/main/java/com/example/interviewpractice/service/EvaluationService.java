@@ -64,7 +64,11 @@ public class EvaluationService {
         if (sessions.markProcessing(sessionId, clock.instant()) == 0) {
             throw conflictFor(sessionId);
         }
-        return enqueue(sessionId, user, () -> pipeline.run(sessionId), () -> sessions.revertToUploaded(sessionId));
+        UUID attemptId = recordAttempt(sessionId, user);
+        return enqueue(sessionId, user, () -> pipeline.run(sessionId), () -> {
+            sessions.revertToUploaded(sessionId);
+            sessions.deleteAttempt(attemptId);
+        });
     }
 
     /**
@@ -90,8 +94,11 @@ public class EvaluationService {
             }
             throw new ApiException(HttpStatus.CONFLICT, "SESSION_NOT_READY", "Phiên chưa từng được chấm điểm");
         }
-        return enqueue(sessionId, user, () -> pipeline.rescore(sessionId, text),
-                () -> sessions.revertToScored(sessionId, clock.instant()));
+        UUID attemptId = recordAttempt(sessionId, user);
+        return enqueue(sessionId, user, () -> pipeline.rescore(sessionId, text), () -> {
+            sessions.revertToScored(sessionId, clock.instant());
+            sessions.deleteAttempt(attemptId);
+        });
     }
 
     private void enforceLimits(AuthUser user) {
@@ -101,12 +108,20 @@ public class EvaluationService {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "TOO_MANY_PROCESSING",
                     "Bạn đang có quá nhiều phiên đang chấm, vui lòng đợi một phiên xong rồi thử lại");
         }
-        // Hạn mức theo ngày (F4): bảo vệ chi phí Gemini; đếm theo ngày lịch của múi giờ cấu hình
-        if (sessions.countEvaluatedSince(user.id(), clock.instant().atZone(dayZone).toLocalDate()
+        // Hạn mức theo ngày (F4): bảo vệ chi phí Gemini; đếm số lượt chấm thật (evaluate, retry, rescore) theo ngày
+        // lịch của múi giờ cấu hình, mỗi lượt một đơn vị dù bên trong có thử lại nhiều lần gọi HTTP
+        if (sessions.countAttemptsSince(user.id(), clock.instant().atZone(dayZone).toLocalDate()
                 .atStartOfDay(dayZone).toInstant()) >= maxEvaluationsPerDay) {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "DAILY_LIMIT_EXCEEDED",
                     "Bạn đã dùng hết " + maxEvaluationsPerDay + " lượt chấm hôm nay, vui lòng quay lại vào ngày mai");
         }
+    }
+
+    /** Ghi một lượt chấm vào hạn mức ngày; gọi ngay sau khi giành được quyền chấm. */
+    private UUID recordAttempt(UUID sessionId, AuthUser user) {
+        UUID attemptId = UUID.randomUUID();
+        sessions.recordAttempt(attemptId, user.id(), sessionId, clock.instant());
+        return attemptId;
     }
 
     /** Đưa việc vào executor sau khi đã giành quyền chấm; hàng đợi đầy thì chạy {@code revert} rồi trả 503. */

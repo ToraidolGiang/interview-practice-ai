@@ -172,4 +172,34 @@ class RescoreIntegrationTest extends AbstractSessionApiTest {
                 Boolean.class, session.getId())).isTrue();
         assertThat(transcript()).isEqualTo(words(20));
     }
+
+    private int attemptCount() {
+        return jdbc.queryForObject("select count(*) from evaluation_attempts where user_id = ?", Integer.class,
+                owner.getId());
+    }
+
+    @Test
+    void repeatedRescoresOnOneSessionHitDailyLimit() {
+        // submit trong @BeforeEach đã tính 1 lượt; còn 19 lượt chấm lại trong hạn mức 20
+        for (int i = 0; i < 19; i++) {
+            evaluation.rescore(session.getId(), user, words(20) + " lan" + i);
+        }
+        assertThat(attemptCount()).isEqualTo(20);
+
+        ApiException e = rescoreFails(words(20) + " them");
+
+        assertThat(e.getStatus()).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+        assertThat(e.getCode()).isEqualTo("DAILY_LIMIT_EXCEEDED");
+        verify(llm, times(20)).score(any());
+    }
+
+    @Test
+    void rescoreRejectedByFullQueueDoesNotConsumeQuotaAndKeepsEarlierAttempts() {
+        assertThat(attemptCount()).isEqualTo(1);
+        doThrow(new TaskRejectedException("đầy")).when(executor).execute(any());
+
+        assertThat(rescoreFails(words(20) + " sửa").getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+
+        assertThat(attemptCount()).isEqualTo(1);
+    }
 }

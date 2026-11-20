@@ -52,12 +52,24 @@ class EvaluationDailyLimitTest extends AbstractSessionApiTest {
         assertThat(evaluation.submit(waiting.getId(), asOwner()).status()).isEqualTo(PracticeSession.Status.PROCESSING);
     }
 
+    @Test
+    void manyAttemptsOnOneSessionCountIndividually() {
+        PracticeSession one = newSession(owner, PracticeSession.Status.FAILED);
+        for (int i = 0; i < LIMIT; i++) {
+            markEvaluated(one, Instant.now());
+        }
+        PracticeSession waiting = newSession(owner, PracticeSession.Status.UPLOADED);
+
+        assertThatThrownBy(() -> evaluation.submit(waiting.getId(), asOwner()))
+                .isInstanceOfSatisfying(ApiException.class, e -> assertThat(e.getCode()).isEqualTo("DAILY_LIMIT_EXCEEDED"));
+    }
+
     private AuthUser asOwner() {
         return new AuthUser(owner.getId(), owner.getEmail(), owner.getRole());
     }
 
     private void markEvaluated(PracticeSession s, Instant at) {
-        jdbc.update("update practice_sessions set processing_started_at = ? where id = ?",
-                java.sql.Timestamp.from(at), s.getId());
+        jdbc.update("insert into evaluation_attempts (id, user_id, session_id, started_at) values (?, ?, ?, ?)",
+                java.util.UUID.randomUUID(), owner.getId(), s.getId(), java.sql.Timestamp.from(at));
     }
 }

@@ -116,11 +116,26 @@ public interface PracticeSessionRepository extends JpaRepository<PracticeSession
     long countProcessingByUser(@Param("userId") UUID userId);
 
     /**
-     * Số phiên user đã được đưa vào chấm kể từ {@code since}, để giới hạn lượt chấm theo ngày (F4). Chấm lại cùng
-     * một phiên ghi đè processing_started_at nên chỉ tính một lượt; phiên bị hoàn tác (NULL) không tính.
+     * Số lượt chấm thật (evaluate, retry, rescore) user đã bắt đầu kể từ {@code since}, để giới hạn theo ngày (F4).
+     * Mỗi lượt một dòng evaluation_attempts nên chấm lại cùng một phiên vẫn tăng bộ đếm.
      */
-    @Query("SELECT COUNT(s) FROM PracticeSession s WHERE s.user.id = :userId AND s.processingStartedAt >= :since")
-    long countEvaluatedSince(@Param("userId") UUID userId, @Param("since") Instant since);
+    @Query(value = "SELECT COUNT(*) FROM evaluation_attempts WHERE user_id = :userId AND started_at >= :since",
+            nativeQuery = true)
+    long countAttemptsSince(@Param("userId") UUID userId, @Param("since") Instant since);
+
+    /** Ghi một lượt chấm sau khi đã giành được quyền chấm phiên. */
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO evaluation_attempts (id, user_id, session_id, started_at) "
+            + "VALUES (:id, :userId, :sessionId, :now)", nativeQuery = true)
+    int recordAttempt(@Param("id") UUID id, @Param("userId") UUID userId, @Param("sessionId") UUID sessionId,
+            @Param("now") Instant now);
+
+    /** Xóa lượt chấm chưa dùng tới Gemini (hàng đợi đầy, đã hoàn tác trạng thái) để không tính vào hạn mức. */
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM evaluation_attempts WHERE id = :id", nativeQuery = true)
+    int deleteAttempt(@Param("id") UUID id);
 
     /** Dữ liệu worker cần để chấm; đọc bằng một truy vấn nên không giữ transaction/entity lazy khi gọi dịch vụ ngoài. */
     @Query("SELECT s.id AS sessionId, s.audioKey AS audioKey, s.durationSec AS durationSec, "

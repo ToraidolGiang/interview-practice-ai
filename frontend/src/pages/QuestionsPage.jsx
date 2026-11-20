@@ -29,6 +29,13 @@ export default function QuestionsPage() {
   const [result, setResult] = useState({ key: null, data: null, error: null })
   const [randomError, setRandomError] = useState(null)
 
+  // Back/forward đổi từ khoá trên URL thì ô tìm kiếm phải theo kịp
+  const [syncedKeyword, setSyncedKeyword] = useState(filters.keyword)
+  if (syncedKeyword !== filters.keyword) {
+    setSyncedKeyword(filters.keyword)
+    setKeywordInput(filters.keyword)
+  }
+
   useEffect(() => {
     let cancelled = false
     const current = readFilters(new URLSearchParams(filtersKey))
@@ -109,6 +116,7 @@ export default function QuestionsPage() {
             <span className="visually-hidden">Từ khoá</span>
             <input
               type="search"
+              maxLength={200}
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}
               placeholder="Tìm theo từ khóa, ví dụ: xung đột nhóm, REST API, deadline..."

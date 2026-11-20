@@ -27,4 +27,4 @@ mọi ngành đều đếm 128 câu. Muốn thử nhánh lỗi thì thêm header
 - `src/layouts/` - `AuthLayout` (màn chia đôi đăng nhập/đăng ký), `AppLayout` (header + footer sau đăng nhập)
 - `src/components/` - component dùng chung
 - `src/pages/` - mỗi màn hình một file
-- `src/assets/figma/` - icon, logo tải từ Figma
+- `src/assets/illustrations/` - ảnh minh hoạ (hero đăng nhập, landing, FAQ, CTA); icon/logo dựng bằng SVG/CSS trong component (không có thư mục `src/assets/figma/`)

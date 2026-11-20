@@ -38,6 +38,18 @@ Khớp OpenAPI, không lộ số lượng bản ghi qua URL, sinh ở phía ứn
 **Xóa câu hỏi thì dữ liệu lịch sử ra sao?**
 Xóa mềm: câu hỏi đã có trong lịch sử chuyển `status = HIDDEN`, các khóa ngoại dùng `ON DELETE RESTRICT` nên không thể xóa cứng nhầm. Dữ liệu thuộc về một phiên (kết quả, tiêu chí, nhật ký gọi AI) dùng `CASCADE`.
 
+**Xóa câu hỏi qua API thì xử lý thế nào, có bị race với việc tạo phiên không?**
+`DELETE /admin/questions/{id}` kiểm tra câu hỏi đã có trong `practice_sessions` chưa: có thì ẩn (`HIDDEN`), chưa thì xóa cứng. Nếu một phiên mới được tạo đúng giữa lúc kiểm tra và lúc xóa, khóa ngoại `ON DELETE RESTRICT` chặn lệnh xóa; service bắt lỗi đó và làm lại trong transaction mới theo hướng ẩn, nên không trả 500 và không mất dữ liệu. Cả hai nhánh đều ghi `audit_logs` (action `DELETE`) trong cùng transaction.
+
+**Vị trí `Chung` hoạt động ra sao khi lọc câu hỏi?**
+Khi có cả `industry` và `position`, kết quả gồm câu của vị trí đó và câu `Chung` của cùng ngành (`position IN (:position, 'Chung')`). Chỉ có `position` mà không có `industry` thì khớp đúng vị trí, vì `Chung` thuộc về từng ngành và không có ngành thì không biết lấy `Chung` của ngành nào.
+
+**Vì sao `/admin/questions` trả thêm `referenceAnswer` còn `/questions` thì không?**
+Đáp án tham chiếu dùng để chấm câu `TECHNICAL`; lộ cho người luyện tập thì họ chép lại để đạt điểm. Hai DTO tách riêng (`QuestionDto`, `AdminQuestionDto`) nên không thể vô tình trả trường này ở endpoint công khai, và test khẳng định JSON công khai không có khóa `referenceAnswer`.
+
+**Vì sao kiểm tra ngành/vị trí theo danh mục khi thêm câu hỏi?**
+Giá trị lưu đúng nguyên văn taxonomy-v1.0; gõ sai chính tả khiến câu hỏi không bao giờ hiện trong bộ lọc. Backend kiểm tra cặp ngành/vị trí (`Taxonomy`), trả 400 gắn đúng trường. Danh mục có ở hai nơi (backend và `frontend/src/constants/taxonomy.js`) nên đổi danh mục phải sửa cả hai.
+
 **Làm sao truy vết một điểm số do mô hình nào chấm?**
 Mỗi `score_results` lưu `rubric_version`, `prompt_version`, `model_version`, `filler_list_version`; đổi phiên bản không tính lại kết quả cũ.
 

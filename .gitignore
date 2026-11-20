@@ -41,3 +41,5 @@ frontend/mock/.generated/
 
 # Python
 __pycache__/
+.claude/learning/
+.claude/agent-memory-local/

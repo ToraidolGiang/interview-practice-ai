@@ -59,6 +59,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+		<!-- Gửi email đặt lại mật khẩu (#157); JavaMailSender chỉ được tạo khi có spring.mail.host -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 		<!-- Mang theo Nimbus JOSE để ký và kiểm tra JWT; Nimbus không phụ thuộc Jackson nên không vướng Jackson 3 của Spring Boot 4 -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>

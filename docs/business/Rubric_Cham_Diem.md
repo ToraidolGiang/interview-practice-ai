@@ -1,6 +1,6 @@
 # Rubric chấm điểm câu trả lời phỏng vấn
 
-- Phiên bản rubric: `rubric-v1.0` (draft, chờ hiệu chỉnh bằng bộ dữ liệu chuẩn, xem mục 9)
+- Phiên bản rubric: `rubric-v1.1` (draft, chờ hiệu chỉnh bằng bộ dữ liệu chuẩn, xem mục 9; thay đổi so với v1.0 ở mục 10)
 - Thay thế: cách chấm S-T-A-R cố định trong UC5 (business rule B1) và `ScoreResult` cũ (`sScore`, `tScore`, `aScore`, `rScore`)
 - Đây là tài liệu gốc cho: UC5, OpenAPI `ScoreResult`, ERD, class/sequence diagram, prompt và code tính điểm. Khi có mâu thuẫn, tài liệu này được ưu tiên.
 
@@ -37,38 +37,84 @@ Mỗi tiêu chí do LLM chấm theo thang **1-5, số nguyên** (riêng Delivery
 
 ### 3.1 Mô tả neo (anchor)
 
-**RELEVANCE**
-- 1: Lạc đề hoặc không trả lời câu hỏi.
-- 3: Trả lời một phần câu hỏi, có đoạn lan man.
-- 5: Trả lời trúng và đầy đủ các ý câu hỏi yêu cầu, không lạc đề.
+Quy tắc chung:
+- Chấm từng tiêu chí độc lập: một câu có thể cấu trúc tốt nhưng sai chuyên môn.
+- Độ dài và từ đệm không ảnh hưởng điểm nội dung.
+- Chỉ tính điều thí sinh thực sự nói ra, không suy diễn thay thí sinh.
+- Khi `off_topic` = true thì `STRUCTURE` và `DEPTH` đều bằng 1; nội dung ngoài câu hỏi không tính cho khung hay yếu tố nào.
+- "Ví dụ" là một tình huống hoặc đối tượng cụ thể. Chỉ nêu tên loại việc hoặc tên công cụ thì không tính. So sánh cụ thể được tính như ví dụ. Ví dụ hoặc so sánh tính kể cả khi sai, nhưng không tính nếu chính nó là điều câu hỏi yêu cầu trả lời.
+- "Lướt" là chỉ nhắc tên, không nói vì sao liên quan; ví dụ có đối tượng hoặc số liệu cụ thể thì không phải là lướt.
+- "Sáo rỗng" là câu đúng với mọi ứng viên hoặc mọi vị trí.
 
-**STRUCTURE** (mức 2 và 4 là mức trung gian)
+**RELEVANCE** (chỉ xét có trả lời đúng điều được hỏi hay không; đúng sai chuyên môn tính ở `CORRECTNESS`)
+- 1: Không có ý nào trả lời trực tiếp câu hỏi, kể cả khi cùng lĩnh vực (ví dụ hỏi về index mà nói về chuẩn hóa). Bắt buộc đặt `off_topic` = true.
+- 2: Chạm đến câu hỏi nhưng né tránh, từ chối, nói không biết, hoặc chỉ có một câu khẳng định không có nội dung.
+- 3: Trả lời một phần: thiếu một vế của câu hỏi, hoặc phần lớn câu trả lời là lan man.
+- 4: Trả lời đủ các vế, có đoạn lan man ngắn hoặc một vế còn sơ sài.
+- 5: Trả lời trúng và đầy đủ các vế câu hỏi yêu cầu, không lạc đề.
+
+`off_topic` = true khi và chỉ khi `RELEVANCE` = 1.
+
+Cách đo: "lan man ngắn" là dưới một nửa số câu của câu trả lời, "phần lớn" là từ một nửa trở lên. "Sơ sài" là chỉ nhắc tới vế đó mà không nói nội dung gì; một mệnh đề có nội dung là đủ. Vế chỉ suy ra được mà không nói ra thì tính là thiếu. Lan man là câu không góp vào điều được hỏi; mô tả vấn đề hoặc nguyên nhân dẫn thẳng tới biện pháp thì không tính là lan man.
+
+**STRUCTURE**
 - `BEHAVIORAL`, khung STAR:
   - 1: Không xác định được bối cảnh hay hành động.
-  - 3: Có 2-3 thành phần S/T/A/R, thiếu hoặc mơ hồ phần còn lại (thường là Result).
+  - 2: Có 1 thành phần S/T/A/R.
+  - 3: Có 2-3 thành phần S/T/A/R, hoặc đủ 4 nhưng từ hai phần trở lên còn mơ hồ.
+  - 4: Đủ 4 thành phần nhưng đúng một phần còn mơ hồ hoặc vai trò cá nhân chưa rõ.
   - 5: Đủ Situation, Task, Action, Result, rõ vai trò cá nhân, trình tự hợp lý.
+  - Task không cần nói thành câu riêng: suy ra rõ ràng từ Situation thì vẫn tính là có.
 - `SITUATIONAL`, khung phân tích → quyết định → lý do:
   - 1: Không nêu hướng xử lý.
+  - 2: Có hướng xử lý nhưng mơ hồ, không có bước nào cụ thể.
   - 3: Nêu hướng xử lý nhưng thiếu lý do hoặc thứ tự bước.
+  - 4: Có thứ tự và lý do, chưa cân nhắc rủi ro hoặc phương án khác.
   - 5: Nêu cách tiếp cận có thứ tự, giải thích lý do, cân nhắc rủi ro hoặc phương án khác.
+  - Vấn đề nêu ngay trước biện pháp tính là lý do. Làm thử có điều kiện dừng tính là cân nhắc rủi ro. Câu trả lời chỉ có một bước tính là thiếu thứ tự.
 - `TECHNICAL`, khung khái niệm → giải thích → ví dụ:
   - 1: Rời rạc, không có mạch giải thích.
+  - 2: Có định nghĩa nhưng không có giải thích.
   - 3: Có định nghĩa và giải thích, thiếu ví dụ hoặc so sánh.
-  - 5: Mạch rõ: khái niệm, cơ chế, ví dụ hoặc trường hợp áp dụng.
-- `INTRO`, khung hiện tại → quá khứ → định hướng:
-  - 1: Liệt kê rời rạc, không liên kết.
-  - 3: Có 2 trong 3 phần, thiếu liên hệ với vị trí ứng tuyển.
-  - 5: Mạch lạc, nối kinh nghiệm với vị trí ứng tuyển và định hướng.
+  - 4: Đủ khái niệm, cơ chế, ví dụ hoặc so sánh, nhưng phần ví dụ chỉ nêu lướt.
+  - 5: Mạch rõ: khái niệm, cơ chế, ví dụ, so sánh hoặc trường hợp áp dụng.
+  - Câu không hỏi định nghĩa thì "khái niệm" là luận điểm trả lời trực tiếp. Định nghĩa phải là của đối tượng được hỏi. "Giải thích" dùng cùng phép thử với yếu tố giải thích của `DEPTH`.
+- `INTRO`, chọn khung theo câu hỏi:
+  - Câu "giới thiệu bản thân": hiện tại → quá khứ → định hướng.
+  - Câu khác (động lực, điểm mạnh yếu, định hướng, hiểu về vị trí): ý chính → bằng chứng → liên hệ vị trí hoặc định hướng nghề.
+  - Câu "hiểu về vị trí": ý chính là mô tả công việc, bằng chứng là trải nghiệm của thí sinh, liên hệ là vì sao thí sinh phù hợp.
+  - Câu định hướng: bằng chứng là việc đã làm hoặc đã học; kế hoạch tương lai chỉ tính là liên hệ.
+  - Kế hoạch cải thiện bản thân tính là liên hệ định hướng nghề. Ý chính sáo rỗng không tính là một phần.
+  - 1: Không có phần nào của khung, hoặc liệt kê rời rạc không liên kết.
+  - 2: Có 1 trong 3 phần.
+  - 3: Có 2 trong 3 phần của khung.
+  - 4: Đủ 3 phần nhưng phần cuối chỉ nối lướt qua.
+  - 5: Đủ 3 phần, mạch lạc, phần cuối nối được với vị trí ứng tuyển hoặc định hướng nghề.
 
-**DEPTH**
-- 1: Chung chung, toàn câu nói sáo rỗng, không có chi tiết cụ thể.
-- 3: Có ví dụ hoặc lập luận cụ thể nhưng thiếu số liệu, kết quả hoặc vai trò cá nhân.
-- 5: Chi tiết cụ thể, có số liệu hoặc kết quả đo được, nêu rõ đóng góp cá nhân và bài học.
+**DEPTH**: đếm số yếu tố có mặt theo loại câu hỏi, `điểm = số yếu tố + 1`. Yếu tố chỉ được tính khi nói cụ thể; câu sáo rỗng không tính. Một câu có thể tính cho nhiều yếu tố nếu chứa đủ thông tin cho từng yếu tố, nhưng một con số chỉ tính cho một yếu tố.
 
-**CORRECTNESS** (chỉ `TECHNICAL`)
-- 1: Sai cơ bản hoặc mâu thuẫn với `referenceAnswer`.
-- 3: Đúng ý chính nhưng thiếu hoặc sai một số ý quan trọng.
-- 5: Đúng và đủ các ý chính trong `referenceAnswer`, không có sai sót đáng kể.
+| `questionType` | Yếu tố 1 | Yếu tố 2 | Yếu tố 3 | Yếu tố 4 |
+|---|---|---|---|---|
+| `BEHAVIORAL` | Chi tiết cụ thể của sự việc | Số liệu hoặc kết quả đo được | Việc chính thí sinh đã làm | Bài học hoặc thay đổi sau đó |
+| `SITUATIONAL` | Biện pháp cụ thể, không chỉ nguyên tắc | Lý do của biện pháp | Ví dụ, công cụ hoặc con số minh họa cho biện pháp | Cách đo kết quả hoặc xử lý khi biện pháp không hiệu quả |
+| `TECHNICAL` | Giải thích cơ chế hoặc vì sao | Ví dụ hoặc so sánh cụ thể | Giới hạn, đánh đổi hoặc khi nào không dùng | Kinh nghiệm thực tế, số liệu hoặc cách kiểm chứng |
+| `INTRO` | Thông tin cụ thể về vai trò, công nghệ hoặc thời gian của chính thí sinh | Thành tích có số liệu | Đóng góp cá nhân | Lý do hoặc kế hoạch cụ thể, gắn với câu hỏi |
+
+Cách tính một số yếu tố:
+- "Thay đổi sau đó" phải khác với việc xử lý chính.
+- "Giải thích cơ chế hoặc vì sao" tính khi có quan hệ nhân quả nói ra rõ ràng, kể cả khi sai; chỉ định nghĩa lại, hoặc mệnh đề nhân quả nằm trong định nghĩa mà không thêm ý mới, thì không tính.
+- "Giới hạn, đánh đổi" chỉ tính khi nêu rõ mặt hại, chi phí hoặc tình huống không nên dùng; làm rõ khái niệm hay nêu điều kiện áp dụng thì không tính.
+- "Cách kiểm chứng" chỉ tính phần ngoài điều câu hỏi đã yêu cầu trả lời. Quy tắc này chỉ áp dụng cho yếu tố kiểm chứng.
+- Với câu hỏi dạng liệt kê, việc xác nhận lại với người hỏi tính là "cách đo kết quả".
+
+**CORRECTNESS** (chỉ `TECHNICAL`): tính tỉ lệ ý trong `referenceAnswer` được nêu đúng, mỗi gạch đầu dòng là một ý. Nêu đủ các vế của gạch đầu dòng tính 1 ý, nêu đúng một phần tính 0,5 ý. Các ví dụ liệt kê trong gạch đầu dòng chỉ cần nêu một.
+- 1: Dưới 20%, kể cả nói không biết; hoặc sai ở khái niệm trung tâm của câu hỏi.
+- 2: 20% đến dưới 50%.
+- 3: 50% đến dưới 70%.
+- 4: 70% đến dưới 90%.
+- 5: Từ 90% trở lên, không có phát biểu sai.
+
+Mỗi phát biểu sai nhưng không thuộc khái niệm trung tâm trừ 1 mức, tối thiểu là 1. Ý đúng ngoài `referenceAnswer` không cộng điểm và không trừ điểm. Nếu câu hỏi không có `referenceAnswer` thì tính theo các ý mà câu hỏi yêu cầu.
 
 ## 4. Trọng số và công thức tổng điểm
 
@@ -93,7 +139,7 @@ totalScore = Σ wᵢ · (sᵢ − 1) / 4        → thang 0-100, làm tròn 1 ch
 
 Trường hợp đặc biệt:
 - **Không đủ dữ liệu Delivery** (transcript dưới 30 từ hoặc không có thời lượng): bỏ DELIVERY, chia lại trọng số 10 cho các tiêu chí còn lại theo tỷ lệ.
-- **`off_topic` = true**: `totalScore` tối đa 30.
+- **`off_topic` = true** (tương đương `RELEVANCE` = 1, mục 3.1): `totalScore` tối đa 30.
 - **Câu trả lời dưới 15 từ**: không chấm, trả lỗi 422 `ANSWER_TOO_SHORT`.
 
 ## 5. Delivery (tính bằng code, không dùng LLM)
@@ -170,3 +216,17 @@ Rubric này là giả thuyết cần kiểm chứng (liên quan ticket DLPVXVTHA
 2. 2-3 người chấm độc lập theo đúng rubric này.
 3. Đo: mức đồng thuận giữa người chấm (weighted kappa), AI so với người (QWK, Spearman, MAE), độ lặp lại (chạy cùng input 5 lần, đo độ lệch chuẩn).
 4. Chỉnh anchor, prompt, trọng số, thông số Delivery cho đến khi QWK đạt khoảng 0.6-0.7. Mỗi lần chỉnh tăng version.
+
+## 10. Lịch sử thay đổi
+
+**rubric-v1.1** (không đổi tiêu chí, trọng số, công thức):
+- `RELEVANCE`: mô tả đủ 5 mức, tách câu né tránh khỏi câu lạc đề, không xét đúng sai chuyên môn.
+- `off_topic`: định nghĩa bằng `RELEVANCE` = 1, gồm cả câu cùng lĩnh vực nhưng không trả lời câu hỏi.
+- `DEPTH`: đếm 4 yếu tố theo từng loại câu hỏi, thay cho một mô tả chung.
+- `STRUCTURE`: `INTRO` chọn khung theo câu hỏi; `BEHAVIORAL` chấp nhận Task suy ra được.
+- `CORRECTNESS`: tính theo tỉ lệ ý đúng, có quy tắc cho ý đúng một phần, phát biểu sai và câu nói không biết.
+- `STRUCTURE`: mô tả đủ mức 2 và 4; định nghĩa "ví dụ"; câu lạc đề có `STRUCTURE` và `DEPTH` bằng 1.
+
+Còn lại: nhiều gạch đầu dòng trong `referenceAnswer` chưa phân biệt vế bắt buộc và ví dụ, nên `CORRECTNESS` vẫn có thể lệch 1 mức. Cần đánh dấu lại khi rà ngân hàng câu hỏi.
+
+Điểm chấm theo v1.0 không so sánh trực tiếp với v1.1. Chỉ đổi `RUBRIC_VERSION` trong code cùng lúc với prompt chấm điểm, để phiên bản lưu trong `ScoreResult` đúng với prompt thực tế đã dùng.

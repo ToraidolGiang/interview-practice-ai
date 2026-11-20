@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +21,7 @@ import com.example.interviewpractice.dto.RegisterResponse;
 import com.example.interviewpractice.dto.UserDto;
 import com.example.interviewpractice.entity.User;
 import com.example.interviewpractice.exception.ApiException;
+import com.example.interviewpractice.exception.DbConstraints;
 import com.example.interviewpractice.repository.UserRepository;
 import com.example.interviewpractice.security.JwtService;
 
@@ -72,21 +72,11 @@ public class AuthService {
             return new RegisterResponse(saved.getId(), saved.getEmail());
         } catch (DataIntegrityViolationException e) {
             // Chỉ vi phạm chỉ mục email mới là trùng email; lỗi toàn vẹn khác (NOT NULL, độ dài...) ném tiếp
-            if (!violatesEmailIndex(e)) {
+            if (!DbConstraints.violates(e, EMAIL_UNIQUE_INDEX)) {
                 throw e;
             }
             throw new ApiException(HttpStatus.CONFLICT, "EMAIL_EXISTS", "Email đã được đăng ký");
         }
-    }
-
-    private static boolean violatesEmailIndex(DataIntegrityViolationException e) {
-        for (Throwable cause = e; cause != null; cause = cause.getCause()) {
-            if (cause instanceof ConstraintViolationException violation
-                    && EMAIL_UNIQUE_INDEX.equalsIgnoreCase(violation.getConstraintName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // Lần đăng nhập sai phải được lưu dù trả lỗi, nên không rollback khi ném ApiException

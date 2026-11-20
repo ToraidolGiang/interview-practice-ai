@@ -9,7 +9,7 @@ Nền tảng luyện phỏng vấn xin việc tích hợp AI (tiếng Việt là
 | Backend | Spring Boot (Java 21) — Web MVC, Data JPA, Security | Security dùng cho JWT + RBAC |
 | Frontend | React (Vite) | Ghi âm qua MediaRecorder API |
 | Database | PostgreSQL | Schema quản lý bằng Flyway; điểm từng tiêu chí rubric lưu ở bảng `score_criteria` |
-| STT + LLM | Gemini 3.7 Flash | Qua `generateContent` |
+| STT + LLM | Gemini: `gemini-3.5-transcribe` (STT, chế độ VERBATIM giữ từ đệm), `gemini-3.8-flash` (chấm điểm) | Qua `generateContent`; đổi bằng `GEMINI_STT_MODEL`/`GEMINI_LLM_MODEL` |
 | TTS | FPT.AI Text-to-Speech | Giọng tiếng Việt bản địa |
 | Object Storage | AWS S3 | Lưu file ghi âm câu trả lời |
 | Auth | JWT | Token 24h, RBAC qua role claim |
@@ -44,6 +44,24 @@ cp ../.env.example ../.env   # điền giá trị thật, không commit file nà
 # export các biến trong .env vào shell, hoặc cấu hình trong IDE
 ./mvnw spring-boot:run
 ```
+
+Biến môi trường (xem `.env.example`; không commit `.env`):
+
+| Biến | Bắt buộc | Ghi chú |
+|---|---|---|
+| `DATABASE_URL`, `JWT_SECRET` | có | |
+| `GEMINI_API_KEY` | có | STT + chấm điểm LLM |
+| `GEMINI_BASE_URL`, `GEMINI_STT_MODEL`, `GEMINI_LLM_MODEL` | không | Có mặc định; tên model mặc định chưa xác minh với API thật |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | có | Lưu audio lên S3 |
+| `AWS_REGION`, `AWS_S3_BUCKET` | không | Có mặc định |
+
+**Windows: múi giờ JVM.** Máy đặt múi giờ `Asia/Saigon` làm PostgreSQL 16 từ chối kết nối (không nhận tên múi giờ này). Đặt trước khi chạy backend/test:
+
+```powershell
+$env:JAVA_TOOL_OPTIONS = "-Duser.timezone=Asia/Ho_Chi_Minh"   # hoặc UTC
+```
+
+Cần đúng **JDK 21** (`java -version`); JDK khác làm build lỗi.
 
 ### Frontend
 

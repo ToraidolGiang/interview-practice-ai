@@ -86,7 +86,7 @@ Mục tiêu: chọn câu hỏi → ghi âm → upload → chấm điểm → xem
 
 ## 5. Việc cần cập nhật trên Jira
 
-- [ ] Đổi assignee: #118, #123, #157 sang Vũ; giao #159 cho Vũ.
-- [ ] Tạo ticket mới: API tạo phiên luyện tập + upload audio S3 (Giang); giao diện chọn câu hỏi UC3 (Vũ); giao diện quản trị câu hỏi UC8 (Vũ); thống kê API usage + audit log cho admin (Giang).
+- [x] Đổi assignee: #118, #123, #157 sang Vũ; giao #159 cho Vũ. (đã đúng trên Jira, kiểm 17/11/2026)
+- [x] Tạo ticket mới (17/11/2026: #160 API phiên + upload S3, #161 UI chọn câu hỏi, #162 UI quản trị câu hỏi, #163 thống kê usage + audit log): API tạo phiên luyện tập + upload audio S3 (Giang); giao diện chọn câu hỏi UC3 (Vũ); giao diện quản trị câu hỏi UC8 (Vũ); thống kê API usage + audit log cho admin (Giang).
 - [ ] Đóng Sprint 2, đặt ngày cho Sprint 3, 4; xếp #152-#159 vào sprint.
-- [ ] Ghi rõ ranh giới #113 (CI build/test) và #133 (CD tự động deploy).
+- [x] Ghi rõ ranh giới #113 (CI build/test) và #133 (CD tự động deploy).

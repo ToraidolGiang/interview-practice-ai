@@ -1,0 +1,14 @@
+# Giá trị giả cho test: không gọi Gemini/S3 thật. DATABASE_URL và JWT_SECRET vẫn lấy từ env/CI.
+ai:
+  gemini:
+    api-key: test-gemini-key
+    base-url: http://localhost:0
+  fpt:
+    api-key: test-fpt-key
+
+aws:
+  access-key-id: test-access-key
+  secret-access-key: test-secret-key
+  region: ap-southeast-1
+  s3:
+    bucket: test-audio-bucket

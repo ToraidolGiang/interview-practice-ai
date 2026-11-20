@@ -1,0 +1,100 @@
+{"id": "GOLD-001", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 1, "CORRECTNESS": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-002", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-003", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-004", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 2, "CORRECTNESS": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-005", "scores": {"RELEVANCE": 4, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-007", "scores": {"RELEVANCE": 4, "STRUCTURE": 3, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-008", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-011", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-012", "scores": {"RELEVANCE": 5, "STRUCTURE": 2, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-013", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-015", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-019", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 3, "CORRECTNESS": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-020", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1, "CORRECTNESS": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-021", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-023", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5, "CORRECTNESS": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-024", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 3, "CORRECTNESS": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-025", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-026", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-027", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-028", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 2, "CORRECTNESS": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-030", "scores": {"RELEVANCE": 3, "STRUCTURE": 3, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-031", "scores": {"RELEVANCE": 3, "STRUCTURE": 2, "DEPTH": 2, "CORRECTNESS": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-032", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-033", "scores": {"RELEVANCE": 4, "STRUCTURE": 3, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-035", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-038", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1, "CORRECTNESS": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-039", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-040", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-043", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 2, "CORRECTNESS": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-044", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-045", "scores": {"RELEVANCE": 3, "STRUCTURE": 2, "DEPTH": 1, "CORRECTNESS": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-046", "scores": {"RELEVANCE": 4, "STRUCTURE": 3, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-048", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-049", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-053", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-056", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-058", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-059", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1, "CORRECTNESS": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-060", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 1, "CORRECTNESS": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-061", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-062", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-065", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-066", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 2, "CORRECTNESS": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-069", "scores": {"RELEVANCE": 4, "STRUCTURE": 3, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-071", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-072", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 4, "CORRECTNESS": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-074", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 3, "CORRECTNESS": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-075", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-076", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-078", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 2, "CORRECTNESS": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-080", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-081", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-082", "scores": {"RELEVANCE": 4, "STRUCTURE": 3, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-085", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-086", "scores": {"RELEVANCE": 4, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-088", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-090", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 2, "CORRECTNESS": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-091", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 3, "CORRECTNESS": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-092", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-093", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-094", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-095", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-097", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-098", "scores": {"RELEVANCE": 2, "STRUCTURE": 2, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-099", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-100", "scores": {"RELEVANCE": 1, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": true, "rater": "nguoi_cham_1"}
+{"id": "GOLD-102", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5, "CORRECTNESS": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-104", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-105", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-106", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-108", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-110", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 2}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-111", "scores": {"RELEVANCE": 3, "STRUCTURE": 2, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-112", "scores": {"RELEVANCE": 5, "STRUCTURE": 2, "DEPTH": 1, "CORRECTNESS": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-113", "scores": {"RELEVANCE": 3, "STRUCTURE": 2, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-114", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-116", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 1, "CORRECTNESS": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-117", "scores": {"RELEVANCE": 4, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-118", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-119", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-120", "scores": {"RELEVANCE": 3, "STRUCTURE": 3, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-121", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-122", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 4}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-123", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-125", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-126", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-127", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-128", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-131", "scores": {"RELEVANCE": 3, "STRUCTURE": 4, "DEPTH": 4, "CORRECTNESS": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-132", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-134", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-135", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-136", "scores": {"RELEVANCE": 2, "STRUCTURE": 1, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-137", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-139", "scores": {"RELEVANCE": 4, "STRUCTURE": 2, "DEPTH": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-140", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-141", "scores": {"RELEVANCE": 5, "STRUCTURE": 3, "DEPTH": 2, "CORRECTNESS": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-142", "scores": {"RELEVANCE": 3, "STRUCTURE": 2, "DEPTH": 1, "CORRECTNESS": 1}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-143", "scores": {"RELEVANCE": 5, "STRUCTURE": 5, "DEPTH": 5}, "off_topic": false, "rater": "nguoi_cham_1"}
+{"id": "GOLD-144", "scores": {"RELEVANCE": 5, "STRUCTURE": 4, "DEPTH": 3}, "off_topic": false, "rater": "nguoi_cham_1"}

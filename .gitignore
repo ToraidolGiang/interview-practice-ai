@@ -38,3 +38,8 @@ data/interim/review.csv
 
 # Mock spec sinh tu docs/api/openapi.yaml
 frontend/mock/.generated/
+
+# Python
+__pycache__/
+.claude/learning/
+.claude/agent-memory-local/

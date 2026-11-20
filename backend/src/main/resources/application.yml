@@ -11,6 +11,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
 
   # SMTP chỉ bật khi đặt SPRING_MAIL_HOST (cùng SPRING_MAIL_PORT, SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD);
   # không đặt thì MailService chỉ ghi link đặt lại mật khẩu ra log (dùng khi dev)
@@ -33,9 +37,39 @@ password-reset:
 ai:
   gemini:
     api-key: ${GEMINI_API_KEY}
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+    stt-model: ${GEMINI_STT_MODEL:gemini-3.5-transcribe}
+    llm-model: ${GEMINI_LLM_MODEL:gemini-3.8-flash}
   fpt:
     api-key: ${FPT_AI_API_KEY}
+  stt:
+    timeout: 15s
+  llm:
+    timeout: 15s
+    temperature: 0.2
 
 aws:
   access-key-id: ${AWS_ACCESS_KEY_ID}
   secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+  region: ${AWS_REGION:ap-southeast-1}
+  s3:
+    bucket: ${AWS_S3_BUCKET:interview-practice-audio}
+
+app:
+  audio:
+    max-bytes: 10485760
+    min-seconds: 10
+    max-seconds: 180
+  scoring:
+    # Phiên PROCESSING quá hạn này bị đánh FAILED PROCESSING_TIMEOUT; phải dài hơn thời gian chấm tối đa
+    processing-timeout-seconds: 300
+    sweep-interval-ms: 60000
+    # Số phiên đang chấm tối đa của một user (chống một user lấp đầy hàng đợi chung)
+    max-processing-per-user: 3
+    # Số lượt chấm tối đa của một user mỗi ngày (bảo vệ chi phí Gemini); ngày tính theo múi giờ day-zone
+    max-evaluations-per-day: 20
+    day-zone: Asia/Ho_Chi_Minh
+    executor:
+      core: 2
+      max: 4
+      queue: 20

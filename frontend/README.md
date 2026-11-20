@@ -1,6 +1,6 @@
 # Frontend - TalentSTAR AI
 
-React 19 + Vite, router `react-router` v7, CSS Modules. Giao diện theo Figma "AI-Interview".
+React 19 + Vite, router `react-router` v7, CSS Modules. Giao diện theo Figma "InterviewAI-MockupV1".
 
 ## Chạy
 

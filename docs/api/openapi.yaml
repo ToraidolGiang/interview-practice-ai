@@ -344,8 +344,26 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Không phải chủ sở hữu phiên luyện tập (code FORBIDDEN)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Không tìm thấy phiên luyện tập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Phiên đang PROCESSING (code SESSION_PROCESSING) hoặc đã SCORED (code SESSION_ALREADY_SCORED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Lưu file lên S3 thất bại hoặc hàng đợi chấm điểm đầy (code SERVICE_UNAVAILABLE); trạng thái phiên không đổi
           content:
             application/json:
               schema:
@@ -377,6 +395,12 @@ paths:
                 status: PROCESSING
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Không phải chủ sở hữu phiên luyện tập (code FORBIDDEN)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Không tìm thấy phiên luyện tập
           content:
@@ -384,7 +408,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Session chưa có audio (status != UPLOADED/FAILED) hoặc đang PROCESSING (code SESSION_PROCESSING)
+          description: Session chưa có audio hoặc đang PROCESSING (code SESSION_PROCESSING), hoặc đã SCORED (code SESSION_ALREADY_SCORED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Người dùng đang có quá nhiều phiên PROCESSING (mặc định 3, code TOO_MANY_PROCESSING) hoặc đã hết hạn mức chấm trong ngày (mặc định 20 lượt, ngày tính theo giờ Asia/Ho_Chi_Minh, code DAILY_LIMIT_EXCEEDED); phiên giữ nguyên trạng thái
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Hàng đợi chấm điểm đầy (code SERVICE_UNAVAILABLE); phiên được hoàn tác về UPLOADED
           content:
             application/json:
               schema:
@@ -428,7 +464,8 @@ paths:
       summary: Chấm lại với transcript đã sửa (UC5, Alt 6a, bất đồng bộ)
       description: >
         Dùng khi STT nhận sai. Không gọi lại STT: hệ thống tính lại Delivery từ transcript đã sửa, gọi LLM 1 lần rồi ghi đè kết quả cũ.
-        Trả 202 và polling như /evaluate.
+        Trả 202 và polling như /evaluate. Chỉ phiên đã có kết quả (SCORED, hoặc FAILED sau một lần chấm lại lỗi) mới chấm lại được;
+        nếu chấm lại lỗi, phiên chuyển FAILED và kết quả cũ vẫn còn để thử lại. Tính vào cùng giới hạn 429 như /evaluate.
       parameters:
         - $ref: '#/components/parameters/SessionId'
       requestBody:
@@ -466,6 +503,18 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Session đang PROCESSING hoặc chưa từng được chấm (code SESSION_PROCESSING / SESSION_NOT_READY)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Quá nhiều phiên đang chấm (TOO_MANY_PROCESSING) hoặc hết hạn mức chấm trong ngày (DAILY_LIMIT_EXCEEDED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Hàng đợi chấm đầy; phiên hoàn tác về SCORED với kết quả cũ
           content:
             application/json:
               schema:
@@ -794,6 +843,9 @@ paths:
     get:
       tags: [Admin - Analytics]
       summary: Xuất báo cáo hoạt động dạng Excel/CSV — chỉ ADMIN
+      description: >
+        Mỗi dòng là một người dùng (họ tên, email, số phiên, số phiên đã chấm, điểm trung bình, lần luyện tập gần nhất) trong
+        khoảng [from, to]. Hiện chỉ hỗ trợ format=csv (UTF-8 có BOM, chống formula injection); xlsx trả 400 VALIDATION_ERROR.
       security:
         - bearerAuth: [ADMIN]
       parameters:
@@ -825,6 +877,12 @@ paths:
               schema:
                 type: string
                 format: binary
+        '400':
+          description: format không hỗ trợ hoặc from sau to (code VALIDATION_ERROR)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -961,7 +1019,9 @@ components:
           type: string
           description: >
             Mã lỗi nghiệp vụ, ví dụ UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION_ERROR, EMAIL_EXISTS,
-            ACCOUNT_LOCKED, INVALID_TOKEN, SESSION_NOT_READY, SESSION_PROCESSING, DUPLICATE_QUESTION
+            ACCOUNT_LOCKED, INVALID_TOKEN, SESSION_NOT_READY, SESSION_PROCESSING, SESSION_ALREADY_SCORED, DUPLICATE_QUESTION,
+            TOO_MANY_PROCESSING (429: quá nhiều phiên đang chấm), DAILY_LIMIT_EXCEEDED (429: hết hạn mức chấm trong ngày),
+            SERVICE_UNAVAILABLE (503: S3 lỗi hoặc hàng đợi chấm đầy), INTERNAL_ERROR
           example: VALIDATION_ERROR
         message:
           type: string
@@ -1124,8 +1184,9 @@ components:
           $ref: '#/components/schemas/PracticeSessionStatus'
         audioUrl:
           type: string
-          format: uri
           nullable: true
+          description: >
+            Thực chất là khóa đối tượng S3 (bucket riêng tư, chỉ server đọc), KHÔNG phải URL tải được.
         duration:
           type: integer
           description: Thời lượng ghi âm (giây)
@@ -1151,7 +1212,7 @@ components:
         errorCode:
           type: string
           nullable: true
-          description: Mã lỗi khi status = FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART)
+          description: Mã lỗi khi status = FAILED (STT_ERROR, LLM_ERROR, INVALID_RESULT, ANSWER_TOO_SHORT, SERVER_RESTART, PROCESSING_TIMEOUT, INTERNAL_ERROR)
     ScoreResult:
       type: object
       properties:

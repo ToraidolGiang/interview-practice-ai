@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.example.interviewpractice.dto.ErrorResponse;
@@ -95,6 +97,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                 error.getDefaultMessage())))
                 .toList();
         return validationError(fieldErrors);
+    }
+
+    // Upload vượt giới hạn multipart: 400 VALIDATION_ERROR thay vì 413 mặc định (Q2)
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return validationError(List.of(new ErrorResponse.FieldError("audio", "File audio vượt quá dung lượng cho phép")));
+    }
+
+    // Thiếu part multipart bắt buộc (ví dụ audio)
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException e,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return validationError(List.of(new ErrorResponse.FieldError(e.getRequestPartName(),
+                "Thiếu phần dữ liệu bắt buộc")));
     }
 
     private static String fieldName(ParameterValidationResult result, MessageSourceResolvable error) {

@@ -28,7 +28,7 @@ Trạng thái phiên: `CREATED` → `UPLOADED` → `PROCESSING` → `SCORED` | `
 | 10 | POST | `/practice-sessions/{id}/answer` | Nộp file ghi âm câu trả lời (UC4) | Đã đăng nhập | UC4 | path id; body multipart/form-data | 200 PracticeSession | 400, 401, 404 |
 | 11 | POST | `/practice-sessions/{id}/evaluate` | Bắt đầu chấm điểm câu trả lời bằng AI (UC5, bất đồng bộ) | Đã đăng nhập | UC5 | path id | 202 PracticeSession | 401, 404, 409 |
 | 12 | GET | `/practice-sessions/{id}/result` | Lấy kết quả chấm điểm (sau khi session SCORED) | Đã đăng nhập | UC5 | path id | 200 ScoreResult | 401, 403, 404, 409 |
-| 13 | POST | `/practice-sessions/{id}/rescore` | Chấm lại với transcript đã sửa (UC5, Alt 6a, bất đồng bộ) | Đã đăng nhập | UC5 | path id; body RescoreRequest | 202 PracticeSession | 400, 401, 403, 404, 409 |
+| 13 | POST | `/practice-sessions/{id}/rescore` | Chấm lại với transcript đã sửa (UC5, Alt 6a, bất đồng bộ) | Đã đăng nhập | UC5 | path id; body RescoreRequest | 202 PracticeSession | 400, 401, 403, 404, 409, 429, 503 |
 | 14 | GET | `/practice-sessions/{id}/feedback/audio` | Lấy audio TTS đọc phản hồi AI (UC6) | Đã đăng nhập | UC6 | path id | 200 FeedbackAudioResponse | 401, 404, 502 |
 | 15 | GET | `/history` | Danh sách lịch sử luyện tập của chính người dùng (UC7) | Đã đăng nhập | UC7 | query from; query to; query industry; query minScore; query maxScore; query page; query size | 200 HistoryPage | 401 |
 | 16 | GET | `/history/{id}` | Chi tiết một mục lịch sử, kèm link phát lại audio | Đã đăng nhập | UC7 | path id | 200 HistoryDetail | 401, 403, 404 |

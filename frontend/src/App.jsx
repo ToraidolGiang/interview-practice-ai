@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { GuestOnly, RequireAdmin, RequireAuth } from './auth/RequireAuth'
 import AppLayout from './layouts/AppLayout'
+import AdminLayout from './layouts/AdminLayout'
 import AdminAnalyticsPage from './pages/AdminAnalyticsPage'
 import AdminQuestionsPage from './pages/AdminQuestionsPage'
 import DashboardPage from './pages/DashboardPage'
@@ -44,7 +45,11 @@ export default function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/upgrade" element={<UpgradePage />} />
           <Route path="/upgrade/success" element={<UpgradeSuccessPage />} />
-          <Route element={<RequireAdmin />}>
+        </Route>
+        {/* Khu quản trị có vỏ riêng (header QUẢN TRỊ), chỉ ADMIN vào được */}
+        <Route element={<RequireAdmin />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<Navigate to="/admin/questions" replace />} />
             <Route path="/admin/questions" element={<AdminQuestionsPage />} />
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           </Route>

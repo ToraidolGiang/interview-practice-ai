@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { exportAnalyticsCsv, getAnalyticsOverview } from '../api/adminAnalytics'
-import AdminTabs from '../components/AdminTabs'
 import Breadcrumb from '../components/Breadcrumb'
 import { apiErrorMessage } from '../constants/scoring'
 import styles from './AdminAnalyticsPage.module.css'
@@ -60,7 +59,7 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="container page">
-      <Breadcrumb current="Thống kê" />
+      <Breadcrumb items={[{ label: 'Tổng quan', to: '/dashboard' }]} current="Thống kê" />
       <div className={styles.titleRow}>
         <div>
           <h1 className="page-title">Thống kê hoạt động</h1>
@@ -75,8 +74,6 @@ export default function AdminAnalyticsPage() {
           {exporting ? 'Đang tải...' : 'Xuất CSV'}
         </button>
       </div>
-
-      <AdminTabs />
 
       <section className={`card ${styles.filters}`} aria-label="Khoảng ngày">
         <label className={styles.dateField}>

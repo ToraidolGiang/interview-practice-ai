@@ -450,7 +450,7 @@ function HistoryRow({ session, question }) {
         )}
       </td>
       <td>
-        <MiniPlayer src={session.audioUrl} duration={session.duration} seed={session.id} />
+        <MiniPlayer src={session.playbackUrl} duration={session.duration} seed={session.id} />
       </td>
       <td className={styles.right}>
         <Link to={`/results/${session.id}`} className={styles.detail}>
@@ -484,7 +484,7 @@ function MiniPlayer({ src, duration, seed }) {
           else a.pause()
         }}
         aria-label={playing ? 'Tạm dừng' : 'Nghe bản ghi'}
-        title={src ? undefined : 'Bản ghi đã hết hạn lưu trữ'}
+        title={src ? undefined : 'Chưa có liên kết nghe lại bản ghi'}
       >
         <Icon name={playing ? 'pause' : 'play'} size={11} />
       </button>

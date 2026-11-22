@@ -62,6 +62,24 @@ const questions = [
   createdAt: '2026-10-01T08:00:00Z',
 }))
 
+const adminQuestions = [
+  ...questions.slice(0, 3).map((q) => ({ ...q, referenceAnswer: null })),
+  {
+    ...questions[0],
+    id: '3f6c1f0e-2a54-4a54-9b1e-0d5e2f7a9c20',
+    questionType: 'TECHNICAL',
+    content: 'Giải thích sự khác nhau giữa transaction isolation level READ COMMITTED và REPEATABLE READ.',
+    answerHint: 'Nêu hiện tượng non-repeatable read và phantom read.',
+    referenceAnswer: 'READ COMMITTED chỉ thấy dữ liệu đã commit tại mỗi câu lệnh; REPEATABLE READ giữ snapshot cố định trong transaction; nêu non-repeatable read, phantom read.',
+  },
+  {
+    ...questions[3],
+    id: '3f6c1f0e-2a54-4a54-9b1e-0d5e2f7a9c21',
+    status: 'HIDDEN',
+    referenceAnswer: null,
+  },
+]
+
 function scoreResult(i) {
   return {
     id: `9a1b2c3d-0000-4000-8000-00000000000${i}`,
@@ -92,6 +110,17 @@ function scoreResult(i) {
 
 export const SCHEMA_EXAMPLES = {
   Question: questions[0],
+  AdminQuestion: adminQuestions[3],
+  AdminQuestionPage: { content: adminQuestions, page: 0, size: 10, totalElements: 5, totalPages: 1 },
+  AnalyticsOverview: {
+    totalUsers: 128,
+    activeUsers: 54,
+    totalSessions: 412,
+    scoredSessions: 389,
+    averageScore: 71.35,
+    aiApiCalls: { stt: 412, llm: 801, tts: 150 },
+    estimatedCost: 12.3456,
+  },
   QuestionPage: { content: questions, page: 0, size: 6, totalElements: 128, totalPages: 22 },
   RegisterResponse: { id: '3f6c1f0e-2a54-4a54-9b1e-0d5e2f7a9c11', email: 'cand@example.com' },
   PracticeSession: {

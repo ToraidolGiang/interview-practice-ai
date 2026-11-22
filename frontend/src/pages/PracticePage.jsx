@@ -14,7 +14,7 @@ import {
   STRUCTURE_STEPS,
   WARNING_REMAINING_SECONDS,
 } from '../constants/practice'
-import { CRITERIA, WEIGHTS } from '../constants/scoring'
+import { apiErrorMessage, CRITERIA, FAILED_MESSAGE_FALLBACK, FAILED_MESSAGES, WEIGHTS } from '../constants/scoring'
 import { isRecordingSupported, useAudioRecorder } from '../hooks/useAudioRecorder'
 import PracticeLobby from './PracticeLobby'
 import styles from './PracticePage.module.css'
@@ -108,7 +108,7 @@ function PracticeRoom({ sessionId }) {
 function submitErrorMessage(err) {
   if (err.status === 400) return err.message || 'File ghi âm không hợp lệ hoặc ngoài khoảng 10 giây - 3 phút.'
   if (err.code === 'SESSION_PROCESSING') return 'Bài của bạn đang được chấm, vui lòng đợi.'
-  return err.message
+  return apiErrorMessage(err)
 }
 
 const PROGRESS_MARKS = [
@@ -164,7 +164,7 @@ function RecorderCard({ canReuseUpload, failedCode, submitState, onSubmit, onCan
         <p role="alert" className="alert alert-warn">
           {failedCode === 'ANSWER_TOO_SHORT'
             ? 'Lần chấm trước thất bại vì câu trả lời quá ngắn (dưới 15 từ). Hãy ghi âm lại.'
-            : `Lần chấm trước thất bại (${failedCode}). Bạn có thể gửi chấm lại bản đã nộp hoặc ghi âm lại.`}
+            : `Lần chấm trước thất bại. ${FAILED_MESSAGES[failedCode] ?? FAILED_MESSAGE_FALLBACK}`}
         </p>
       )}
 

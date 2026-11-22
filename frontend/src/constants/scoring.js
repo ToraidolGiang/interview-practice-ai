@@ -102,6 +102,27 @@ export const FAILED_MESSAGES = {
   LLM_ERROR: 'Dịch vụ chấm điểm AI đang gặp sự cố. Bạn có thể gửi chấm lại sau ít phút.',
   INVALID_RESULT: 'Kết quả chấm điểm không hợp lệ. Bạn có thể gửi chấm lại.',
   SERVER_RESTART: 'Máy chủ khởi động lại trong lúc chấm. Bạn có thể gửi chấm lại.',
+  PROCESSING_TIMEOUT: 'Việc chấm điểm mất quá nhiều thời gian nên đã bị dừng. Bạn có thể gửi chấm lại.',
+  INTERNAL_ERROR: 'Hệ thống gặp sự cố khi chấm điểm. Bạn có thể gửi chấm lại sau ít phút.',
+}
+
+// Mã lỗi không có trong FAILED_MESSAGES: không lộ mã kỹ thuật cho người dùng
+export const FAILED_MESSAGE_FALLBACK = 'Phiên chấm điểm không thành công. Bạn có thể thử gửi chấm lại.'
+
+// Thông điệp cho lỗi HTTP chung (429/403), tra theo err.code rồi err.status
+export const HTTP_ERROR_MESSAGES = {
+  TOO_MANY_PROCESSING: 'Đang có quá nhiều phiên đang chấm. Hãy chờ phiên hiện tại hoàn tất rồi thử lại.',
+  DAILY_LIMIT_EXCEEDED: 'Bạn đã hết lượt chấm điểm trong ngày (tính theo giờ Việt Nam). Hãy thử lại vào ngày mai.',
+  FORBIDDEN: 'Bạn không có quyền thực hiện thao tác này.',
+  TOO_MANY_REQUESTS: 'Bạn thao tác quá nhanh hoặc hệ thống đang bận. Vui lòng thử lại sau ít phút.',
+}
+
+// Chọn thông điệp tiếng Việt cho ApiError; không khớp thì dùng fallback (hoặc err.message)
+export function apiErrorMessage(err, fallback) {
+  if (err?.code && HTTP_ERROR_MESSAGES[err.code]) return HTTP_ERROR_MESSAGES[err.code]
+  if (err?.status === 429) return HTTP_ERROR_MESSAGES.TOO_MANY_REQUESTS
+  if (err?.status === 403) return HTTP_ERROR_MESSAGES.FORBIDDEN
+  return fallback ?? err?.message ?? 'Đã xảy ra lỗi. Vui lòng thử lại.'
 }
 
 // Mức điểm hiển thị ở Lịch sử / Tổng quan (Figma: Xuất sắc, Rất tốt, Cần cải thiện)

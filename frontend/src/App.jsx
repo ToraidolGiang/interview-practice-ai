@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router'
-import { GuestOnly, RequireAuth } from './auth/RequireAuth'
+import { GuestOnly, RequireAdmin, RequireAuth } from './auth/RequireAuth'
 import AppLayout from './layouts/AppLayout'
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage'
+import AdminQuestionsPage from './pages/AdminQuestionsPage'
 import DashboardPage from './pages/DashboardPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import HistoryPage from './pages/HistoryPage'
@@ -42,6 +44,10 @@ export default function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/upgrade" element={<UpgradePage />} />
           <Route path="/upgrade/success" element={<UpgradeSuccessPage />} />
+          <Route element={<RequireAdmin />}>
+            <Route path="/admin/questions" element={<AdminQuestionsPage />} />
+            <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+          </Route>
         </Route>
       </Route>
 

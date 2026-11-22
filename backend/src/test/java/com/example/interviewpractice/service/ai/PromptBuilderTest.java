@@ -46,6 +46,24 @@ class PromptBuilderTest {
     }
 
     @Test
+    void cauKyThuatCoDapAnNhieuYThiDanhSoTungYVaTraVeDanhSachY() {
+        LlmRequest tech = builder.build(sessionId, Question.Type.TECHNICAL, "Tham số cây quyết định?",
+                "- Độ sâu tối đa\n- Số mẫu tối thiểu\n- Gini hoặc entropy", "độ sâu tối đa là ba");
+
+        assertThat(tech.referencePoints()).containsExactly("Độ sâu tối đa", "Số mẫu tối thiểu", "Gini hoặc entropy");
+        assertThat(tech.userPrompt()).contains("1. Độ sâu tối đa").contains("3. Gini hoặc entropy");
+        assertThat(builder.build(sessionId, Question.Type.INTRO, "q", "- một ý", "x").referencePoints()).isEmpty();
+        assertThat(builder.build(sessionId, Question.Type.TECHNICAL, "q", null, "x").referencePoints()).isEmpty();
+    }
+
+    @Test
+    void systemPromptYeuCauDoiChieuTheoYVaTrichDanMotDoan() {
+        assertThat(builder.build(sessionId, Question.Type.TECHNICAL, "q", "- a", "x").systemPrompt())
+                .contains("points").contains("COVERED").contains("PARTIAL").contains("MISSING").contains("INCORRECT")
+                .contains("không nối nhiều đoạn");
+    }
+
+    @Test
     void toStringKhongLoTranscript() {
         LlmRequest r = builder.build(sessionId, Question.Type.INTRO, "Giới thiệu", null, "BÍ-MẬT-THÍ-SINH");
         assertThat(r.toString()).doesNotContain("BÍ-MẬT-THÍ-SINH");

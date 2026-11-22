@@ -8,13 +8,29 @@ import java.util.UUID;
 import com.example.interviewpractice.entity.Question;
 import com.example.interviewpractice.entity.ScoreCriterion;
 import com.example.interviewpractice.entity.ScoreCriterion.Code;
+import com.example.interviewpractice.entity.ScoreError;
+import com.example.interviewpractice.entity.ScorePoint;
 import com.example.interviewpractice.entity.ScoreResult;
 
 /** Kết quả chấm trả cho client, khớp schema ScoreResult trong openapi.yaml (ttsAudioUrl chưa hỗ trợ nên bỏ). */
 public record ScoreResultResponse(UUID id, UUID sessionId, String transcript, Question.Type questionType,
         BigDecimal totalScore, BigDecimal contentScore, List<CriterionDto> criteria, DeliveryDto delivery,
         boolean offTopic, boolean injectionSuspected, String rubricVersion, String promptVersion,
-        String modelVersion, String feedbackText, String sampleAnswer) {
+        String modelVersion, String feedbackText, String sampleAnswer, List<PointDto> points,
+        List<ErrorDto> errors) {
+
+    /** Một phát biểu sai về chuyên môn: quote là lời thí sinh, explanation là điều đúng. */
+    public record ErrorDto(int position, String quote, String explanation) {
+    }
+
+
+    /**
+     * Kết quả đối chiếu một ý của đáp án tham chiếu; pointText là bản chụp lúc chấm, quote là đoạn trong transcript
+     * làm bằng chứng, quoteInvalid là true khi trích dẫn không khớp transcript nên verdict đã bị hạ.
+     */
+    public record PointDto(int position, String pointText, ScorePoint.Verdict verdict, String quote,
+            boolean quoteInvalid, String note) {
+    }
 
     /** Điểm một tiêu chí; weight là trọng số gốc theo rubric. */
     public record CriterionDto(Code code, int score, int weight, String reasoning, String quote,
@@ -32,6 +48,15 @@ public record ScoreResultResponse(UUID id, UUID sessionId, String transcript, Qu
                 .map(c -> new CriterionDto(c.getCode(), c.getScore(), c.getWeight(), c.getReasoning(), c.getQuote(),
                         c.isQuoteInvalid()))
                 .toList();
+        List<PointDto> points = r.getPoints().stream()
+                .sorted(Comparator.comparing(ScorePoint::getPosition))
+                .map(p -> new PointDto(p.getPosition(), p.getPointText(), p.getVerdict(), p.getQuote(),
+                        p.isQuoteInvalid(), p.getNote()))
+                .toList();
+        List<ErrorDto> errors = r.getErrors().stream()
+                .sorted(Comparator.comparing(ScoreError::getPosition))
+                .map(e -> new ErrorDto(e.getPosition(), e.getQuote(), e.getExplanation()))
+                .toList();
         // Cột delivery_score null nghĩa là thiếu dữ liệu Delivery (transcript dưới 30 từ hoặc không có thời lượng)
         DeliveryDto delivery = r.getDeliveryScore() == null ? null
                 : new DeliveryDto(r.getWpm(), r.getFillerCount(), r.getFillerRate(), r.getDeliveryScore(),
@@ -40,6 +65,6 @@ public record ScoreResultResponse(UUID id, UUID sessionId, String transcript, Qu
         return new ScoreResultResponse(r.getId(), r.getSession().getId(), r.getTranscript(), r.getQuestionType(),
                 r.getTotalScore(), r.getContentScore(), criteria, delivery, r.isOffTopic(),
                 r.isInjectionSuspected(), r.getRubricVersion(), r.getPromptVersion(), r.getModelVersion(),
-                r.getFeedbackText(), r.getSampleAnswer());
+                r.getFeedbackText(), r.getSampleAnswer(), points, errors);
     }
 }

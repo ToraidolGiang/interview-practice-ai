@@ -138,6 +138,45 @@ Index và ràng buộc duy nhất:
 
 - Duy nhất `uq_score_criteria_result_code`: `(result_id, code)`
 
+## `score_points`
+
+Đối chiếu theo ý của đáp án tham chiếu (V4). Chỉ có với câu TECHNICAL có `reference_answer`; kết quả khác không có dòng nào.
+
+| Cột | Kiểu | Null | Mặc định | Ràng buộc | Mô tả |
+|---|---|---|---|---|---|
+| `id` | uuid | không | `gen_random_uuid()` | PK | Khóa chính |
+| `result_id` | uuid | không |  | FK → score_results(id) ON DELETE CASCADE | Kết quả chấm |
+| `position` | smallint | không |  | CHECK position >= 1 | Số thứ tự ý trong đáp án tham chiếu |
+| `point_text` | text | không |  |  | Nội dung ý, bản chụp lúc chấm (không đổi khi `reference_answer` bị sửa) |
+| `verdict` | varchar(10) | không |  | CHECK verdict IN ('COVERED','PARTIAL','MISSING','INCORRECT') | Nêu đủ, nêu thiếu/lệch, không nêu, nêu sai |
+| `quote` | text | có |  |  | Đoạn transcript làm bằng chứng |
+| `quote_invalid` | boolean | không | `false` |  | Trích dẫn không khớp transcript nên verdict đã bị hạ một bậc |
+| `note` | text | có |  |  | Giải thích ngắn của LLM |
+
+Index và ràng buộc duy nhất:
+
+- Duy nhất `uq_score_points_result_position`: `(result_id, position)`
+
+Điểm `score_criteria.score` của CORRECTNESS do server tính từ các dòng này: `1 + làm tròn(4·coverage)`, với `coverage = (COVERED + 0.5·PARTIAL − 0.5·INCORRECT) / số ý`, chặn dưới 0.
+
+## `score_errors`
+
+Phát biểu sai về chuyên môn do lượt kiểm lỗi kiến thức tìm thấy (V5). Chỉ có với câu TECHNICAL có `reference_answer`; chỉ lưu lỗi có trích dẫn nằm trong transcript.
+
+| Cột | Kiểu | Null | Mặc định | Ràng buộc | Mô tả |
+|---|---|---|---|---|---|
+| `id` | uuid | không | `gen_random_uuid()` | PK | Khóa chính |
+| `result_id` | uuid | không |  | FK → score_results(id) ON DELETE CASCADE | Kết quả chấm |
+| `position` | smallint | không |  | CHECK position >= 1 | Số thứ tự lỗi |
+| `quote` | text | không |  |  | Đoạn thí sinh nói |
+| `explanation` | text | không |  |  | Điều đúng |
+
+Index và ràng buộc duy nhất:
+
+- Duy nhất `uq_score_errors_result_position`: `(result_id, position)`
+
+Mỗi lỗi trừ 0,5 trong tử số `coverage` của điểm CORRECTNESS (xem `score_points`).
+
 ## `api_usages`
 
 Nhật ký gọi dịch vụ AI để thống kê độ trễ và chi phí.

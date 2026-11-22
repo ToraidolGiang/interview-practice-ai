@@ -7,6 +7,8 @@ import java.util.UUID;
 import com.example.interviewpractice.entity.Question;
 import com.example.interviewpractice.service.scoring.CriterionScore;
 import com.example.interviewpractice.service.scoring.DeliveryMetrics;
+import com.example.interviewpractice.service.scoring.KnowledgeError;
+import com.example.interviewpractice.service.scoring.PointScore;
 import com.example.interviewpractice.service.scoring.ScoreOutcome;
 
 /**
@@ -15,7 +17,27 @@ import com.example.interviewpractice.service.scoring.ScoreOutcome;
  */
 public record ScoredAnswer(UUID sessionId, String transcript, Question.Type questionType,
         List<CriterionScore> criteria, Optional<DeliveryMetrics> delivery, ScoreOutcome outcome, boolean offTopic,
-        boolean injectionSuspected, String feedbackText, String sampleAnswer) {
+        boolean injectionSuspected, String feedbackText, String sampleAnswer, List<PointScore> points,
+        List<KnowledgeError> errors) {
+
+    public ScoredAnswer {
+        points = points == null ? List.of() : List.copyOf(points);
+        errors = errors == null ? List.of() : List.copyOf(errors);
+    }
+
+    public ScoredAnswer(UUID sessionId, String transcript, Question.Type questionType, List<CriterionScore> criteria,
+            Optional<DeliveryMetrics> delivery, ScoreOutcome outcome, boolean offTopic, boolean injectionSuspected,
+            String feedbackText, String sampleAnswer, List<PointScore> points) {
+        this(sessionId, transcript, questionType, criteria, delivery, outcome, offTopic, injectionSuspected,
+                feedbackText, sampleAnswer, points, List.of());
+    }
+
+    public ScoredAnswer(UUID sessionId, String transcript, Question.Type questionType, List<CriterionScore> criteria,
+            Optional<DeliveryMetrics> delivery, ScoreOutcome outcome, boolean offTopic, boolean injectionSuspected,
+            String feedbackText, String sampleAnswer) {
+        this(sessionId, transcript, questionType, criteria, delivery, outcome, offTopic, injectionSuspected,
+                feedbackText, sampleAnswer, List.of());
+    }
 
     @Override
     public String toString() {

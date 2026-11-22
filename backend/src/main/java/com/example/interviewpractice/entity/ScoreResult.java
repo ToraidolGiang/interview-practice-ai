@@ -98,6 +98,24 @@ public class ScoreResult {
     @OneToMany(mappedBy = "result", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScoreCriterion> criteria = new ArrayList<>();
 
+    // Đối chiếu theo ý của đáp án tham chiếu; rỗng khi câu hỏi không có đáp án tham chiếu để đối chiếu
+    @OneToMany(mappedBy = "result", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScorePoint> points = new ArrayList<>();
+
+    // Phát biểu sai về chuyên môn do lượt kiểm lỗi kiến thức tìm thấy; rỗng khi không có hoặc không chạy
+    @OneToMany(mappedBy = "result", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScoreError> errors = new ArrayList<>();
+
+    public void addError(ScoreError error) {
+        error.setResult(this);
+        errors.add(error);
+    }
+
+    public void addPoint(ScorePoint point) {
+        point.setResult(this);
+        points.add(point);
+    }
+
     public void addCriterion(ScoreCriterion criterion) {
         criterion.setResult(this);
         criteria.add(criterion);

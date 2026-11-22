@@ -984,6 +984,50 @@ components:
         quoteInvalid:
           type: boolean
           description: true nếu trích dẫn không khớp transcript và điểm đã bị hạ
+    PointVerdict:
+      type: string
+      enum: [COVERED, PARTIAL, MISSING, INCORRECT]
+      description: Nêu đủ ý, nêu thiếu hoặc lệch, không nêu, nêu sai
+    PointResult:
+      type: object
+      description: |
+        Kết quả đối chiếu một ý của đáp án tham chiếu (chỉ câu TECHNICAL có đáp án tham chiếu).
+        Điểm CORRECTNESS do server tính từ các ý này, không lấy điểm LLM tự cho.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+          description: Số thứ tự ý trong đáp án tham chiếu
+        pointText:
+          type: string
+          description: Nội dung ý, bản chụp tại thời điểm chấm
+        verdict:
+          $ref: '#/components/schemas/PointVerdict'
+        quote:
+          type: string
+          nullable: true
+          description: Đoạn trong transcript làm bằng chứng (null khi không có đoạn liên quan)
+        quoteInvalid:
+          type: boolean
+          description: true nếu trích dẫn không khớp transcript nên verdict đã bị hạ một bậc
+        note:
+          type: string
+          nullable: true
+    KnowledgeError:
+      type: object
+      description: |
+        Phát biểu sai về chuyên môn trong câu trả lời, do lượt kiểm lỗi kiến thức phát hiện (chỉ câu TECHNICAL có
+        đáp án tham chiếu). Chỉ trả những lỗi có trích dẫn nằm trong transcript. Mỗi lỗi trừ 0,5 ý trong điểm CORRECTNESS.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+        quote:
+          type: string
+          description: Đoạn thí sinh nói (nguyên văn trong transcript)
+        explanation:
+          type: string
+          description: Điều đúng
     DeliveryMetrics:
       type: object
       nullable: true
@@ -1258,6 +1302,16 @@ components:
         sampleAnswer:
           type: string
           nullable: true
+        errors:
+          type: array
+          description: Phát biểu sai về chuyên môn; mảng rỗng khi không có, hoặc lượt kiểm lỗi không chạy hay thất bại
+          items:
+            $ref: '#/components/schemas/KnowledgeError'
+        points:
+          type: array
+          description: Đối chiếu theo ý của đáp án tham chiếu theo thứ tự ý; mảng rỗng khi không có
+          items:
+            $ref: '#/components/schemas/PointResult'
         ttsAudioUrl:
           type: string
           format: uri
@@ -1277,7 +1331,7 @@ components:
         offTopic: false
         injectionSuspected: false
         rubricVersion: rubric-v1.0
-        promptVersion: prompt-v1
+        promptVersion: prompt-v2
         modelVersion: gemini-flash
         feedbackText: Bạn nên bổ sung kết quả đo được ở cuối câu trả lời.
     FieldError:

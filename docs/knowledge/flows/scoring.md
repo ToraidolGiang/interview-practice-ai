@@ -33,10 +33,10 @@ sequenceDiagram
 ```
 1. Upload: kiểm sở hữu -> duration [10,180] -> MIME whitelist + đuôi + <=10MB -> trạng thái; S3 `put` rồi `markUploaded` (`PracticeSessionService`).
 2. Evaluate: `EvaluationService.submit`; executor từ chối -> `revertToUploaded` + 503.
-3. Worker `ScoringPipeline.run`: STT -> đếm từ theo khoảng trắng -> `LlmScorer` (tối đa 2 lần gọi LLM) -> `QuoteValidator` -> `DeliveryMetricsProvider` -> `ScoreCalculator` -> `ScoreResultWriter`.
+3. Worker `ScoringPipeline.run`: STT -> đếm từ theo khoảng trắng -> `LlmScorer` (tối đa 2 lần gọi LLM; câu TECHNICAL có đáp án tham chiếu thì đối chiếu theo ý, `CorrectnessCalculator` tính điểm CORRECTNESS; song song là `KnowledgeErrorDetector` tìm phát biểu sai, lượt này lỗi hay quá hạn thì bỏ qua) -> `QuoteValidator` -> `DeliveryMetricsProvider` -> `ScoreCalculator` -> `ScoreResultWriter`.
 
 ## Dữ liệu chạm tới
-`practice_sessions` (trạng thái, `audio_key`, `error_code`, `processing_started_at`), `score_results` (UNIQUE `session_id`), `score_criteria`, `api_usage`. Không migration mới (V1 đủ).
+`practice_sessions` (trạng thái, `audio_key`, `error_code`, `processing_started_at`), `score_results` (UNIQUE `session_id`), `score_criteria`, `score_points` (V4, đối chiếu theo ý), `score_errors` (V5, lỗi kiến thức), `api_usage`.
 
 ## Quy tắc nghiệp vụ & ràng buộc
 - Trạng thái: CREATED -> UPLOADED -> PROCESSING -> SCORED/FAILED; FAILED -> upload lại/evaluate lại được.

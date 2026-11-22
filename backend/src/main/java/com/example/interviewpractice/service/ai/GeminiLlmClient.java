@@ -1,6 +1,9 @@
 package com.example.interviewpractice.service.ai;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +15,7 @@ import org.springframework.web.client.RestClientException;
 import com.example.interviewpractice.config.AiProperties;
 import com.example.interviewpractice.entity.ApiUsage.Provider;
 import com.example.interviewpractice.entity.ScoreCriterion.Code;
+import com.example.interviewpractice.entity.ScorePoint.Verdict;
 import com.example.interviewpractice.service.scoring.RubricConfig;
 
 import tools.jackson.core.JacksonException;
@@ -47,7 +51,8 @@ public class GeminiLlmClient implements LlmClient {
                 "generationConfig", Map.of(
                         "temperature", ai.llm().temperature(),
                         "responseMimeType", "application/json",
-                        "responseSchema", responseSchema(RubricConfig.llmCodes(request.questionType()))));
+                        "responseSchema", responseSchema(RubricConfig.llmCodes(request.questionType()),
+                                request.referencePoints().size())));
 
         long start = System.nanoTime();
         BigDecimal usageUnit = null;
@@ -79,6 +84,11 @@ public class GeminiLlmClient implements LlmClient {
 
     // Schema đầu ra theo Rubric_Cham_Diem.md mục 6; code bị ràng buộc theo bộ tiêu chí của loại câu hỏi
     static Map<String, Object> responseSchema(List<Code> codes) {
+        return responseSchema(codes, 0);
+    }
+
+    // pointCount > 0: thêm mảng points đối chiếu theo ý của đáp án tham chiếu, đúng pointCount phần tử
+    static Map<String, Object> responseSchema(List<Code> codes, int pointCount) {
         Map<String, Object> criterion = Map.of(
                 "type", "OBJECT",
                 "properties", Map.of(
@@ -87,16 +97,29 @@ public class GeminiLlmClient implements LlmClient {
                         "quote", Map.of("type", "STRING", "nullable", true),
                         "score", Map.of("type", "INTEGER")),
                 "required", List.of("code", "reasoning", "quote", "score"));
-        return Map.of(
-                "type", "OBJECT",
-                "properties", Map.of(
-                        "questionType", Map.of("type", "STRING"),
-                        "offTopic", Map.of("type", "BOOLEAN"),
-                        "injectionSuspected", Map.of("type", "BOOLEAN"),
-                        "criteria", Map.of("type", "ARRAY", "items", criterion,
-                                "minItems", codes.size(), "maxItems", codes.size()),
-                        "feedbackText", Map.of("type", "STRING"),
-                        "sampleAnswer", Map.of("type", "STRING", "nullable", true)),
-                "required", List.of("offTopic", "injectionSuspected", "criteria", "feedbackText"));
+        Map<String, Object> properties = new LinkedHashMap<>();
+        properties.put("questionType", Map.of("type", "STRING"));
+        properties.put("offTopic", Map.of("type", "BOOLEAN"));
+        properties.put("injectionSuspected", Map.of("type", "BOOLEAN"));
+        properties.put("criteria", Map.of("type", "ARRAY", "items", criterion,
+                "minItems", codes.size(), "maxItems", codes.size()));
+        properties.put("feedbackText", Map.of("type", "STRING"));
+        properties.put("sampleAnswer", Map.of("type", "STRING", "nullable", true));
+        List<String> required = new ArrayList<>(List.of("offTopic", "injectionSuspected", "criteria", "feedbackText"));
+        if (pointCount > 0) {
+            Map<String, Object> point = Map.of(
+                    "type", "OBJECT",
+                    "properties", Map.of(
+                            "index", Map.of("type", "INTEGER"),
+                            "verdict", Map.of("type", "STRING",
+                                    "enum", Arrays.stream(Verdict.values()).map(Verdict::name).toList()),
+                            "quote", Map.of("type", "STRING", "nullable", true),
+                            "note", Map.of("type", "STRING")),
+                    "required", List.of("index", "verdict", "quote", "note"));
+            properties.put("points", Map.of("type", "ARRAY", "items", point,
+                    "minItems", pointCount, "maxItems", pointCount));
+            required.add("points");
+        }
+        return Map.of("type", "OBJECT", "properties", properties, "required", required);
     }
 }

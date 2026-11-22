@@ -200,6 +200,8 @@ function ScoredView({ session, result, question, editing, setEditing, onRescored
       <div className={styles.layout}>
         <div className={styles.mainCol}>
           <CriteriaCard rows={rows} questionType={questionType} />
+          <PointsCard points={result.points} />
+          <ErrorsCard errors={result.errors} />
           {editing ? (
             <TranscriptEditor
               sessionId={session.id}
@@ -481,6 +483,73 @@ function CriteriaCard({ rows, questionType }) {
             </p>
           </article>
         ))}
+      </div>
+    </section>
+  )
+}
+
+/** Phát biểu sai về chuyên môn do lượt kiểm lỗi kiến thức phát hiện (đã trừ vào điểm "Đúng chuyên môn"). */
+function ErrorsCard({ errors }) {
+  if (!errors?.length) return null
+  return (
+    <section className="card">
+      <h2 className={styles.cardTitle}>Chỗ cần sửa</h2>
+      <p className={styles.cardSub}>
+        Hệ thống phát hiện {errors.length} phát biểu chưa đúng về chuyên môn, mỗi lỗi bị trừ vào điểm “Đúng chuyên
+        môn”. Đây là kiểm tra tự động nên hãy đối chiếu thêm với tài liệu.
+      </p>
+      <div className={styles.criteria}>
+        {errors.map((e) => (
+          <article key={e.position} className={styles.criterion}>
+            <blockquote className={`${styles.quote} ${styles.quoteInvalid}`}>“{e.quote}”</blockquote>
+            <p className={styles.reasoning}>
+              <strong>Đúng là:</strong> {e.explanation}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+const VERDICTS = {
+  COVERED: { label: 'Đã nêu đủ', pill: 'pill-green', mark: '✓' },
+  PARTIAL: { label: 'Nêu chưa đủ', pill: 'pill-amber', mark: '◐' },
+  MISSING: { label: 'Chưa nêu', pill: 'pill-gray', mark: '✗' },
+  INCORRECT: { label: 'Nêu chưa đúng', pill: 'pill-red', mark: '✗' },
+}
+
+/** Đối chiếu từng ý của đáp án tham chiếu với câu trả lời; chỉ có ở câu kỹ thuật có đáp án tham chiếu. */
+function PointsCard({ points }) {
+  if (!points?.length) return null
+  const covered = points.filter((p) => p.verdict === 'COVERED').length
+  return (
+    <section className="card">
+      <h2 className={styles.cardTitle}>Đối chiếu với đáp án tham chiếu</h2>
+      <p className={styles.cardSub}>
+        Bạn đã nêu đủ {covered}/{points.length} ý. Điểm “Đúng chuyên môn” được tính từ kết quả đối chiếu này.
+      </p>
+      <div className={styles.criteria}>
+        {points.map((p) => {
+          const v = VERDICTS[p.verdict] ?? VERDICTS.MISSING
+          return (
+            <article key={p.position} className={styles.criterion}>
+              <div className={styles.criterionHead}>
+                <h3>
+                  <span aria-hidden>{v.mark}</span> {p.pointText}
+                </h3>
+                <span className={`pill ${v.pill}`}>{v.label}</span>
+              </div>
+              {p.note && <p className={styles.reasoning}>{p.note}</p>}
+              {p.quote && (
+                <blockquote className={`${styles.quote} ${p.quoteInvalid ? styles.quoteInvalid : ''}`}>
+                  “{p.quote}”
+                  {p.quoteInvalid && <small>Trích dẫn không khớp transcript nên mức đánh giá ý này đã bị hạ.</small>}
+                </blockquote>
+              )}
+            </article>
+          )
+        })}
       </div>
     </section>
   )

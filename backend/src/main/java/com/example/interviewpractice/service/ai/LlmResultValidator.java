@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 import com.example.interviewpractice.entity.Question;
 import com.example.interviewpractice.entity.ScoreCriterion.Code;
+import com.example.interviewpractice.entity.ScorePoint;
 import com.example.interviewpractice.service.scoring.CriterionScore;
+import com.example.interviewpractice.service.scoring.PointScore;
 import com.example.interviewpractice.service.scoring.RubricConfig;
 
 import tools.jackson.core.JacksonException;
@@ -31,6 +33,14 @@ public class LlmResultValidator {
     }
 
     public LlmResult validate(LlmRawResult raw, Question.Type type) {
+        return validate(raw, type, List.of());
+    }
+
+    /**
+     * @param referencePoints các ý của đáp án tham chiếu đã gửi cho LLM; không rỗng thì points bắt buộc, đúng
+     *                        từng ý một (index 1..n, không trùng, verdict hợp lệ); rỗng thì points bị bỏ qua
+     */
+    public LlmResult validate(LlmRawResult raw, Question.Type type, List<String> referencePoints) {
         JsonNode root;
         try {
             root = jsonMapper.readTree(raw.json());
@@ -48,7 +58,45 @@ public class LlmResultValidator {
         String sampleAnswer = sample.isString() ? sample.asString() : null;
 
         List<CriterionScore> criteria = parseCriteria(root.path("criteria"), type);
-        return new LlmResult(offTopic, injectionSuspected, criteria, feedbackText, sampleAnswer);
+        List<PointScore> points = referencePoints.isEmpty() ? List.of()
+                : parsePoints(root.path("points"), referencePoints);
+        return new LlmResult(offTopic, injectionSuspected, criteria, feedbackText, sampleAnswer, points);
+    }
+
+    private List<PointScore> parsePoints(JsonNode node, List<String> referencePoints) {
+        if (!node.isArray() || node.size() != referencePoints.size()) {
+            throw invalid("points phải là mảng đúng " + referencePoints.size() + " phần tử");
+        }
+        PointScore[] byPosition = new PointScore[referencePoints.size()];
+        for (JsonNode item : node) {
+            if (!item.isObject()) {
+                throw invalid("Phần tử points không phải đối tượng");
+            }
+            JsonNode index = item.path("index");
+            if (!index.isIntegralNumber() || !index.canConvertToInt() || index.intValue() < 1
+                    || index.intValue() > referencePoints.size()) {
+                throw invalid("index của points ngoài khoảng 1-" + referencePoints.size());
+            }
+            int position = index.intValue();
+            if (byPosition[position - 1] != null) {
+                throw invalid("Trùng index points " + position);
+            }
+            JsonNode verdict = item.path("verdict");
+            if (!verdict.isString()) {
+                throw invalid("Thiếu verdict của points");
+            }
+            ScorePoint.Verdict v;
+            try {
+                v = ScorePoint.Verdict.valueOf(verdict.asString());
+            } catch (IllegalArgumentException e) {
+                throw invalid("verdict của points không hợp lệ");
+            }
+            JsonNode quote = item.path("quote");
+            JsonNode note = item.path("note");
+            byPosition[position - 1] = new PointScore(position, referencePoints.get(position - 1), v,
+                    quote.isString() ? quote.asString() : null, note.isString() ? note.asString() : null, false);
+        }
+        return List.of(byPosition);
     }
 
     private List<CriterionScore> parseCriteria(JsonNode node, Question.Type type) {

@@ -16,7 +16,7 @@ import com.example.interviewpractice.entity.ScoreCriterion.Code;
 public final class RubricConfig {
 
     public static final String RUBRIC_VERSION = "rubric-v1.0";
-    public static final String PROMPT_VERSION = "prompt-v1";
+    public static final String PROMPT_VERSION = "prompt-v2";
 
     /** Trọng số Delivery; khi thiếu dữ liệu Delivery thì phần này chia lại theo tỷ lệ cho tiêu chí còn lại. */
     public static final int DELIVERY_WEIGHT = 10;

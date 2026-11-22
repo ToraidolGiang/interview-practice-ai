@@ -33,6 +33,12 @@ ai:
   llm:
     timeout: 15s
     temperature: 0.2
+  # Lượt kiểm lỗi kiến thức chạy song song với lượt chấm chính (chỉ câu TECHNICAL có đáp án tham chiếu)
+  check:
+    enabled: ${KNOWLEDGE_CHECK_ENABLED:true}
+    model: ${GEMINI_CHECK_MODEL:gemini-3-flash-preview}
+    thinking-level: minimal
+    timeout: 8s
 
 aws:
   access-key-id: ${AWS_ACCESS_KEY_ID}

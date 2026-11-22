@@ -77,6 +77,31 @@ class QuoteValidatorTest {
     }
 
     @Test
+    void quoteNhieuMaiNoiBangBaChamHopLeKhiQuaNuaMaiKhop() {
+        // 2/3 mảnh khớp nguyên văn, mảnh giữa bị LLM rút gọn
+        assertThat(checkOne(4, "Lúc đó, nhóm bị trễ... tôi chia việc hai tuần... Tôi đã chia lại việc").quoteInvalid())
+                .isFalse();
+        assertThat(checkOne(4, "nhóm bị trễ tiến độ … Tôi đã chia lại việc").score()).isEqualTo(4);
+    }
+
+    @Test
+    void quoteNhieuMaiBiaVanBiHa() {
+        CriterionScore c = checkOne(4, "doanh thu tăng gấp ba... khách hàng rất hài lòng... Tôi đã chia lại việc");
+        assertThat(c.score()).isEqualTo(2);
+        assertThat(c.quoteInvalid()).isTrue();
+    }
+
+    @Test
+    void maiNganDuoiBaTuBiBoQuaKhiConMaiDai() {
+        assertThat(checkOne(4, "nhóm bị trễ tiến độ hai tuần... xyz").quoteInvalid()).isFalse();
+    }
+
+    @Test
+    void haiMaiMotDungMotSaiVanBiHa() {
+        assertThat(checkOne(4, "nhóm bị trễ tiến độ... doanh thu tăng gấp ba").quoteInvalid()).isTrue();
+    }
+
+    @Test
     void transcriptRongThiMoiQuoteDeuSai() {
         assertThat(validator.check(List.of(score(4, "abc")), null).criteria().get(0).quoteInvalid()).isTrue();
     }

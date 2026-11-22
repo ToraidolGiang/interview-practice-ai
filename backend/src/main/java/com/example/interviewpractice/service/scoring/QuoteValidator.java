@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
  * Kiểm trích dẫn LLM trả về có thật sự nằm trong transcript (Rubric_Cham_Diem.md mục 6, quy tắc 2).
  * Chuẩn hóa cả hai phía: Unicode NFC, chữ thường, dấu câu thành khoảng trắng, gộp khoảng trắng; rồi kiểm chuỗi con.
  * Tiêu chí điểm từ 3 trở lên mà trích dẫn không hợp lệ bị hạ về 2 và gắn quoteInvalid; điểm 1-2 giữ nguyên.
+ * Trích dẫn có thể là nhiều đoạn nối bằng "..." (LLM hay ghép đoạn): tách thành các mảnh, bỏ mảnh dưới
+ * {@value #MIN_FRAGMENT_WORDS} từ (nếu còn mảnh đủ dài), hợp lệ khi quá nửa số mảnh là chuỗi con của transcript.
+ * Trích dẫn một mảnh vẫn phải khớp trọn như trước.
  */
 @Component
 public class QuoteValidator {
@@ -20,6 +23,12 @@ public class QuoteValidator {
     static final int MIN_SCORE_REQUIRING_QUOTE = 3;
     /** Điểm sau khi bị hạ vì trích dẫn không hợp lệ. */
     static final int DOWNGRADED_SCORE = 2;
+
+    /** Mảnh trích dẫn ngắn hơn số từ này bị bỏ qua khi quyết định hợp lệ (trừ khi mọi mảnh đều ngắn). */
+    static final int MIN_FRAGMENT_WORDS = 3;
+
+    // LLM hay nối các đoạn rời bằng dấu ba chấm
+    private static final Pattern ELLIPSIS = Pattern.compile("\\.{2,}|\u2026");
 
     // Mọi ký tự không phải chữ/số (dấu câu, ký hiệu, khoảng trắng lạ) đều thành một khoảng trắng
     private static final Pattern NON_WORD = Pattern.compile("[^\\p{L}\\p{N}]+");
@@ -56,10 +65,36 @@ public class QuoteValidator {
         return new Checked(List.copyOf(result), invalid);
     }
 
+    /** Trích dẫn có nằm trong transcript không (cùng quy tắc chuẩn hóa và tách mảnh như tiêu chí). */
+    public boolean isSupported(String quote, String transcript) {
+        return isValid(quote, normalize(transcript));
+    }
+
     // Trích dẫn rỗng sau chuẩn hóa không phải bằng chứng (chuỗi rỗng là chuỗi con của mọi chuỗi)
     private static boolean isValid(String quote, String normalizedTranscript) {
-        String q = normalize(quote);
-        return !q.isEmpty() && normalizedTranscript.contains(q);
+        if (quote == null) {
+            return false;
+        }
+        List<String> fragments = new ArrayList<>();
+        for (String part : ELLIPSIS.split(quote)) {
+            String n = normalize(part);
+            if (!n.isEmpty()) {
+                fragments.add(n);
+            }
+        }
+        if (fragments.isEmpty()) {
+            return false;
+        }
+        List<String> counted = fragments.stream().filter(f -> wordCount(f) >= MIN_FRAGMENT_WORDS).toList();
+        if (counted.isEmpty()) {
+            counted = fragments;
+        }
+        long valid = counted.stream().filter(normalizedTranscript::contains).count();
+        return valid * 2 > counted.size();
+    }
+
+    private static int wordCount(String normalized) {
+        return normalized.split(" ").length;
     }
 
     static String normalize(String text) {

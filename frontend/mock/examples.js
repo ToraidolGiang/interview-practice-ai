@@ -80,10 +80,12 @@ function scoreResult(i) {
     offTopic: false,
     injectionSuspected: false,
     rubricVersion: 'rubric-v1.0',
-    promptVersion: 'prompt-v1',
+    promptVersion: 'prompt-v2',
     modelVersion: 'mock',
     feedbackText: 'Bạn mô tả sự cố rõ ràng và nêu được vai trò của mình. Hãy bổ sung nguyên nhân gốc và số liệu sau khắc phục.',
     sampleAnswer: null,
+    points: [],
+    errors: [],
     ttsAudioUrl: null,
   }
 }

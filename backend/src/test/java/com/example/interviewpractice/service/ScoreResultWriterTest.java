@@ -115,6 +115,58 @@ class ScoreResultWriterTest {
         assertThat(weights).containsExactly(15, 15, 25, 35);
     }
 
+    private ScoredAnswer answerWithPoints() {
+        ScoredAnswer base = answer(4, "75.0", true);
+        return new ScoredAnswer(base.sessionId(), base.transcript(), base.questionType(), base.criteria(),
+                base.delivery(), base.outcome(), false, false, "nhận xét", null,
+                List.of(new com.example.interviewpractice.service.scoring.PointScore(1, "Ý một",
+                                com.example.interviewpractice.entity.ScorePoint.Verdict.COVERED, "đoạn trích", "đủ",
+                                false),
+                        new com.example.interviewpractice.service.scoring.PointScore(2, "Ý hai",
+                                com.example.interviewpractice.entity.ScorePoint.Verdict.MISSING, null, "thiếu",
+                                false)));
+    }
+
+    @Test
+    void savePersistsPointsAndRescoreReplacesThem() {
+        writer.save(answerWithPoints());
+
+        assertThat(jdbc.queryForList("""
+                select p.position || ':' || p.verdict || ':' || p.point_text
+                from score_points p join score_results r on r.id = p.result_id
+                where r.session_id = ? order by p.position""", String.class, session.getId()))
+                .containsExactly("1:COVERED:Ý một", "2:MISSING:Ý hai");
+
+        jdbc.update("update practice_sessions set status = 'PROCESSING' where id = ?", session.getId());
+        writer.save(answer(4, "75.0", true)); // chấm lại, lần này không có ý nào
+
+        assertThat(jdbc.queryForObject("""
+                select count(*) from score_points p join score_results r on r.id = p.result_id
+                where r.session_id = ?""", Integer.class, session.getId())).isZero();
+    }
+
+    @Test
+    void savePersistsKnowledgeErrorsAndRescoreReplacesThem() {
+        ScoredAnswer base = answer(4, "75.0", true);
+        writer.save(new ScoredAnswer(base.sessionId(), base.transcript(), base.questionType(), base.criteria(),
+                base.delivery(), base.outcome(), false, false, "nhận xét", null, List.of(),
+                List.of(new com.example.interviewpractice.service.scoring.KnowledgeError(1, "đoạn sai", "đúng là A"),
+                        new com.example.interviewpractice.service.scoring.KnowledgeError(2, "đoạn sai hai", "đúng là B"))));
+
+        assertThat(jdbc.queryForList("""
+                select e.position || ':' || e.quote || ':' || e.explanation
+                from score_errors e join score_results r on r.id = e.result_id
+                where r.session_id = ? order by e.position""", String.class, session.getId()))
+                .containsExactly("1:đoạn sai:đúng là A", "2:đoạn sai hai:đúng là B");
+
+        jdbc.update("update practice_sessions set status = 'PROCESSING' where id = ?", session.getId());
+        writer.save(answer(4, "75.0", true));
+
+        assertThat(jdbc.queryForObject("""
+                select count(*) from score_errors e join score_results r on r.id = e.result_id
+                where r.session_id = ?""", Integer.class, session.getId())).isZero();
+    }
+
     @Test
     void saveWithoutDeliveryLeavesDeliveryColumnsNull() {
         writer.save(answer(3, "50.0", false));

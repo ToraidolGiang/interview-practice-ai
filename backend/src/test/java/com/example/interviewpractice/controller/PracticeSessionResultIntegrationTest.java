@@ -45,6 +45,54 @@ class PracticeSessionResultIntegrationTest extends AbstractSessionApiTest {
     }
 
     @Test
+    void resultReturnsPointsInOrderAndEmptyListWhenNone() throws Exception {
+        PracticeSession withPoints = processing();
+        ScoredAnswer base = scored(withPoints.getId(), true);
+        writer.save(new ScoredAnswer(base.sessionId(), base.transcript(), base.questionType(), base.criteria(),
+                base.delivery(), base.outcome(), false, false, "nhận xét", null,
+                List.of(new com.example.interviewpractice.service.scoring.PointScore(2, "Ý hai",
+                                com.example.interviewpractice.entity.ScorePoint.Verdict.MISSING, null, "thiếu", false),
+                        new com.example.interviewpractice.service.scoring.PointScore(1, "Ý một",
+                                com.example.interviewpractice.entity.ScorePoint.Verdict.PARTIAL, "trễ tiến độ",
+                                "thiếu số liệu", true))));
+
+        mvc.perform(get("/practice-sessions/" + withPoints.getId() + "/result").header("Authorization", ownerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.points.length()").value(2))
+                .andExpect(jsonPath("$.points[0].position").value(1))
+                .andExpect(jsonPath("$.points[0].pointText").value("Ý một"))
+                .andExpect(jsonPath("$.points[0].verdict").value("PARTIAL"))
+                .andExpect(jsonPath("$.points[0].quote").value("trễ tiến độ"))
+                .andExpect(jsonPath("$.points[0].quoteInvalid").value(true))
+                .andExpect(jsonPath("$.points[1].verdict").value("MISSING"))
+                .andExpect(jsonPath("$.points[1].quote").doesNotExist());
+
+        PracticeSession none = processing();
+        writer.save(scored(none.getId(), true));
+        mvc.perform(get("/practice-sessions/" + none.getId() + "/result").header("Authorization", ownerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.points.length()").value(0));
+    }
+
+    @Test
+    void resultReturnsKnowledgeErrorsInOrder() throws Exception {
+        PracticeSession session = processing();
+        ScoredAnswer base = scored(session.getId(), true);
+        writer.save(new ScoredAnswer(base.sessionId(), base.transcript(), base.questionType(), base.criteria(),
+                base.delivery(), base.outcome(), false, false, "nhận xét", null, List.of(),
+                List.of(new com.example.interviewpractice.service.scoring.KnowledgeError(2, "câu sai hai", "đúng B"),
+                        new com.example.interviewpractice.service.scoring.KnowledgeError(1, "câu sai một", "đúng A"))));
+
+        mvc.perform(get("/practice-sessions/" + session.getId() + "/result").header("Authorization", ownerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors.length()").value(2))
+                .andExpect(jsonPath("$.errors[0].position").value(1))
+                .andExpect(jsonPath("$.errors[0].quote").value("câu sai một"))
+                .andExpect(jsonPath("$.errors[0].explanation").value("đúng A"))
+                .andExpect(jsonPath("$.errors[1].quote").value("câu sai hai"));
+    }
+
+    @Test
     void sessionScoredGets200WithVersionsTranscriptAndPerCriterionDetails() throws Exception {
         PracticeSession session = processing();
         writer.save(scored(session.getId(), true));
@@ -53,7 +101,7 @@ class PracticeSessionResultIntegrationTest extends AbstractSessionApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sessionId").value(session.getId().toString()))
                 .andExpect(jsonPath("$.rubricVersion").value("rubric-v1.0"))
-                .andExpect(jsonPath("$.promptVersion").value("prompt-v1"))
+                .andExpect(jsonPath("$.promptVersion").value("prompt-v2"))
                 .andExpect(jsonPath("$.modelVersion").isNotEmpty())
                 .andExpect(jsonPath("$.delivery.fillerListVersion").value("filler-vi-v1"))
                 .andExpect(jsonPath("$.delivery.wpm").value(128))

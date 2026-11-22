@@ -148,7 +148,7 @@ Giới hạn cần ghi trong báo cáo: nếu STT làm sạch transcript và b�
 
 Quy tắc kiểm tra phía server:
 1. `criteria` phải đủ các tiêu chí LLM-chấm của `questionType` đó, `score` là số nguyên 1-5.
-2. `quote` chuẩn hoá (bỏ dấu câu thừa, khoảng trắng, không phân biệt hoa/thường) phải là chuỗi con của transcript. Tiêu chí có `score ≥ 3` mà `quote` không hợp lệ thì bị hạ xuống 2 và gắn cờ `quoteInvalid`.
+2. `quote` chuẩn hoá (bỏ dấu câu thừa, khoảng trắng, không phân biệt hoa/thường) phải là chuỗi con của transcript. Quote nhiều đoạn nối bằng `...` được tách thành các mảnh (bỏ mảnh dưới 3 từ), hợp lệ khi quá nửa số mảnh là chuỗi con (prompt-v2). Tiêu chí có `score ≥ 3` mà `quote` không hợp lệ thì bị hạ xuống 2 và gắn cờ `quoteInvalid`.
 3. Nếu hơn nửa số tiêu chí có `quote` không hợp lệ hoặc JSON sai schema: gọi lại LLM đúng 1 lần (thống nhất với business rule B4); vẫn lỗi thì session chuyển `FAILED`.
 4. `totalScore` luôn do server tính theo mục 4, bỏ qua mọi điểm tổng do LLM tự trả.
 

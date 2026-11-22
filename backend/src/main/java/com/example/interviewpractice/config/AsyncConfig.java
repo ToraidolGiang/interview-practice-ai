@@ -1,5 +1,7 @@
 package com.example.interviewpractice.config;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableScheduling
 public class AsyncConfig {
+
+    /**
+     * Chạy lượt kiểm lỗi kiến thức song song với lượt chấm chính. Tách khỏi scoringExecutor để một worker chấm đang
+     * chờ kết quả không phải xếp hàng sau chính các phiên khác (tránh nghẽn khi hàng đợi chấm đầy). Luồng ảo vì việc
+     * chỉ là chờ HTTP.
+     */
+    @Bean(name = "knowledgeCheckExecutor", destroyMethod = "close")
+    public ExecutorService knowledgeCheckExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
+    }
 
     @Bean(name = "scoringExecutor")
     public ThreadPoolTaskExecutor scoringExecutor(

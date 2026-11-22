@@ -8,11 +8,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.interviewpractice.config.AiProperties;
 import com.example.interviewpractice.entity.ScoreCriterion;
+import com.example.interviewpractice.entity.ScoreError;
+import com.example.interviewpractice.entity.ScorePoint;
 import com.example.interviewpractice.entity.ScoreResult;
 import com.example.interviewpractice.repository.PracticeSessionRepository;
 import com.example.interviewpractice.repository.ScoreResultRepository;
 import com.example.interviewpractice.service.scoring.CriterionScore;
 import com.example.interviewpractice.service.scoring.DeliveryMetrics;
+import com.example.interviewpractice.service.scoring.KnowledgeError;
+import com.example.interviewpractice.service.scoring.PointScore;
 import com.example.interviewpractice.service.scoring.RubricConfig;
 
 /**
@@ -70,6 +74,23 @@ public class ScoreResultWriter {
             criterion.setQuote(c.quote());
             criterion.setQuoteInvalid(c.quoteInvalid());
             result.addCriterion(criterion);
+        }
+        for (PointScore p : answer.points()) {
+            ScorePoint point = new ScorePoint();
+            point.setPosition((short) p.position());
+            point.setPointText(p.pointText());
+            point.setVerdict(p.verdict());
+            point.setQuote(p.quote());
+            point.setQuoteInvalid(p.quoteInvalid());
+            point.setNote(p.note());
+            result.addPoint(point);
+        }
+        for (KnowledgeError e : answer.errors()) {
+            ScoreError error = new ScoreError();
+            error.setPosition((short) e.position());
+            error.setQuote(e.quote());
+            error.setExplanation(e.explanation());
+            result.addError(error);
         }
         results.saveAndFlush(result);
 

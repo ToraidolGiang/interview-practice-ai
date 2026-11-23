@@ -125,11 +125,7 @@ function AccountMenu() {
               <div className={styles.menuDivider} />
               <Link to="/admin/questions" role="menuitem" className={styles.menuItem}>
                 <Icon name="shieldCheck" size={16} />
-                Quản trị câu hỏi
-              </Link>
-              <Link to="/admin/analytics" role="menuitem" className={styles.menuItem}>
-                <Icon name="trendUp" size={16} />
-                Thống kê quản trị
+                Khu quản trị
               </Link>
             </>
           )}

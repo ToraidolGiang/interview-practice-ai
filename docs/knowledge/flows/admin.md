@@ -4,6 +4,7 @@
 ADMIN quản lý ngân hàng câu hỏi và xem thống kê. CANDIDATE gõ `/admin/*` bị chuyển về `/dashboard` (`RequireAdmin`, `frontend/src/auth/RequireAuth.jsx:12`).
 
 ## Điểm vào
+Các trang admin nằm trong `layouts/AdminLayout.jsx` (header QUẢN TRỊ, footer riêng); `/admin` chuyển về `/admin/questions`. Form thêm/sửa câu hỏi mở bằng `components/Modal`.
 - `/admin/questions` -> `pages/AdminQuestionsPage.jsx`, API `api/adminQuestions.js` (`/admin/questions`: status, keyword, page, size; POST/PUT body `QuestionUpsertRequest`).
 - `/admin/analytics` -> `pages/AdminAnalyticsPage.jsx`, API `api/adminAnalytics.js` (overview + xuất CSV qua `downloadBlob`, `format=csv`, from/to).
 

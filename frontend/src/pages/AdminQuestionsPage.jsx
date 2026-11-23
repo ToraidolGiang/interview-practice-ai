@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   createAdminQuestion,
   deleteAdminQuestion,
   listAdminQuestions,
   updateAdminQuestion,
 } from '../api/adminQuestions'
-import AdminTabs from '../components/AdminTabs'
 import Breadcrumb from '../components/Breadcrumb'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Icon from '../components/Icon'
+import Modal from '../components/Modal'
 import Pagination from '../components/Pagination'
 import { apiErrorMessage } from '../constants/scoring'
-import { INDUSTRIES, LEVELS, levelOf, QUESTION_TYPES, questionContext, questionTypeLabel } from '../constants/taxonomy'
+import { INDUSTRIES, LEVELS, levelOf, QUESTION_TYPES, questionTypeLabel } from '../constants/taxonomy'
 import styles from './AdminQuestionsPage.module.css'
 
 const PAGE_SIZE = 10
@@ -22,6 +22,15 @@ const STATUS_OPTIONS = [
   { value: 'ACTIVE', label: 'Đang hiển thị' },
   { value: 'HIDDEN', label: 'Đã ẩn' },
 ]
+// Trọng số rubric-v1.0 theo loại câu hỏi (khớp RubricConfig phía backend), hiện trong form để người soạn biết câu sẽ được chấm thế nào
+const RUBRIC_HINT = {
+  BEHAVIORAL: 'Liên quan 20% · Cấu trúc 30% · Độ cụ thể 40% · Trình bày 10%',
+  SITUATIONAL: 'Liên quan 25% · Cấu trúc 25% · Độ cụ thể 40% · Trình bày 10%',
+  TECHNICAL: 'Liên quan 15% · Cấu trúc 15% · Độ cụ thể 25% · Đúng chuyên môn 35% · Trình bày 10%',
+  INTRO: 'Liên quan 25% · Cấu trúc 30% · Độ cụ thể 35% · Trình bày 10%',
+}
+const LEVEL_PILL = { EASY: 'pill-green', MEDIUM: 'pill-indigo', HARD: 'pill-red' }
+const dateFmt = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
 const EMPTY_FORM = {
   content: '',
   industry: '',
@@ -50,7 +59,6 @@ export default function AdminQuestionsPage() {
   const [form, setForm] = useState(null) // null = đóng; { id, values } = đang thêm (id null) / sửa
   const [toDelete, setToDelete] = useState(null)
   const [notice, setNotice] = useState(null)
-  const formAnchor = useRef(null)
 
   const key = `${status}|${keyword}|${page}|${reloadKey}`
 
@@ -102,7 +110,6 @@ export default function AdminQuestionsPage() {
           }
         : { id: null, values: EMPTY_FORM },
     )
-    setTimeout(() => formAnchor.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
   }
 
   function onSaved(message) {
@@ -113,32 +120,28 @@ export default function AdminQuestionsPage() {
 
   return (
     <div className="container page">
-      <Breadcrumb current="Quản trị" />
+      <Breadcrumb items={[{ label: 'Tổng quan', to: '/dashboard' }]} current="Quản lý câu hỏi" />
       <div className={styles.titleRow}>
         <div>
-          <h1 className="page-title">Quản trị câu hỏi</h1>
+          <h1 className="page-title">Quản lý câu hỏi</h1>
           <p className="page-sub">Thêm, sửa và xoá câu hỏi trong ngân hàng.</p>
         </div>
-        <button type="button" className="btn btn-primary" onClick={() => openForm(null)} disabled={form?.id === null}>
+        <button type="button" className="btn btn-primary" onClick={() => openForm(null)}>
           <Icon name="plus" size={14} />
           Thêm câu hỏi
         </button>
       </div>
 
-      <AdminTabs />
-
-      <div ref={formAnchor}>
-        {form && (
-          <QuestionForm
-            key={form.id ?? 'new'}
-            id={form.id}
-            initial={form.values}
-            onCancel={() => setForm(null)}
-            onSaved={onSaved}
-            onGone={() => setReloadKey((k) => k + 1)}
-          />
-        )}
-      </div>
+      {form && (
+        <QuestionForm
+          key={form.id ?? 'new'}
+          id={form.id}
+          initial={form.values}
+          onCancel={() => setForm(null)}
+          onSaved={onSaved}
+          onGone={() => setReloadKey((k) => k + 1)}
+        />
+      )}
 
       {notice && (
         <p role="status" className={`alert alert-success ${styles.alert}`}>
@@ -209,7 +212,7 @@ export default function AdminQuestionsPage() {
                   <th scope="col">Câu hỏi</th>
                   <th scope="col">Ngành · Vị trí</th>
                   <th scope="col">Loại</th>
-                  <th scope="col">Mức</th>
+                  <th scope="col">Độ khó</th>
                   <th scope="col">Trạng thái</th>
                   <th scope="col">
                     <span className="visually-hidden">Thao tác</span>
@@ -220,25 +223,35 @@ export default function AdminQuestionsPage() {
                 {data.content.map((q) => (
                   <tr key={q.id}>
                     <td data-label="Câu hỏi" className={styles.contentCell}>
-                      {q.content}
+                      <span className={styles.contentText}>{q.content}</span>
+                      {q.createdAt && <span className={styles.meta}>Thêm {dateFmt.format(new Date(q.createdAt))}</span>}
                     </td>
-                    <td data-label="Ngành · Vị trí">{questionContext(q)}</td>
-                    <td data-label="Loại">{questionTypeLabel(q.questionType)}</td>
-                    <td data-label="Mức">{levelOf(q.level)?.label ?? q.level}</td>
+                    <td data-label="Ngành · Vị trí">
+                      <span className={styles.industry}>{q.industry}</span>
+                      <span className={styles.meta}>{q.position}</span>
+                    </td>
+                    <td data-label="Loại">
+                      <span className="pill pill-gray">{questionTypeLabel(q.questionType)}</span>
+                    </td>
+                    <td data-label="Mức">
+                      <span className={`pill ${LEVEL_PILL[q.level] ?? 'pill-gray'}`}>
+                        {levelOf(q.level)?.label ?? q.level}
+                      </span>
+                    </td>
                     <td data-label="Trạng thái">
                       {q.status === 'HIDDEN' ? (
-                        <span className="pill pill-gray">Đã ẩn</span>
+                        <span className="pill pill-amber pill-dot">Đã ẩn</span>
                       ) : (
-                        <span className="pill pill-green">Đang hiển thị</span>
+                        <span className="pill pill-green pill-dot">Hiển thị</span>
                       )}
                     </td>
                     <td className={styles.actions}>
-                      <button type="button" className="btn btn-outline btn-sm" onClick={() => openForm(q)}>
+                      <button type="button" className={styles.link} onClick={() => openForm(q)}>
                         Sửa
                       </button>
                       <button
                         type="button"
-                        className="btn btn-outline btn-sm"
+                        className={`${styles.link} ${styles.linkDanger}`}
                         onClick={() => {
                           setNotice(null)
                           setToDelete(q)
@@ -263,6 +276,12 @@ export default function AdminQuestionsPage() {
           </div>
         </>
       )}
+
+      <p className={styles.footNote}>
+        <Icon name="info" size={14} />
+        Câu hỏi đã được dùng trong lịch sử luyện tập chỉ bị ẩn khỏi danh sách luyện tập, không xoá vĩnh viễn, để giữ
+        nguyên kết quả cũ. Chỉ câu hỏi chưa có lượt luyện mới bị xoá hẳn.
+      </p>
 
       {toDelete && (
         <DeleteDialog
@@ -361,17 +380,20 @@ function QuestionForm({ id, initial, onCancel, onSaved, onGone }) {
   }
 
   return (
-    <form className={`card ${styles.form}`} onSubmit={submit} aria-labelledby="question-form-title" noValidate>
-      <h2 id="question-form-title" className={styles.formTitle}>
-        {id === null ? 'Thêm câu hỏi' : 'Sửa câu hỏi'}
-      </h2>
+    <Modal
+      title={id === null ? 'Thêm câu hỏi mới' : 'Sửa câu hỏi'}
+      subtitle="Các trường có dấu * là bắt buộc."
+      busy={submitting}
+      onClose={onCancel}
+    >
+    <form className={styles.form} onSubmit={submit} noValidate>
       {error && (
         <p role="alert" className="alert">
           {error}
         </p>
       )}
 
-      <FormField label="Nội dung câu hỏi" error={fieldErrors.content}>
+      <FormField label="Nội dung câu hỏi *" error={fieldErrors.content}>
         {(p) => (
           <textarea
             {...p}
@@ -385,7 +407,7 @@ function QuestionForm({ id, initial, onCancel, onSaved, onGone }) {
       </FormField>
 
       <div className={styles.formGrid}>
-        <FormField label="Ngành" error={fieldErrors.industry}>
+        <FormField label="Ngành *" error={fieldErrors.industry}>
           {(p) => (
             <select
               {...p}
@@ -409,7 +431,7 @@ function QuestionForm({ id, initial, onCancel, onSaved, onGone }) {
             </select>
           )}
         </FormField>
-        <FormField label="Vị trí" error={fieldErrors.position}>
+        <FormField label="Vị trí *" error={fieldErrors.position}>
           {(p) => (
             <select
               {...p}
@@ -431,7 +453,7 @@ function QuestionForm({ id, initial, onCancel, onSaved, onGone }) {
             </select>
           )}
         </FormField>
-        <FormField label="Loại câu hỏi" error={fieldErrors.questionType}>
+        <FormField label="Loại câu hỏi *" error={fieldErrors.questionType}>
           {(p) => (
             <select
               {...p}
@@ -447,7 +469,7 @@ function QuestionForm({ id, initial, onCancel, onSaved, onGone }) {
             </select>
           )}
         </FormField>
-        <FormField label="Mức độ" error={fieldErrors.level}>
+        <FormField label="Độ khó *" error={fieldErrors.level}>
           {(p) => (
             <select {...p} className="select" value={values.level} onChange={(e) => set('level', e.target.value)}>
               {LEVELS.map((l) => (
@@ -460,7 +482,7 @@ function QuestionForm({ id, initial, onCancel, onSaved, onGone }) {
         </FormField>
       </div>
 
-      <FormField label="Gợi ý trả lời (không bắt buộc)" error={fieldErrors.answerHint}>
+      <FormField label="Gợi ý trả lời (hiển thị cho ứng viên)" error={fieldErrors.answerHint}>
         {(p) => (
           <textarea
             {...p}
@@ -486,15 +508,24 @@ function QuestionForm({ id, initial, onCancel, onSaved, onGone }) {
         </FormField>
       )}
 
+      <p className={styles.rubricHint}>
+        <Icon name="info" size={14} />
+        <span>
+          {QUESTION_TYPES.find((t) => t.value === values.questionType)?.label} được chấm:{' '}
+          {RUBRIC_HINT[values.questionType]} (rubric-v1.0).
+        </span>
+      </p>
+
       <div className={styles.formActions}>
         <button type="button" className="btn btn-outline" onClick={onCancel} disabled={submitting}>
           Huỷ
         </button>
         <button type="submit" className="btn btn-primary" disabled={submitting}>
-          {submitting ? 'Đang lưu...' : 'Lưu'}
+          {submitting ? 'Đang lưu...' : 'Lưu câu hỏi'}
         </button>
       </div>
     </form>
+    </Modal>
   )
 }
 
